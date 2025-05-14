@@ -1,0 +1,357 @@
+---
+title: "Text Preprocessing and Entity Extraction"
+author: "Chao Liu"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Text Preprocessing and Entity Extraction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+# Text Preprocessing and Entity Extraction
+
+This vignette explains the text preprocessing and entity extraction capabilities of the `LBDiscover` package, which are fundamental steps in the literature-based discovery process.
+
+## Introduction
+
+Before applying discovery models, we need to preprocess the text data and extract the entities of interest. These steps transform raw text into structured information that can be used for discovering relationships between biomedical concepts.
+
+## Loading the Package
+
+```{r load-package}
+library(LBDiscover)
+```
+
+## Data Retrieval
+
+First, let's retrieve some sample articles:
+
+```{r retrieve-data, eval = TRUE}
+# Search for articles about migraines
+migraine_articles <- pubmed_search(
+  query = "migraine pathophysiology",
+  max_results = 100
+)
+
+# View the first article
+head(migraine_articles[, c("pmid", "title")], 3)
+```
+
+## Basic Text Preprocessing
+
+The first step is to preprocess the text data to extract meaningful terms:
+
+```{r basic-preprocessing, eval = TRUE}
+# Preprocess the abstracts
+preprocessed_data <- preprocess_text(
+  migraine_articles,
+  text_column = "abstract",
+  remove_stopwords = TRUE,
+  custom_stopwords = c("study", "patient", "result", "conclusion"),
+  min_word_length = 3,
+  max_word_length = 25
+)
+
+# View terms extracted from the first document
+head(preprocessed_data$terms[[1]], 10)
+```
+
+### Optimized Preprocessing for Large Datasets
+
+For larger datasets, we can use the optimized vectorized preprocessing function:
+
+```{r optimized-preprocessing, eval = TRUE}
+# Use optimized vectorized preprocessing
+opt_preprocessed_data <- vec_preprocess(
+  migraine_articles,
+  text_column = "abstract",
+  remove_stopwords = TRUE,
+  min_word_length = 3,
+  chunk_size = 50  # Process in chunks of 50 documents
+)
+
+# Compare processing times
+system.time({
+  preprocess_text(
+    migraine_articles,
+    text_column = "abstract",
+    remove_stopwords = TRUE
+  )
+})
+
+system.time({
+  vec_preprocess(
+    migraine_articles,
+    text_column = "abstract",
+    remove_stopwords = TRUE,
+    chunk_size = 50
+  )
+})
+```
+
+## Advanced Text Analysis
+
+### N-gram Extraction
+
+We can extract n-grams (sequences of n words) to capture multi-word concepts:
+
+```{r ngram-extraction, eval = TRUE}
+# Extract bigrams (2-word sequences)
+bigrams <- extract_ngrams(
+  migraine_articles$abstract,
+  n = 2,
+  min_freq = 2
+)
+
+# View the most frequent bigrams
+head(bigrams, 10)
+```
+
+### Sentence Segmentation
+
+Segmenting text into sentences can be useful for more granular analysis:
+
+```{r sentence-segmentation, eval = TRUE}
+# Extract sentences from the first abstract
+abstracts <- migraine_articles$abstract
+first_abstract <- abstracts[1]
+
+# Make sure we have a valid abstract
+if(is.na(first_abstract) || length(first_abstract) == 0 || nchar(first_abstract) == 0) {
+  # Find the first non-empty abstract
+  valid_idx <- which(!is.na(abstracts) & nchar(abstracts) > 0)
+  if(length(valid_idx) > 0) {
+    first_abstract <- abstracts[valid_idx[1]]
+    cat("First abstract was empty, using abstract #", valid_idx[1], "instead.\n")
+  } else {
+    # Create a sample abstract for demonstration
+    first_abstract <- "This is a sample abstract for demonstration. It contains multiple sentences. Each sentence will be extracted separately."
+    cat("No valid abstracts found. Using a sample abstract for demonstration.\n")
+  }
+}
+
+# Now segment the valid abstract
+sentences <- segment_sentences(first_abstract)
+
+# Check if sentences list has elements before trying to access them
+if(length(sentences) > 0 && length(sentences[[1]]) > 0) {
+  # View the first few sentences
+  head(sentences[[1]], min(3, length(sentences[[1]])))
+} else {
+  cat("No sentences could be extracted. The abstract might be too short or formatted incorrectly.\n")
+}
+
+# View the first few sentences
+head(sentences[[1]], 3)
+```
+
+### Language Detection
+
+For dealing with multilingual corpora, we can detect the language of each document:
+
+```{r language-detection, eval = TRUE}
+# Filter out NA values from abstracts and detect language
+abstracts <- migraine_articles$abstract[1:5]
+valid_abstracts <- abstracts[!is.na(abstracts)]
+
+# Apply language detection to valid abstracts
+if (length(valid_abstracts) > 0) {
+  languages <- sapply(valid_abstracts, detect_lang)
+  
+  # View results
+  data.frame(
+    abstract_id = which(!is.na(abstracts)),
+    language = languages
+  )
+} else {
+  message("No valid abstracts found for language detection")
+}
+```
+
+## Entity Extraction
+
+After preprocessing, the next step is to extract biomedical entities from the text.
+
+### Loading Entity Dictionaries
+
+First, let's load entity dictionaries that will be used for entity recognition:
+
+```{r load-dictionaries, eval = TRUE}
+# Load a disease dictionary
+disease_dict <- load_dictionary(
+  dictionary_type = "disease",
+  source = "mesh"
+)
+
+# Load a drug dictionary
+drug_dict <- load_dictionary(
+  dictionary_type = "drug",
+  source = "mesh"
+)
+
+# View a sample of each dictionary
+head(disease_dict, 3)
+head(drug_dict, 3)
+```
+
+### Basic Entity Extraction
+
+Now we can extract entities from the text using these dictionaries:
+
+```{r basic-entity-extraction, eval = TRUE}
+# Extract disease and drug entities
+entities <- extract_entities(
+  preprocessed_data,
+  text_column = "abstract",
+  dictionary = rbind(disease_dict, drug_dict),
+  case_sensitive = FALSE,
+  overlap_strategy = "priority"
+)
+
+# View some extracted entities
+head(entities[, c("doc_id", "entity", "entity_type", "sentence")], 10)
+```
+
+### Complete Entity Extraction Workflow
+
+For a more comprehensive approach, we can use the complete entity extraction workflow:
+
+```{r complete-entity-extraction, eval = TRUE}
+# Extract entities using the complete workflow
+# Check if running in R CMD check environment
+is_check <- !interactive() && 
+            (!is.null(Sys.getenv("R_CHECK_RUNNING")) && 
+             Sys.getenv("R_CHECK_RUNNING") == "true")
+             
+# More robust check for testing environment
+if (!is_check && !is.null(Sys.getenv("_R_CHECK_LIMIT_CORES_"))) {
+  is_check <- TRUE
+}
+
+# Set number of cores based on environment
+num_cores_to_use <- if(is_check) 1 else 4
+
+# Extract entities using the complete workflow
+entities_workflow <- extract_entities_workflow(
+  preprocessed_data,
+  text_column = "abstract",
+  entity_types = c("disease", "drug", "gene", "protein", "pathway"),
+  dictionary_sources = c("local", "mesh"),
+  sanitize = TRUE,
+  parallel = !is_check,           # Disable parallel in check environment
+  num_cores = num_cores_to_use    # Use 1 core in check environment
+)
+
+# View summary of entity types
+table(entities_workflow$entity_type)
+```
+
+### Customizing Entity Extraction
+
+We can customize the entity extraction process by providing additional MeSH queries or custom dictionaries:
+
+```{r custom-entity-extraction, eval = TRUE}
+# Define custom MeSH queries for different entity types
+mesh_queries <- list(
+  "disease" = "migraine disorders[MeSH] OR headache disorders[MeSH]",
+  "drug" = "analgesics[MeSH] OR serotonin agonists[MeSH] OR anticonvulsants[MeSH]",
+  "gene" = "genes[MeSH] OR channelopathy[MeSH]"
+)
+
+# Create a custom dictionary
+custom_dict <- data.frame(
+  term = c("CGRP", "trigeminal nerve", "cortical spreading depression"),
+  type = c("protein", "anatomy", "biological_process"),
+  id = c("CUSTOM_1", "CUSTOM_2", "CUSTOM_3"),
+  source = rep("custom", 3),
+  stringsAsFactors = FALSE
+)
+
+# Extract entities with custom settings
+custom_entities <- extract_entities_workflow(
+  preprocessed_data,
+  text_column = "abstract",
+  entity_types = c("disease", "drug", "gene", "protein", "pathway"),
+  dictionary_sources = c("local", "mesh"),
+  additional_mesh_queries = mesh_queries,
+  custom_dictionary = custom_dict,
+  sanitize = TRUE
+)
+
+# View custom entities
+custom_entities[custom_entities$source == "custom", ]
+```
+
+## Dictionary Sanitization
+
+The quality of entity extraction heavily depends on the quality of the dictionaries. We can sanitize dictionaries to improve extraction quality:
+
+```{r dictionary-sanitization, eval = TRUE}
+# Create a raw dictionary with some problematic entries
+raw_dict <- data.frame(
+  term = c("migraine", "5-HT", "headache", "the", "and", "patient", "inflammation", "study"),
+  type = c("disease", "chemical", "symptom", "NA", "NA", "NA", "biological_process", "NA"),
+  id = paste0("ID_", 1:8),
+  source = rep("example", 8),
+  stringsAsFactors = FALSE
+)
+
+# Sanitize the dictionary
+sanitized_dict <- sanitize_dictionary(
+  raw_dict,
+  term_column = "term",
+  type_column = "type",
+  validate_types = TRUE,
+  verbose = TRUE
+)
+
+# View the sanitized dictionary
+sanitized_dict
+```
+
+## Mapping Terms to Biomedical Ontologies
+
+We can map extracted terms to standard biomedical ontologies like MeSH or UMLS:
+
+```{r ontology-mapping, eval = TRUE}
+# Extract terms to map
+terms_to_map <- c("migraine", "headache", "CGRP", "serotonin")
+
+# Map to MeSH
+mesh_mappings <- map_ontology(
+  terms_to_map,
+  ontology = "mesh",
+  fuzzy_match = TRUE,
+  similarity_threshold = 0.8
+)
+
+# View MeSH mappings
+mesh_mappings
+```
+
+## Topic Modeling
+
+We can also apply topic modeling to discover the main themes in the corpus:
+
+```{r topic-modeling, eval = TRUE}
+# Extract topics from the corpus
+topics <- extract_topics(
+  migraine_articles,
+  text_column = "abstract",
+  n_topics = 5,
+  max_terms = 10
+)
+
+# View top terms for each topic
+topics$topics
+```

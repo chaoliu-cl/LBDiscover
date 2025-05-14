@@ -1,0 +1,12 @@
+^LBDiscover\.Rproj$
+^\.Rproj\.user$
+^migraine_chord\.html$
+^migraine_discoveries\.html$
+^migraine_heatmap\.png$
+^migraine_network\.html$
+^migraine_network\.png$
+^term_cache\.rds$
+^README\.Rmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

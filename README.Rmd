@@ -1,0 +1,213 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# LBDiscover <img src="man/figures/logo.png" align="right" height="139" />
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/chaoliu-cl/LBDiscover/workflows/R-CMD-check/badge.svg)](https://github.com/chaoliu-cl/LBDiscover/actions)
+[![CRAN status](https://www.r-pkg.org/badges/version/LBDiscover)](https://CRAN.R-project.org/package=LBDiscover)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+<!-- badges: end -->
+
+## Overview
+
+LBDiscover is an R package for literature-based discovery (LBD) in biomedical research. It provides a comprehensive suite of tools for retrieving scientific articles, extracting biomedical entities, building co-occurrence networks, and applying various discovery models to uncover hidden connections in the scientific literature.
+
+The package implements several literature-based discovery approaches including:
+
+- ABC model (Swanson's discovery model)
+- AnC model (improved version with better biomedical term filtering)
+- Latent Semantic Indexing (LSI)
+- BITOLA-style approaches
+
+LBDiscover also features powerful visualization tools for exploring discovered connections using networks, heatmaps, and interactive diagrams.
+
+## Installation
+
+```{r, eval = FALSE}
+# Install from CRAN
+install.packages("LBDiscover")
+
+# Or install the development version from GitHub
+# install.packages("devtools")
+devtools::install_github("chaoliu-cl/LBDiscover")
+```
+
+## Key Features
+
+LBDiscover provides a complete workflow for literature-based discovery:
+
+1. **Data Retrieval**: Query and retrieve scientific articles from PubMed and other NCBI databases
+2. **Text Preprocessing**: Clean and prepare text for analysis
+3. **Entity Extraction**: Identify biomedical entities in text (diseases, drugs, genes, etc.)
+4. **Co-occurrence Analysis**: Build networks of entity co-occurrences
+5. **Discovery Models**: Apply various discovery algorithms to find hidden connections
+6. **Validation**: Validate discoveries through statistical tests
+7. **Visualization**: Explore results through network graphs, heatmaps, and more
+
+## Quick Start Example
+
+```{r eval=FALSE}
+library(LBDiscover)
+
+# Retrieve articles from PubMed
+articles <- pubmed_search("migraine treatment", max_results = 100)
+
+# Preprocess article text
+preprocessed <- vec_preprocess(
+  articles,
+  text_column = "abstract",
+  remove_stopwords = TRUE
+)
+
+# Extract biomedical entities
+entities <- extract_entities_workflow(
+  preprocessed,
+  text_column = "abstract",
+  entity_types = c("disease", "drug", "gene")
+)
+
+# Create co-occurrence matrix
+co_matrix <- create_comat(
+  entities,
+  doc_id_col = "doc_id",
+  entity_col = "entity",
+  type_col = "entity_type"
+)
+
+# Apply the ABC model to find new connections
+abc_results <- abc_model(
+  co_matrix,
+  a_term = "migraine",
+  n_results = 50,
+  scoring_method = "combined"
+)
+
+# Visualize the results
+vis_abc_network(abc_results, top_n = 20)
+```
+
+## Discovery Models
+
+### ABC Model
+
+The ABC model is based on Swanson's discovery paradigm. If concept A is related to concept B, and concept B is related to concept C, but A and C are not directly connected in the literature, then A may have a hidden relationship with C.
+
+```{r eval=FALSE}
+# Apply the ABC model
+abc_results <- abc_model(
+  co_matrix,
+  a_term = "migraine",
+  min_score = 0.1,
+  n_results = 50
+)
+
+# Visualize as a network
+vis_abc_network(abc_results)
+
+# Or as a heatmap
+vis_heatmap(abc_results)
+```
+
+### AnC Model
+
+The AnC model is an extension of the ABC model that uses multiple B terms to establish stronger connections between A and C.
+
+```{r eval=FALSE}
+# Apply the AnC model
+anc_results <- anc_model(
+  co_matrix,
+  a_term = "migraine",
+  n_b_terms = 5,
+  min_score = 0.1
+)
+```
+
+### LSI Model
+
+The Latent Semantic Indexing model identifies semantically related terms using dimensionality reduction techniques.
+
+```{r eval=FALSE}
+# Create term-document matrix
+tdm <- create_term_document_matrix(preprocessed)
+
+# Apply LSI model
+lsi_results <- lsi_model(
+  tdm,
+  a_term = "migraine",
+  n_factors = 100
+)
+```
+
+## Visualization
+
+The package offers multiple visualization options:
+
+```{r eval=FALSE}
+# Network visualization
+vis_abc_network(abc_results, top_n = 25)
+
+# Heatmap of connections
+vis_heatmap(abc_results, top_n = 20)
+
+# Export interactive HTML network
+export_network(abc_results, output_file = "abc_network.html")
+
+# Export interactive chord diagram
+export_chord(abc_results, output_file = "abc_chord.html")
+```
+
+## Comprehensive Analysis
+
+For an end-to-end analysis:
+
+```{r eval=FALSE}
+# Run comprehensive discovery analysis
+discovery_results <- run_lbd(
+  search_query = "migraine pathophysiology",
+  a_term = "migraine",
+  discovery_approaches = c("abc", "anc", "lsi"),
+  include_visualizations = TRUE,
+  output_file = "discovery_report.html"
+)
+```
+
+## Documentation
+
+For more detailed documentation and examples, please see the package vignettes:
+
+```{r eval=FALSE}
+# View package vignettes
+browseVignettes("LBDiscover")
+```
+
+## Citation
+
+If you use LBDiscover in your research, please cite:
+
+```
+Liu, C. (2025). LBDiscover: Literature-Based Discovery Tools for Biomedical Research. 
+R package version 0.1.0. https://github.com/chaoliu-cl/LBDiscover
+```
+
+## License
+
+This project is licensed under the GPL-3 License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- The ABC model implementation is based on the pioneering work of Don Swanson
+- Thanks to contributors and users for feedback and suggestions

@@ -1,0 +1,293 @@
+---
+title: "Working with Discovery Models"
+author: "Chao Liu"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with Discovery Models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+# Discovery Models in Literature-Based Discovery
+
+This vignette explores the various discovery models available in the `LBDiscover` package, which enable you to identify hidden connections in the biomedical literature.
+
+## Overview of Discovery Models
+
+The `LBDiscover` package implements several discovery models:
+
+1. **ABC Model**: The classic model that discovers implicit connections between terms A and C through intermediate B terms.
+
+2. **AnC Model**: A variant of the ABC model that uses multiple B terms to establish stronger connections between A and C.
+
+3. **BITOLA Model**: A model that incorporates semantic types to guide the discovery process.
+
+4. **LSI (Latent Semantic Indexing) Model**: A model that uses dimensionality reduction to discover semantically related terms.
+
+Each model has its strengths and is suitable for different types of discovery tasks.
+
+## Setup and Data Preparation
+
+Let's start by loading the package and preparing some sample data:
+
+```{r load-package, message=FALSE}
+library(LBDiscover)
+```
+
+```{r prepare-data, eval = TRUE, message=FALSE}
+# Search for articles about Alzheimer's disease
+alzheimer_articles <- pubmed_search(
+  query = "alzheimer pathophysiology",
+  max_results = 1000
+)
+
+# Search for treatment-related articles
+drug_articles <- pubmed_search(
+  query = "neurodegenerative disease treatment OR cognitive impairment therapy",
+  max_results = 1000
+)
+
+# Combine and remove duplicates
+all_articles <- merge_results(alzheimer_articles, drug_articles)
+print(paste("Retrieved", nrow(all_articles), "unique articles"))
+
+# Preprocess text
+preprocessed_articles <- preprocess_text(
+  all_articles,
+  text_column = "abstract",
+  remove_stopwords = TRUE,
+  min_word_length = 3
+)
+
+# Extract entities
+entities <- extract_entities_workflow(
+  preprocessed_articles,
+  text_column = "abstract",
+  entity_types = c("disease", "drug", "gene", "protein", "chemical", "pathway"),
+  dictionary_sources = c("local", "mesh")
+)
+
+# Create co-occurrence matrix with less restrictive normalization
+co_matrix <- create_comat(
+  entities,
+  doc_id_col = "doc_id",
+  entity_col = "entity",
+  type_col = "entity_type",
+  normalize = TRUE,
+  normalization_method = "dice"  # Using dice coefficient for better sensitivity
+)
+
+# Define our primary term of interest
+a_term <- "alzheimer"
+
+# Let's first examine what terms are available in the co-occurrence matrix
+available_terms <- rownames(co_matrix)
+message("First 30 terms in the co-occurrence matrix:")
+print(head(available_terms, 30))
+
+# Check if the term is misspelled or slightly different
+message("\nChecking for variations of 'alzheimer' and related terms:")
+alzheimer_like <- grep("alzheim|dementia|cognitive", available_terms, value = TRUE, ignore.case = TRUE)
+print(alzheimer_like)
+
+# Find our primary term in the co-occurrence matrix with flexible matching
+if (!a_term %in% rownames(co_matrix)) {
+  # First, try to find terms containing 'alzheimer'
+  possible_matches <- alzheimer_like
+  
+  if (length(possible_matches) > 0) {
+    message("Primary term '", a_term, "' not found exactly. Using related term: ", possible_matches[1])
+    a_term <- possible_matches[1]
+  } else {
+    # If no Alzheimer terms, try some other neurodegenerative disease terms
+    neuro_terms <- grep("neurodegenerat|parkinson|huntington|dementia", rownames(co_matrix), value = TRUE, ignore.case = TRUE)
+    if (length(neuro_terms) > 0) {
+      message("No Alzheimer terms found. Using alternative neurodegenerative disease term: ", neuro_terms[1])
+      a_term <- neuro_terms[1]
+    } else {
+      # If still no match, let's use any disease term for demonstration
+      disease_terms <- grep("disease", rownames(co_matrix), value = TRUE, ignore.case = TRUE)
+      if (length(disease_terms) > 0) {
+        message("No neurodegenerative terms found. Using general disease term for demonstration: ", disease_terms[1])
+        a_term <- disease_terms[1]
+      } else {
+        # Last resort - take any term marked as disease in the entity types
+        if (!is.null(attr(co_matrix, "entity_types"))) {
+          disease_entities <- names(attr(co_matrix, "entity_types"))[attr(co_matrix, "entity_types") == "disease"]
+          if (length(disease_entities) > 0) {
+            a_term <- disease_entities[1]
+            message("Using first disease entity: ", a_term)
+          } else {
+            stop("No suitable disease terms found in the co-occurrence matrix")
+          }
+        } else {
+          stop("No terms found in the co-occurrence matrix")
+        }
+      }
+    }
+  }
+} else {
+  message("Found exact match for primary term")
+}
+
+# Check matrix dimensions
+dim(co_matrix)
+```
+
+## 1. Classic ABC Model
+
+The ABC model identifies potential connections between term A (your starting point) and term C (potential discoveries) through shared B terms.
+
+```{r abc-model, eval = TRUE}
+# Apply the ABC model with lower thresholds
+abc_results <- abc_model(
+  co_matrix,
+  a_term = a_term,
+  min_score = 0.0001,  # Much lower threshold
+  n_results = 500  # Get more results
+)
+
+# View top results
+if (nrow(abc_results) > 0) {
+  head(abc_results[, c("a_term", "b_term", "c_term", "abc_score")])
+} else {
+  message("No results from ABC model")
+}
+```
+
+### Statistical Validation of ABC Results
+
+We can apply statistical validation to evaluate the significance of the discovered connections:
+
+```{r validate-abc, eval = TRUE}
+validated_results <- validate_abc(
+  abc_results,
+  co_matrix,
+  alpha = 0.05,
+  correction = "BH"
+)
+
+# View statistically significant connections
+significant_results <- validated_results[validated_results$significant, ]
+if (nrow(significant_results) > 0) {
+  head(significant_results[, c("a_term", "b_term", "c_term", "abc_score", "p_value")])
+} else {
+  message("No statistically significant results found")
+}
+```
+
+## 2. AnC Model
+
+The AnC model extends the ABC model by considering multiple intermediate B terms:
+
+```{r anc-model, eval = TRUE}
+# Apply the AnC model with lower thresholds
+anc_results <- anc_model(
+  co_matrix,
+  a_term = a_term,
+  n_b_terms = 10,  # Consider more B terms
+  c_type = NULL,  # Allow all entity types, not just drugs
+  min_score = 0.0001,  # Lower threshold
+  n_results = 500  # Get more results
+)
+
+# View top results
+if (nrow(anc_results) > 0) {
+  head(anc_results[, c("a_term", "b_terms", "c_term", "anc_score")])
+} else {
+  message("No results from AnC model")
+}
+```
+
+## 3. BITOLA Model
+
+The BITOLA model incorporates semantic types to guide the discovery process:
+
+```{r bitola-model, eval = TRUE}
+# Apply the BITOLA model with appropriate semantic types
+bitola_results <- bitola_model(
+  co_matrix,
+  a_term = a_term,
+  a_semantic_type = "disease",    # Set semantic type for source term
+  c_semantic_type = "drug",       # Set semantic type for target terms
+  min_score = 0.0001,  # Lower threshold
+  n_results = 500  # Get more results
+)
+
+# View top results
+if (nrow(bitola_results) > 0) {
+  head(bitola_results[, c("a_term", "c_term", "support", "bitola_score", "ranking_score")])
+} else {
+  message("No results from BITOLA model")
+}
+```
+
+## 4. LSI Model (Latent Semantic Indexing)
+
+The LSI model uses dimensionality reduction to discover semantically related terms:
+
+```{r lsi-model, eval = TRUE, message=FALSE}
+# Create a term-document matrix for LSI model
+tdm <- create_tdm(preprocessed_articles)
+
+# Apply the LSI model
+lsi_results <- lsi_model(
+  tdm,
+  a_term = a_term,
+  n_factors = 100,  # Number of latent factors
+  n_results = 500
+)
+
+# View top results
+if (nrow(lsi_results) > 0) {
+  head(lsi_results[, c("a_term", "c_term", "lsi_similarity")])
+} else {
+  message("No results from LSI model")
+}
+```
+
+## Comparing Results from Different Models
+
+It can be insightful to compare the results from different discovery models:
+
+```{r compare-models, eval = TRUE}
+# Extract C terms from each model
+abc_c_terms <- if (nrow(abc_results) > 0) unique(abc_results$c_term) else character(0)
+anc_c_terms <- if (nrow(anc_results) > 0) unique(anc_results$c_term) else character(0)
+bitola_c_terms <- if (nrow(bitola_results) > 0) unique(bitola_results$c_term) else character(0)
+lsi_c_terms <- if (nrow(lsi_results) > 0) unique(lsi_results$c_term) else character(0)
+
+# Find common C terms across models
+common_abc_anc <- intersect(abc_c_terms, anc_c_terms)
+common_abc_bitola <- intersect(abc_c_terms, bitola_c_terms)
+common_abc_lsi <- intersect(abc_c_terms, lsi_c_terms)
+common_all <- Reduce(intersect, list(abc_c_terms, anc_c_terms, bitola_c_terms, lsi_c_terms))
+
+# Print comparison
+cat("Number of unique C terms found by each model:\n")
+cat("  ABC model:", length(abc_c_terms), "\n")
+cat("  AnC model:", length(anc_c_terms), "\n")
+cat("  BITOLA model:", length(bitola_c_terms), "\n")
+cat("  LSI model:", length(lsi_c_terms), "\n\n")
+
+cat("Number of C terms found by multiple models:\n")
+cat("  Common between ABC and AnC:", length(common_abc_anc), "\n")
+cat("  Common between ABC and BITOLA:", length(common_abc_bitola), "\n")
+cat("  Common between ABC and LSI:", length(common_abc_lsi), "\n")
+cat("  Common across all four models:", length(common_all), "\n\n")
+
+if (length(common_all) > 0) {
+  cat("C terms found by all models:\n")
+  print(common_all)
+}
+```
