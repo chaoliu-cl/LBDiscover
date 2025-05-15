@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ABC Model Chord Diagram</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+    #chord { width: 900px; height: 900px; margin: 0 auto; }
+    .group-arc { stroke: #fff; stroke-width: 1.5px; }
+    .chord { opacity: 0.7; }
+    .chord:hover { opacity: 1; }
+    .tooltip { position: absolute; background: white; border: 1px solid black; padding: 5px; border-radius: 5px; box-shadow: 2px 2px 4px rgba(0,0,0,0.3); font-size: 12px; }
+    h1 { text-align: center; color: #333; }
+    .legend { text-align: center; margin-bottom: 20px; }
+    .legend-item { display: inline-block; margin: 10px; padding: 5px; }
+    .legend-color { display: inline-block; width: 15px; height: 15px; margin-right: 5px; vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <h1>ABC Model Chord Diagram</h1>
+  <div class='legend'>
+    <div class='legend-item'><span class='legend-color' style='background-color: #ff7f0e;'></span> A Terms</div>
+    <div class='legend-item'><span class='legend-color' style='background-color: #1f77b4;'></span> B Terms</div>
+    <div class='legend-item'><span class='legend-color' style='background-color: #2ca02c;'></span> C Terms</div>
+  </div>
+  <div id='chord'></div>
+  <script src='https://d3js.org/d3.v5.min.js'></script>
+  <script>
+    const matrix = [[0, 0.00574552119434281, 0.333004488905435, 0.0215128591372504, 0, 0, 0, 0, 0], [0.00574552119434281, 0, 0, 0, 0.377964473009227, 0.0890870806374748, 0, 0, 0], [0.333004488905435, 0, 0, 0, 0.0196230888287453, 0.0166507430143581, 0.0135952747411296, 0.0055502476714527, 0.0055502476714527], [0.0215128591372504, 0, 0, 0, 0, 0, 0.0477818482567497, 0, 0], [0, 0.377964473009227, 0.0196230888287453, 0, 0, 0, 0, 0, 0], [0, 0.0890870806374748, 0.0166507430143581, 0, 0, 0, 0, 0, 0], [0, 0, 0.0135952747411296, 0.0477818482567497, 0, 0, 0, 0, 0], [0, 0, 0.0055502476714527, 0, 0, 0, 0, 0, 0], [0, 0, 0.0055502476714527, 0, 0, 0, 0, 0, 0]];
+    const names = ["migraine", "thrombosis", "headache", "fatigue", "heparin", "enoxaparin", "myocarditis", "azithromycin", "tocilizumab"];
+    const roles = ["A", "B", "B", "B", "C", "C", "C", "C", "C"];
+    // Set up dimensions
+    const width = 800;
+    const height = 800;
+    const innerRadius = Math.min(width, height) * 0.4;
+    const outerRadius = innerRadius * 1.1;
+
+    // Define role colors directly
+    const roleColors = {
+      'A': '#ff7f0e',  // orange
+      'B': '#1f77b4',  // blue
+      'C': '#2ca02c'   // green
+    };
+
+    // Create SVG element
+    const svg = d3.select('#chord')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+      .append('g')
+      .attr('transform', `translate(${width / 2}, ${height / 2})`);
+
+    // Create chord layout
+    const chord = d3.chord()
+      .padAngle(0.05)
+      .sortSubgroups(d3.descending);
+
+    // Generate chord diagram data
+    const chords = chord(matrix);
+
+    // Create tooltip
+    const tooltip = d3.select('body')
+      .append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0);
+
+    // Draw outer group arcs
+    const arcGroups = svg.append('g')
+      .selectAll('g')
+      .data(chords.groups)
+      .enter()
+      .append('g');
+
+    // Add the outer arc paths with colors based on roles
+    arcGroups.append('path')
+      .attr('d', d3.arc().innerRadius(innerRadius).outerRadius(outerRadius))
+      .style('fill', d => {
+        if (d.index < 0 || d.index >= roles.length) {
+          console.error('Invalid index for role:', d.index);
+          return '#999';
+        }
+        const role = roles[d.index];
+        return roleColors[role] || '#999';
+      })
+      .style('stroke', 'white')
+      .style('stroke-width', '1.5px')
+      .on('mouseover', function(d) {
+        let term = 'undefined';
+        let role = 'unknown';
+        
+        if (d.index >= 0 && d.index < names.length) {
+          term = names[d.index] || 'unnamed';
+          role = roles[d.index] || 'unknown';
+        }
+        
+        tooltip.transition().duration(200).style('opacity', 0.9);
+        tooltip.html(`${term} (${role} Term)`)
+          .style('left', (d3.event.pageX + 10) + 'px')
+          .style('top', (d3.event.pageY - 28) + 'px');
+      })
+      .on('mouseout', function() {
+        tooltip.transition().duration(500).style('opacity', 0);
+      });
+
+    // Add white backdrop for term labels to improve readability
+    arcGroups.append('text')
+      .each(d => { d.angle = (d.startAngle + d.endAngle) / 2; })
+      .attr('dy', '.35em')
+      .attr('transform', d => {
+        const rotate = (d.angle * 180 / Math.PI - 90);
+        const flip = d.angle > Math.PI ? 'rotate(180)' : '';
+        return `rotate(${rotate}) translate(${outerRadius + 10},0) ${flip}`;
+      })
+      .attr('text-anchor', d => d.angle > Math.PI ? 'end' : null)
+      .text(d => {
+        if (d.index < 0 || d.index >= names.length) {
+          console.error('Invalid index for name:', d.index);
+          return 'undefined';
+        }
+        return names[d.index] || 'unnamed';
+      })
+      .style('font-size', '10px')
+      .style('stroke', 'white')
+      .style('stroke-width', '3px')
+      .style('fill', 'none');
+
+    // Add actual term labels
+    arcGroups.append('text')
+      .each(d => { d.angle = (d.startAngle + d.endAngle) / 2; })
+      .attr('dy', '.35em')
+      .attr('transform', d => {
+        const rotate = (d.angle * 180 / Math.PI - 90);
+        const flip = d.angle > Math.PI ? 'rotate(180)' : '';
+        return `rotate(${rotate}) translate(${outerRadius + 10},0) ${flip}`;
+      })
+      .attr('text-anchor', d => d.angle > Math.PI ? 'end' : null)
+      .text(d => {
+        if (d.index < 0 || d.index >= names.length) {
+          return 'undefined';
+        }
+        return names[d.index] || 'unnamed';
+      })
+      .style('font-size', '10px')
+      .style('fill', '#333');
+
+    // Add ribbons for connections
+    svg.append('g')
+      .selectAll('path')
+      .data(chords)
+      .enter()
+      .append('path')
+      .attr('d', d3.ribbon().radius(innerRadius))
+      .style('fill', d => {
+        let sourceRole = 'B';  // Default role
+        let targetRole = 'B';  // Default role
+        
+        if (d.source.index >= 0 && d.source.index < roles.length) {
+          sourceRole = roles[d.source.index] || 'B';
+        }
+        
+        if (d.target.index >= 0 && d.target.index < roles.length) {
+          targetRole = roles[d.target.index] || 'B';
+        }
+        
+        const sourceColor = roleColors[sourceRole] || '#999';
+        const targetColor = roleColors[targetRole] || '#999';
+        return d3.interpolateRgb(sourceColor, targetColor)(0.3);
+      })
+      .style('stroke', 'white')
+      .style('stroke-width', '0.5px')
+      .style('opacity', 0.7)
+      .on('mouseover', function(d) {
+        d3.select(this)
+          .style('opacity', 1)
+          .style('stroke-width', '1.5px');
+          
+        const sourceTerm = names[d.source.index];
+        const targetTerm = names[d.target.index];
+        const sourceRole = roles[d.source.index];
+        const targetRole = roles[d.target.index];
+          
+        tooltip.transition()
+          .duration(200)
+          .style('opacity', 0.9);
+          
+        tooltip.html(`${sourceTerm} (${sourceRole}) <-> ${targetTerm} (${targetRole})<br>Strength: ${d.source.value.toFixed(3)}`)
+          .style('left', (d3.event.pageX + 10) + 'px')
+          .style('top', (d3.event.pageY - 28) + 'px');
+      })
+      .on('mouseout', function() {
+        d3.select(this)
+          .style('opacity', 0.7)
+          .style('stroke-width', '0.5px');
+          
+        tooltip.transition()
+          .duration(500)
+          .style('opacity', 0);
+      });
+  </script>
+</body>
+</html>
