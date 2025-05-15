@@ -12,7 +12,7 @@ Description: A suite of tools for literature-based discovery in biomedical resea
     including ABC, AnC, LSI, and BITOLA. The package also includes 
     visualization tools for exploring discovered connections.
 License: GPL-3
-URL: https://github.com/chaoliu-cl/LBDiscover, http://liu-chao.site/LBDiscover/
+URL: https://github.com/chaoliu-cl/LBDiscover, http://liu-chao.site/LBDiscover/, https://liu-chao.site/LBDiscover/
 BugReports: https://github.com/chaoliu-cl/LBDiscover/issues
 Encoding: UTF-8
 LazyData: true

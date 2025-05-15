@@ -216,9 +216,3 @@ If you use LBDiscover in your research, please cite:
 
 This project is licensed under the GPL-3 License - see the LICENSE file
 for details.
-
-## Acknowledgments
-
-- The ABC model implementation is based on the pioneering work of Don
-  Swanson
-- Thanks to contributors and users for feedback and suggestions
