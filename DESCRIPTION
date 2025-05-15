@@ -1,7 +1,7 @@
 Package: LBDiscover
 Title: Literature-Based Discovery Tools for Biomedical Research
 Version: 0.1.0
-Date: 2025-05-02
+Date: 2025-05-14
 Authors@R: 
     person("Chao Liu", email = "chaoliu@cedarville.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9979-8272"))
@@ -12,7 +12,7 @@ Description: A suite of tools for literature-based discovery in biomedical resea
     including ABC, AnC, LSI, and BITOLA. The package also includes 
     visualization tools for exploring discovered connections.
 License: GPL-3
-URL: https://github.com/chaoliu-cl/LBDiscover
+URL: https://github.com/chaoliu-cl/LBDiscover, http://liu-chao.site/LBDiscover/
 BugReports: https://github.com/chaoliu-cl/LBDiscover/issues
 Encoding: UTF-8
 LazyData: true

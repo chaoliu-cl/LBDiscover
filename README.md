@@ -5,13 +5,15 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/chaoliu-cl/LBDiscover/workflows/R-CMD-check/badge.svg)](https://github.com/chaoliu-cl/LBDiscover/actions)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/LBDiscover)](https://CRAN.R-project.org/package=LBDiscover)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![R-CMD-check](https://github.com/chaoliu-cl/LBDiscover/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/chaoliu-cl/LBDiscover/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/chaoliu-cl/LBDiscover/graph/badge.svg)](https://app.codecov.io/gh/chaoliu-cl/LBDiscover)
 <!-- badges: end -->
 
 ## Overview
