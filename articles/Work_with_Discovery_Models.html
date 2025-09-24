@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Working with Discovery Models</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-05-15</h4>
+            <h4 data-toc-skip class="date">2025-09-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Work_with_Discovery_Models.Rmd" class="external-link"><code>vignettes/Work_with_Discovery_Models.Rmd</code></a></small>
       <div class="d-none name"><code>Work_with_Discovery_Models.Rmd</code></div>
@@ -123,7 +123,7 @@ data:</p>
 <span><span class="co"># Combine and remove duplicates</span></span>
 <span><span class="va">all_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_results.html">merge_results</a></span><span class="op">(</span><span class="va">alzheimer_articles</span>, <span class="va">drug_articles</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Retrieved"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span>, <span class="st">"unique articles"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Retrieved 1955 unique articles"</span></span>
+<span><span class="co">#&gt; [1] "Retrieved 1951 unique articles"</span></span>
 <span></span>
 <span><span class="co"># Preprocess text</span></span>
 <span><span class="va">preprocessed_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocess_text.html">preprocess_text</a></span><span class="op">(</span></span>
@@ -158,11 +158,11 @@ data:</p>
 <span><span class="va">available_terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"First 30 terms in the co-occurrence matrix:"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">available_terms</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "Receptors"      "Acid"           "migraine"       "fatigue"       </span></span>
-<span><span class="co">#&gt;  [5] "cancer"         "Toxins"         "Nitric"         "Menopause"     </span></span>
-<span><span class="co">#&gt;  [9] "headache"       "Aromatherapy"   "heparin"        "Taste"         </span></span>
-<span><span class="co">#&gt; [13] "hypoxemia"      "Phytochemicals" "Anesthetics"    "Hemolysis"     </span></span>
-<span><span class="co">#&gt; [17] "thrombosis"     "Pleurodesis"</span></span>
+<span><span class="co">#&gt;  [1] "Receptors"      "Acid"           "cancer"         "Phytochemicals"</span></span>
+<span><span class="co">#&gt;  [5] "migraine"       "Nitric"         "Menopause"      "Hemolysis"     </span></span>
+<span><span class="co">#&gt;  [9] "Estrogens"      "Toxins"         "headache"       "Aromatherapy"  </span></span>
+<span><span class="co">#&gt; [13] "fatigue"        "Pesticides"     "heparin"        "Nicotiana"     </span></span>
+<span><span class="co">#&gt; [17] "Anesthetics"</span></span>
 <span></span>
 <span><span class="co"># Check if the term is misspelled or slightly different</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"\nChecking for variations of 'alzheimer' and related terms:"</span><span class="op">)</span></span>
@@ -212,7 +212,7 @@ data:</p>
 <span></span>
 <span><span class="co"># Check matrix dimensions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 18 18</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 17 17</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="classic-abc-model">1. Classic ABC Model<a class="anchor" aria-label="anchor" href="#classic-abc-model"></a>
@@ -229,8 +229,8 @@ terms.</p>
 <span>  n_results <span class="op">=</span> <span class="fl">500</span>  <span class="co"># Get more results</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.8)</span></span>
-<span><span class="co">#&gt; Identifying potential C terms via 6 B terms...</span></span>
-<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |============                                                          |  17%  |                                                                              |=======================                                               |  33%  |                                                                              |===================================                                   |  50%  |                                                                              |===============================================                       |  67%  |                                                                              |==========================================================            |  83%  |                                                                              |======================================================================| 100%</span></span>
+<span><span class="co">#&gt; Identifying potential C terms via 5 B terms...</span></span>
+<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==============                                                        |  20%  |                                                                              |============================                                          |  40%  |                                                                              |==========================================                            |  60%  |                                                                              |========================================================              |  80%  |                                                                              |======================================================================| 100%</span></span>
 <span></span>
 <span><span class="co"># View top results</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
@@ -239,8 +239,12 @@ terms.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from ABC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;           a_term    b_term   c_term    abc_score</span></span>
-<span><span class="co">#&gt; fatigue   cancer   fatigue headache 0.0005243055</span></span>
-<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0005235824</span></span></code></pre></div>
+<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0009726680</span></span>
+<span><span class="co">#&gt; Acid2     cancer      Acid  heparin 0.0007790217</span></span>
+<span><span class="co">#&gt; Acid1     cancer      Acid   Toxins 0.0007359138</span></span>
+<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0007079323</span></span>
+<span><span class="co">#&gt; fatigue   cancer   fatigue   Toxins 0.0003604903</span></span>
+<span><span class="co">#&gt; fatigue1  cancer   fatigue headache 0.0002894077</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="statistical-validation-of-abc-results">Statistical Validation of ABC Results<a class="anchor" aria-label="anchor" href="#statistical-validation-of-abc-results"></a>
 </h4>
@@ -254,7 +258,7 @@ the discovered connections:</p>
 <span>  correction <span class="op">=</span> <span class="st">"BH"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimized approach for large matrix validation...</span></span>
-<span><span class="co">#&gt; Using metadata for document count: 271</span></span>
+<span><span class="co">#&gt; Using metadata for document count: 254</span></span>
 <span><span class="co">#&gt; Calculating statistical significance using hypergeometric test...</span></span>
 <span><span class="co">#&gt; 0.0% of connections are statistically significant (p &lt; 0.05, BH correction)</span></span>
 <span></span>
@@ -284,12 +288,11 @@ intermediate B terms:</p>
 <span>  n_results <span class="op">=</span> <span class="fl">500</span>  <span class="co"># Get more results</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Validating biomedical relevance of B terms...</span></span>
-<span><span class="co">#&gt; Retained 5 biomedically relevant B terms after filtering</span></span>
+<span><span class="co">#&gt; Retained 4 biomedically relevant B terms after filtering</span></span>
 <span><span class="co">#&gt; Validating biomedical relevance of C terms...</span></span>
 <span><span class="co">#&gt; Retained 12 biomedically relevant C terms after filtering</span></span>
 <span><span class="co">#&gt; Analyzing 12 potential C terms...</span></span>
 <span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |============                                                          |  17%  |                                                                              |==================                                                    |  25%  |                                                                              |=======================                                               |  33%  |                                                                              |=============================                                         |  42%  |                                                                              |===================================                                   |  50%  |                                                                              |=========================================                             |  58%  |                                                                              |===============================================                       |  67%  |                                                                              |====================================================                  |  75%  |                                                                              |==========================================================            |  83%  |                                                                              |================================================================      |  92%  |                                                                              |======================================================================| 100%</span></span>
-<span><span class="co">#&gt; No AnC connections found</span></span>
 <span></span>
 <span><span class="co"># View top results</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">anc_results</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
@@ -297,7 +300,9 @@ intermediate B terms:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from AnC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; No results from AnC model</span></span></code></pre></div>
+<span><span class="co">#&gt;   a_term         b_terms   c_term   anc_score</span></span>
+<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.006674782</span></span>
+<span><span class="co">#&gt; 2 cancer Acid, Receptors  fatigue 0.003987752</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitola-model">3. BITOLA Model<a class="anchor" aria-label="anchor" href="#bitola-model"></a>
@@ -314,9 +319,8 @@ process:</p>
 <span>  min_score <span class="op">=</span> <span class="fl">0.0001</span>,  <span class="co"># Lower threshold</span></span>
 <span>  n_results <span class="op">=</span> <span class="fl">500</span>  <span class="co"># Get more results</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Analyzing 6 B terms...</span></span>
-<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |============                                                          |  17%  |                                                                              |=======================                                               |  33%  |                                                                              |===================================                                   |  50%  |                                                                              |===============================================                       |  67%  |                                                                              |==========================================================            |  83%  |                                                                              |======================================================================| 100%</span></span>
-<span><span class="co">#&gt; No BITOLA connections found</span></span>
+<span><span class="co">#&gt; Analyzing 5 B terms...</span></span>
+<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==============                                                        |  20%  |                                                                              |============================                                          |  40%  |                                                                              |==========================================                            |  60%  |                                                                              |========================================================              |  80%  |                                                                              |======================================================================| 100%</span></span>
 <span></span>
 <span><span class="co"># View top results</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">bitola_results</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
@@ -324,7 +328,8 @@ process:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from BITOLA model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; No results from BITOLA model</span></span></code></pre></div>
+<span><span class="co">#&gt;     a_term  c_term support bitola_score ranking_score</span></span>
+<span><span class="co">#&gt; sum cancer heparin       1 6.068748e-07  6.068748e-07</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="lsi-model-latent-semantic-indexing">4. LSI Model (Latent Semantic Indexing)<a class="anchor" aria-label="anchor" href="#lsi-model-latent-semantic-indexing"></a>
@@ -349,13 +354,13 @@ related terms:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from LSI model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt;   a_term         c_term lsi_similarity</span></span>
-<span><span class="co">#&gt; 1 cancer adenocarcinoma      0.9524903</span></span>
-<span><span class="co">#&gt; 2 cancer      carcinoma      0.9492129</span></span>
-<span><span class="co">#&gt; 3 cancer        peptide      0.1920824</span></span>
-<span><span class="co">#&gt; 4 cancer      secretase      0.1713798</span></span>
-<span><span class="co">#&gt; 5 cancer        disease      0.1549414</span></span>
-<span><span class="co">#&gt; 6 cancer           base      0.1500490</span></span></code></pre></div>
+<span><span class="co">#&gt;   a_term      c_term lsi_similarity</span></span>
+<span><span class="co">#&gt; 1 cancer glucosidase      0.5303606</span></span>
+<span><span class="co">#&gt; 2 cancer  chemobrain      0.4583070</span></span>
+<span><span class="co">#&gt; 3 cancer        base      0.4388333</span></span>
+<span><span class="co">#&gt; 4 cancer mutagenesis      0.4386841</span></span>
+<span><span class="co">#&gt; 5 cancer     amylase      0.4222016</span></span>
+<span><span class="co">#&gt; 6 cancer cuproptosis      0.4214804</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparing-results-from-different-models">Comparing Results from Different Models<a class="anchor" aria-label="anchor" href="#comparing-results-from-different-models"></a>
@@ -379,20 +384,20 @@ models:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Number of unique C terms found by each model:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of unique C terms found by each model:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  ABC model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">abc_c_terms</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   ABC model: 2</span></span>
+<span><span class="co">#&gt;   ABC model: 4</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  AnC model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">anc_c_terms</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   AnC model: 0</span></span>
+<span><span class="co">#&gt;   AnC model: 2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  BITOLA model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bitola_c_terms</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   BITOLA model: 0</span></span>
+<span><span class="co">#&gt;   BITOLA model: 1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  LSI model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">lsi_c_terms</span><span class="op">)</span>, <span class="st">"\n\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   LSI model: 185</span></span>
+<span><span class="co">#&gt;   LSI model: 177</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Number of C terms found by multiple models:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of C terms found by multiple models:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  Common between ABC and AnC:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">common_abc_anc</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Common between ABC and AnC: 0</span></span>
+<span><span class="co">#&gt;   Common between ABC and AnC: 1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  Common between ABC and BITOLA:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">common_abc_bitola</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   Common between ABC and BITOLA: 0</span></span>
+<span><span class="co">#&gt;   Common between ABC and BITOLA: 1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  Common between ABC and LSI:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">common_abc_lsi</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Common between ABC and LSI: 0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  Common across all four models:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">common_all</span><span class="op">)</span>, <span class="st">"\n\n"</span><span class="op">)</span></span>
@@ -415,7 +420,7 @@ models:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

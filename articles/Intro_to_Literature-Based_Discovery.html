@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Getting Started with Literature-Based Discovery</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-05-15</h4>
+            <h4 data-toc-skip class="date">2025-09-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Intro_to_Literature-Based_Discovery.Rmd" class="external-link"><code>vignettes/Intro_to_Literature-Based_Discovery.Rmd</code></a></small>
       <div class="d-none name"><code>Intro_to_Literature-Based_Discovery.Rmd</code></div>
@@ -150,7 +150,7 @@ treatment.</p>
 <span><span class="co"># Combine and remove duplicates</span></span>
 <span><span class="va">all_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_results.html">merge_results</a></span><span class="op">(</span><span class="va">migraine_articles</span>, <span class="va">drug_articles</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Retrieved"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span>, <span class="st">"unique articles\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Retrieved 1925 unique articles</span></span></code></pre></div>
+<span><span class="co">#&gt; Retrieved 1930 unique articles</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="extract-variations-of-the-primary-term">4. Extract variations of the primary term<a class="anchor" aria-label="anchor" href="#extract-variations-of-the-primary-term"></a>
@@ -159,10 +159,10 @@ treatment.</p>
 <code class="sourceCode R"><span><span class="co"># Extract variations of our primary term using the utility function</span></span>
 <span><span class="va">primary_term_variations</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_term_vars.html">get_term_vars</a></span><span class="op">(</span><span class="va">all_articles</span>, <span class="va">primary_term</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">primary_term_variations</span><span class="op">)</span>, <span class="st">"variations of"</span>, <span class="va">primary_term</span>, <span class="st">"in the corpus:\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Found 13 variations of migraine in the corpus:</span></span>
+<span><span class="co">#&gt; Found 15 variations of migraine in the corpus:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">primary_term_variations</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "migraine"    "Migraine"    "MigrainE"    "migraines"   "Migraines"  </span></span>
-<span><span class="co">#&gt;  [6] "migraineur"  "ofmigraine"  "Migraineux"  "migraineurs" "Migraineurs"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "migraine"    "Migraine"    "MigrainE"    "MIGRAINE"    "Migraines"  </span></span>
+<span><span class="co">#&gt;  [6] "migraines"   "migraineur"  "ofmigraine"  "migraineurs" "Migraineurs"</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="preprocess-text-data">5. Preprocess text data<a class="anchor" aria-label="anchor" href="#preprocess-text-data"></a>
@@ -207,8 +207,8 @@ treatment.</p>
 <span>  type_column <span class="op">=</span> <span class="st">"type"</span>,</span>
 <span>  validate_types <span class="op">=</span> <span class="cn">FALSE</span>  <span class="co"># Don't validate custom terms as they're trusted</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Sanitizing dictionary with 14 terms...</span></span>
-<span><span class="co">#&gt; Sanitization complete. 14 terms remaining (100% of original)</span></span></code></pre></div>
+<span><span class="co">#&gt; Sanitizing dictionary with 16 terms...</span></span>
+<span><span class="co">#&gt; Sanitization complete. 16 terms remaining (100% of original)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="extract-biomedical-entities">7. Extract biomedical entities<a class="anchor" aria-label="anchor" href="#extract-biomedical-entities"></a>
@@ -268,7 +268,7 @@ treatment.</p>
 <span>  <span class="va">standard_entities</span>,</span>
 <span>  <span class="va">primary_term</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Combined 6383 custom entities with 8929 standard entities.</span></span>
+<span><span class="co">#&gt; Combined 6290 custom entities with 8568 standard entities.</span></span>
 <span></span>
 <span><span class="co"># Filter entities to ensure only relevant biomedical terms are included</span></span>
 <span><span class="va">filtered_entities</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/valid_entities.html">valid_entities</a></span><span class="op">(</span></span>
@@ -277,31 +277,31 @@ treatment.</p>
 <span>  <span class="va">primary_term_variations</span>,</span>
 <span>  validation_function <span class="op">=</span> <span class="va">is_valid_biomedical_entity</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Filtered from 9338 to 9338 validated entities</span></span>
+<span><span class="co">#&gt; Filtered from 8964 to 8964 validated entities</span></span>
 <span></span>
 <span><span class="co"># View the first few extracted entities</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">filtered_entities</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         entity entity_type doc_id start_pos end_pos</span></span>
-<span><span class="co">#&gt; 1 antimigraine     disease    251       368     379</span></span>
-<span><span class="co">#&gt; 2 antimigraine     disease    251       667     678</span></span>
-<span><span class="co">#&gt; 3 antimigraine     disease    292      1188    1199</span></span>
-<span><span class="co">#&gt; 4 antimigraine     disease    292       876     887</span></span>
-<span><span class="co">#&gt; 5 antimigraine     disease    292       632     643</span></span>
-<span><span class="co">#&gt; 6 antimigraine     disease    388       670     681</span></span>
-<span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                                      sentence</span></span>
-<span><span class="co">#&gt; 1                                                                 However, the administration of antimigraine drugs in conventional oral pharmaceutical dosage forms is a challenge, since many molecules have difficulty crossing the blood-brain barrier (BBB) to reach the brain, which leads to bioavailability problems.</span></span>
-<span><span class="co">#&gt; 2                                                                                                                                                                                                                           Efforts have been made to find alternative delivery systems and/or routes for antimigraine drugs.</span></span>
-<span><span class="co">#&gt; 3                   The existence of patients with medication-resistant migraine may be due to the: (i) complex migraine pathophysiology, in which several systems appear to be deregulated before, during, and after a migraine attack; and (ii) pharmacodynamic and pharmacokinetic properties of antimigraine medications.</span></span>
-<span><span class="co">#&gt; 4                                                                                                                                                          EXPERT OPINION: Current anti-CGRPergic medications, although effective, have limitations, such as side effects and lack of antimigraine efficacy in some patients.</span></span>
-<span><span class="co">#&gt; 5 AREAS COVERED: By searching multiple electronic scientific databases, this narrative review examined: (i) the role of CGRP in migraine; and (ii) the current knowledge on the effects of CGRPergic antimigraine pharmacotherapies, including a brief analysis of their pharmacodynamic and pharmacokinetic characteristics.</span></span>
-<span><span class="co">#&gt; 6                                                                                                                                    Behavioral analysis, antioxidant assay, immunohistochemistry (IHC), histopathological examination, ELISA, and RT-PCR were conducted to evaluate the antimigraine potential of genistein.</span></span>
+<span><span class="co">#&gt; 1 antimigraine     disease    129      1488    1499</span></span>
+<span><span class="co">#&gt; 2 antimigraine     disease    136      1671    1682</span></span>
+<span><span class="co">#&gt; 3 antimigraine     disease    432       368     379</span></span>
+<span><span class="co">#&gt; 4 antimigraine     disease    432       667     678</span></span>
+<span><span class="co">#&gt; 5 antimigraine     disease    474      1188    1199</span></span>
+<span><span class="co">#&gt; 6 antimigraine     disease    474       876     887</span></span>
+<span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                    sentence</span></span>
+<span><span class="co">#&gt; 1                                                                                         CONCLUSION AND IMPLICATIONS: DOP-mediated antimigraine effect is stronger in female than male rats and appears to be mediated in chronic conditions through peripheral DOPs in females and central DOPs in males.</span></span>
+<span><span class="co">#&gt; 2                                                                                                                                    Our results suggest that the antagonism on the alpha-CGRP isoform plays a relevant role in the antimigraine action of mABs but not in the development of constipation.</span></span>
+<span><span class="co">#&gt; 3                                               However, the administration of antimigraine drugs in conventional oral pharmaceutical dosage forms is a challenge, since many molecules have difficulty crossing the blood-brain barrier (BBB) to reach the brain, which leads to bioavailability problems.</span></span>
+<span><span class="co">#&gt; 4                                                                                                                                                                                                         Efforts have been made to find alternative delivery systems and/or routes for antimigraine drugs.</span></span>
+<span><span class="co">#&gt; 5 The existence of patients with medication-resistant migraine may be due to the: (i) complex migraine pathophysiology, in which several systems appear to be deregulated before, during, and after a migraine attack; and (ii) pharmacodynamic and pharmacokinetic properties of antimigraine medications.</span></span>
+<span><span class="co">#&gt; 6                                                                                                                                        EXPERT OPINION: Current anti-CGRPergic medications, although effective, have limitations, such as side effects and lack of antimigraine efficacy in some patients.</span></span>
 <span><span class="co">#&gt;   frequency</span></span>
-<span><span class="co">#&gt; 1        13</span></span>
-<span><span class="co">#&gt; 2        13</span></span>
-<span><span class="co">#&gt; 3        13</span></span>
-<span><span class="co">#&gt; 4        13</span></span>
-<span><span class="co">#&gt; 5        13</span></span>
-<span><span class="co">#&gt; 6        13</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        24</span></span>
+<span><span class="co">#&gt; 2        24</span></span>
+<span><span class="co">#&gt; 3        24</span></span>
+<span><span class="co">#&gt; 4        24</span></span>
+<span><span class="co">#&gt; 5        24</span></span>
+<span><span class="co">#&gt; 6        24</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="create-co-occurrence-matrix">8. Create co-occurrence matrix<a class="anchor" aria-label="anchor" href="#create-co-occurrence-matrix"></a>
@@ -374,19 +374,19 @@ treatment.</p>
 <span><span class="co">#&gt; Not enough results with strict filtering. Trying with less stringent criteria...</span></span>
 <span><span class="co">#&gt; Filtered 8 B terms (61.5%) that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.8)</span></span>
-<span><span class="co">#&gt; Filtered 8 potential C terms that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; Filtered 9 potential C terms that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Identifying potential C terms via 5 B terms...</span></span>
 <span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==============                                                        |  20%  |                                                                              |============================                                          |  40%  |                                                                              |==========================================                            |  60%  |                                                                              |========================================================              |  80%  |                                                                              |======================================================================| 100%</span></span>
 <span></span>
 <span><span class="co"># View top results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a_term"</span>, <span class="st">"b_term"</span>, <span class="st">"c_term"</span>, <span class="st">"abc_score"</span>, <span class="st">"b_type"</span>, <span class="st">"c_type"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               a_term     b_term       c_term  abc_score  b_type  c_type</span></span>
-<span><span class="co">#&gt; thrombosis1 migraine thrombosis      heparin 0.05907662 disease    drug</span></span>
-<span><span class="co">#&gt; headache2   migraine   headache      heparin 0.05746834 symptom    drug</span></span>
-<span><span class="co">#&gt; headache1   migraine   headache   enoxaparin 0.05632963 symptom    drug</span></span>
-<span><span class="co">#&gt; headache3   migraine   headache  myocarditis 0.05515907 symptom disease</span></span>
-<span><span class="co">#&gt; headache    migraine   headache azithromycin 0.05207699 symptom    drug</span></span>
-<span><span class="co">#&gt; headache4   migraine   headache  tocilizumab 0.05207699 symptom    drug</span></span></code></pre></div>
+<span><span class="co">#&gt;               a_term     b_term       c_term  abc_score  b_type c_type</span></span>
+<span><span class="co">#&gt; thrombosis1 migraine thrombosis      heparin 0.09961923 disease   drug</span></span>
+<span><span class="co">#&gt; headache2   migraine   headache      heparin 0.05811442 symptom   drug</span></span>
+<span><span class="co">#&gt; headache    migraine   headache azithromycin 0.05256587 symptom   drug</span></span>
+<span><span class="co">#&gt; headache3   migraine   headache  tocilizumab 0.05163691 symptom   drug</span></span>
+<span><span class="co">#&gt; headache1   migraine   headache   enoxaparin 0.05115447 symptom   drug</span></span>
+<span><span class="co">#&gt; fatigue     migraine    fatigue  tocilizumab 0.01577138 symptom   drug</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="apply-statistical-validation-to-the-results">10. Apply statistical validation to the results<a class="anchor" aria-label="anchor" href="#apply-statistical-validation-to-the-results"></a>
@@ -410,7 +410,7 @@ treatment.</p>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimized approach for large matrix validation...</span></span>
-<span><span class="co">#&gt; Using metadata for document count: 1692</span></span>
+<span><span class="co">#&gt; Using metadata for document count: 1689</span></span>
 <span><span class="co">#&gt; Calculating statistical significance using hypergeometric test...</span></span>
 <span><span class="co">#&gt; 0.0% of connections are statistically significant (p &lt; 0.10, BH correction)</span></span>
 <span></span>
@@ -422,12 +422,12 @@ treatment.</p>
 <span><span class="co"># View top validated results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a_term"</span>, <span class="st">"b_term"</span>, <span class="st">"c_term"</span>, <span class="st">"abc_score"</span>, <span class="st">"p_value"</span>, <span class="st">"significant"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;               a_term     b_term       c_term  abc_score p_value significant</span></span>
-<span><span class="co">#&gt; thrombosis1 migraine thrombosis      heparin 0.05907662       1       FALSE</span></span>
-<span><span class="co">#&gt; headache2   migraine   headache      heparin 0.05746834       1       FALSE</span></span>
-<span><span class="co">#&gt; headache1   migraine   headache   enoxaparin 0.05632963       1       FALSE</span></span>
-<span><span class="co">#&gt; headache3   migraine   headache  myocarditis 0.05515907       1       FALSE</span></span>
-<span><span class="co">#&gt; headache    migraine   headache azithromycin 0.05207699       1       FALSE</span></span>
-<span><span class="co">#&gt; headache4   migraine   headache  tocilizumab 0.05207699       1       FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt; thrombosis1 migraine thrombosis      heparin 0.09961923       1       FALSE</span></span>
+<span><span class="co">#&gt; headache2   migraine   headache      heparin 0.05811442       1       FALSE</span></span>
+<span><span class="co">#&gt; headache    migraine   headache azithromycin 0.05256587       1       FALSE</span></span>
+<span><span class="co">#&gt; headache3   migraine   headache  tocilizumab 0.05163691       1       FALSE</span></span>
+<span><span class="co">#&gt; headache1   migraine   headache   enoxaparin 0.05115447       1       FALSE</span></span>
+<span><span class="co">#&gt; fatigue     migraine    fatigue  tocilizumab 0.01577138       1       FALSE</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="diversify-and-ensure-minimum-results">11. Diversify and ensure minimum results<a class="anchor" aria-label="anchor" href="#diversify-and-ensure-minimum-results"></a>
@@ -505,9 +505,9 @@ treatment.</p>
 <span>  min_score <span class="op">=</span> <span class="fl">0.0001</span>,</span>
 <span>  open <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Number of unique terms: 9</span></span>
+<span><span class="co">#&gt; Number of unique terms: 8</span></span>
 <span><span class="co">#&gt; First few terms: migraine, thrombosis, headache, fatigue, heparin</span></span>
-<span><span class="co">#&gt; Role assignments: A=1, B=3, C=5</span></span></code></pre></div>
+<span><span class="co">#&gt; Role assignments: A=1, B=3, C=4</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="evaluate-literature-support-and-generate-report">14. Evaluate literature support and generate report<a class="anchor" aria-label="anchor" href="#evaluate-literature-support-and-generate-report"></a>
@@ -524,43 +524,43 @@ treatment.</p>
 <span><span class="co">#&gt; === Evaluation of Top Results ===</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Evaluating potential treatment: heparin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0591 </span></span>
+<span><span class="co">#&gt; ABC score: 0.0996 </span></span>
 <span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
 <span><span class="co">#&gt; Connection through intermediary: thrombosis</span></span>
 <span><span class="co">#&gt; Found 4 articles directly linking migraine and heparin </span></span>
 <span><span class="co">#&gt; Most recent article: Stroke Following Blunt Head Trauma: A Case Report and Review of the Literature. </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Evaluating potential treatment: heparin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0575 </span></span>
+<span><span class="co">#&gt; ABC score: 0.0581 </span></span>
 <span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
 <span><span class="co">#&gt; Connection through intermediary: headache</span></span>
 <span><span class="co">#&gt; Found 4 articles directly linking migraine and heparin </span></span>
 <span><span class="co">#&gt; Most recent article: Stroke Following Blunt Head Trauma: A Case Report and Review of the Literature. </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Evaluating potential treatment: enoxaparin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0563 </span></span>
-<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
-<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
-<span><span class="co">#&gt; Found 5 articles directly linking migraine and enoxaparin </span></span>
-<span><span class="co">#&gt; Most recent article: Cerebral Venous Sinus Thrombosis Following Varicella Infection: A Case Report. </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Evaluating potential treatment: myocarditis  (disease) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0552 </span></span>
-<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
-<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
-<span><span class="co">#&gt; Found 4 articles directly linking migraine and myocarditis </span></span>
-<span><span class="co">#&gt; Most recent article: Brain white matter hyperintensities in Kawasaki disease: A case-control study. </span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Evaluating potential treatment: azithromycin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0521 </span></span>
+<span><span class="co">#&gt; ABC score: 0.0526 </span></span>
 <span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
 <span><span class="co">#&gt; Connection through intermediary: headache</span></span>
 <span><span class="co">#&gt; Found 1 articles directly linking migraine and azithromycin </span></span>
-<span><span class="co">#&gt; Most recent article: A comparison of ciprofloxacin, norfloxacin, ofloxacin, azithromycin and cefixime examined by observational cohort studies.</span></span>
+<span><span class="co">#&gt; Most recent article: A comparison of ciprofloxacin, norfloxacin, ofloxacin, azithromycin and cefixime examined by observational cohort studies. </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Evaluating potential treatment: tocilizumab  (drug) </span></span>
+<span><span class="co">#&gt; ABC score: 0.0516 </span></span>
+<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
+<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
+<span><span class="co">#&gt; Found 1 articles directly linking migraine and tocilizumab </span></span>
+<span><span class="co">#&gt; Most recent article: Lingual necrosis in giant-cell arteritis: a case-based review. </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Evaluating potential treatment: enoxaparin  (drug) </span></span>
+<span><span class="co">#&gt; ABC score: 0.0512 </span></span>
+<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
+<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
+<span><span class="co">#&gt; Found 5 articles directly linking migraine and enoxaparin </span></span>
+<span><span class="co">#&gt; Most recent article: Cerebral Venous Sinus Thrombosis Following Varicella Infection: A Case Report.</span></span>
 <span></span>
 <span><span class="co"># Prepare articles for report generation</span></span>
 <span><span class="va">articles_with_years</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_articles.html">prep_articles</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Found 1925 articles with valid publication years</span></span>
+<span><span class="co">#&gt; Found 1930 articles with valid publication years</span></span>
 <span></span>
 <span><span class="co"># Store results for report</span></span>
 <span><span class="va">results_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>abc <span class="op">=</span> <span class="va">diverse_results</span><span class="op">)</span></span>
@@ -719,7 +719,7 @@ literature. Users can explore examples that are included in the
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Text Preprocessing and Entity Extraction</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-05-15</h4>
+            <h4 data-toc-skip class="date">2025-09-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Text_Preprocessing.Rmd" class="external-link"><code>vignettes/Text_Preprocessing.Rmd</code></a></small>
       <div class="d-none name"><code>Text_Preprocessing.Rmd</code></div>
@@ -106,7 +106,7 @@ relationships between biomedical concepts.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Created pubmed_cache environment for result caching</span></span>
 <span><span class="co">#&gt; Searching PubMed for: migraine pathophysiology</span></span>
-<span><span class="co">#&gt; Found 11643 results, retrieving 100 records</span></span>
+<span><span class="co">#&gt; Found 11828 results, retrieving 100 records</span></span>
 <span><span class="co">#&gt; Fetching batch 1 of 1 (records 1-100)</span></span>
 <span><span class="co">#&gt; Processing 100 articles</span></span>
 <span><span class="co">#&gt;   Processing article 100 of 100</span></span>
@@ -115,13 +115,13 @@ relationships between biomedical concepts.</p>
 <span><span class="co"># View the first article</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">migraine_articles</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pmid"</span>, <span class="st">"title"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       pmid</span></span>
-<span><span class="co">#&gt; 1 40371864</span></span>
-<span><span class="co">#&gt; 2 40357069</span></span>
-<span><span class="co">#&gt; 3 40354987</span></span>
-<span><span class="co">#&gt;                                                                                                                         title</span></span>
-<span><span class="co">#&gt; 1 [Morning headaches in patients with obstructive sleep apnea syndrome: Pathogenesis, differential diagnosis, and treatment].</span></span>
-<span><span class="co">#&gt; 2             Third Occipital Nerve Block and Cooled Radiofrequency Ablation for Managing Hemicrania Continua: A Case Report.</span></span>
-<span><span class="co">#&gt; 3                     Hypothalamic connectivity strength is decreasing with polygenic risk in migraine without aura patients.</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 40979183</span></span>
+<span><span class="co">#&gt; 2 40977107</span></span>
+<span><span class="co">#&gt; 3 40973555</span></span>
+<span><span class="co">#&gt;                                                                                                                                                                                              title</span></span>
+<span><span class="co">#&gt; 1                                              New daily persistent headache with May-Thurner physiology and spinal epidural venous congestion: treatment with ascending lumbar vein embolization.</span></span>
+<span><span class="co">#&gt; 2 Exploring the Link Between Inflammatory Biomarkers (SII, SIRI, PLR, NLR, LMR) and Migraine in Young and Early Middle-Aged US Adults: Evidence From NHANES 1999-2004 and Machine Learning Models.</span></span>
+<span><span class="co">#&gt; 3                                                                                                                                                                 Migraine: advances in treatment.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="basic-text-preprocessing">Basic Text Preprocessing<a class="anchor" aria-label="anchor" href="#basic-text-preprocessing"></a>
@@ -142,17 +142,17 @@ terms:</p>
 <span></span>
 <span><span class="co"># View terms extracted from the first document</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">preprocessed_data</span><span class="op">$</span><span class="va">terms</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt;          word count</span></span>
-<span><span class="co">#&gt; 1   abdominal     1</span></span>
-<span><span class="co">#&gt; 2   addressed     1</span></span>
-<span><span class="co">#&gt; 3      airway     1</span></span>
-<span><span class="co">#&gt; 4       algic     1</span></span>
-<span><span class="co">#&gt; 5       among     1</span></span>
-<span><span class="co">#&gt; 6  anatomical     1</span></span>
-<span><span class="co">#&gt; 7       apnea     3</span></span>
-<span><span class="co">#&gt; 8  associated     6</span></span>
-<span><span class="co">#&gt; 9   attention     1</span></span>
-<span><span class="co">#&gt; 10       back     1</span></span></code></pre></div>
+<span><span class="co">#&gt;            word count</span></span>
+<span><span class="co">#&gt; 1  additionally     1</span></span>
+<span><span class="co">#&gt; 2           alv     3</span></span>
+<span><span class="co">#&gt; 3        artery     1</span></span>
+<span><span class="co">#&gt; 4     ascending     1</span></span>
+<span><span class="co">#&gt; 5    associated     3</span></span>
+<span><span class="co">#&gt; 6         based     1</span></span>
+<span><span class="co">#&gt; 7           can     1</span></span>
+<span><span class="co">#&gt; 8          case     2</span></span>
+<span><span class="co">#&gt; 9      clinical     2</span></span>
+<span><span class="co">#&gt; 10       common     2</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="optimized-preprocessing-for-large-datasets">Optimized Preprocessing for Large Datasets<a class="anchor" aria-label="anchor" href="#optimized-preprocessing-for-large-datasets"></a>
 </h4>
@@ -180,7 +180,7 @@ preprocessing function:</p>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Tokenizing text...</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.065   0.000   0.064</span></span>
+<span><span class="co">#&gt;   0.063   0.000   0.063</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/vec_preprocess.html">vec_preprocess</a></span><span class="op">(</span></span>
@@ -193,7 +193,7 @@ preprocessing function:</p>
 <span><span class="co">#&gt; Processing text in 2 chunks...</span></span>
 <span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;    0.06    0.00    0.06</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.064   0.000   0.064</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -215,16 +215,16 @@ concepts:</p>
 <span><span class="co"># View the most frequent bigrams</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bigrams</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                 ngram frequency</span></span>
-<span><span class="co">#&gt; 7529           in the       161</span></span>
-<span><span class="co">#&gt; 10138     of migraine        79</span></span>
-<span><span class="co">#&gt; 10239          of the        79</span></span>
-<span><span class="co">#&gt; 10631             p 0        79</span></span>
-<span><span class="co">#&gt; 10987   patients with        68</span></span>
-<span><span class="co">#&gt; 16211   with migraine        58</span></span>
-<span><span class="co">#&gt; 7452      in migraine        51</span></span>
-<span><span class="co">#&gt; 2828  associated with        48</span></span>
-<span><span class="co">#&gt; 14627      this study        47</span></span>
-<span><span class="co">#&gt; 14908          to the        44</span></span></code></pre></div>
+<span><span class="co">#&gt; 8000           in the       135</span></span>
+<span><span class="co">#&gt; 11049          of the        82</span></span>
+<span><span class="co">#&gt; 11445             p 0        82</span></span>
+<span><span class="co">#&gt; 7909      in migraine        69</span></span>
+<span><span class="co">#&gt; 10916     of migraine        69</span></span>
+<span><span class="co">#&gt; 11819   patients with        58</span></span>
+<span><span class="co">#&gt; 2825  associated with        44</span></span>
+<span><span class="co">#&gt; 9707     migraine and        44</span></span>
+<span><span class="co">#&gt; 17388   with migraine        44</span></span>
+<span><span class="co">#&gt; 8629             is a        42</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="sentence-segmentation">Sentence Segmentation<a class="anchor" aria-label="anchor" href="#sentence-segmentation"></a>
@@ -260,15 +260,15 @@ analysis:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"No sentences could be extracted. The abstract might be too short or formatted incorrectly.\n"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; [1] "Sleep disorders are often associated with painful ones, especially in patients with chronic syndromes."                                     </span></span>
-<span><span class="co">#&gt; [2] "Cephalgia occupies an important place among such algic forms as fibromyalgia, back pain, and abdominal and joint pain."                     </span></span>
-<span><span class="co">#&gt; [3] "Headaches and sleep disturbances may be independent, deri.e. from a single pathogenetic factor, or their relationship may be bidi.e.tional."</span></span>
+<span><span class="co">#&gt; [1] "May-Thurner physiology (MTP) can lead to various congestion syndromes due to compression of the left common iliac vein (LCIV) by the right common iliac artery (RCIA)."                    </span></span>
+<span><span class="co">#&gt; [2] "This compression may result in venous reflux through the lumbar vein, leading to congestion of the spinal epidural venous plexus (EVP), which could contribute to refractory headaches."   </span></span>
+<span><span class="co">#&gt; [3] "This case report details the clinical course of a patient with severe refractory new daily persistent headache associated with MTP who underwent ascending lumbar vein (ALV) embolization."</span></span>
 <span></span>
 <span><span class="co"># View the first few sentences</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sentences</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Sleep disorders are often associated with painful ones, especially in patients with chronic syndromes."                                     </span></span>
-<span><span class="co">#&gt; [2] "Cephalgia occupies an important place among such algic forms as fibromyalgia, back pain, and abdominal and joint pain."                     </span></span>
-<span><span class="co">#&gt; [3] "Headaches and sleep disturbances may be independent, deri.e. from a single pathogenetic factor, or their relationship may be bidi.e.tional."</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "May-Thurner physiology (MTP) can lead to various congestion syndromes due to compression of the left common iliac vein (LCIV) by the right common iliac artery (RCIA)."                    </span></span>
+<span><span class="co">#&gt; [2] "This compression may result in venous reflux through the lumbar vein, leading to congestion of the spinal epidural venous plexus (EVP), which could contribute to refractory headaches."   </span></span>
+<span><span class="co">#&gt; [3] "This case report details the clinical course of a patient with severe refractory new daily persistent headache associated with MTP who underwent ascending lumbar vein (ALV) embolization."</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="language-detection">Language Detection<a class="anchor" aria-label="anchor" href="#language-detection"></a>
@@ -292,18 +292,18 @@ each document:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No valid abstracts found for language detection"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         abstract_id</span></span>
-<span><span class="co">#&gt; Sleep disorders are often associated with painful ones, especially in patients with chronic syndromes. Cephalgia occupies an important place among such algic forms as fibromyalgia, back pain, and abdominal and joint pain. Headaches and sleep disturbances may be independent, derived from a single pathogenetic factor, or their relationship may be bidirectional. This review focuses on the reciprocal relationship between headaches and sleep disorders; particular attention is paid to the morning headache variant associated with obstructive sleep apnea (OSA). Modern data on the anatomical structures and pathophysiological mechanisms common to disorders in the regulation of the sleep-wake cycle and the perception of pain impulses are presented. Possible pathogenetic processes and nuances of differential diagnosis of headaches associated with sleep apnea are discussed. Methods of treating headaches associated with sleep disorders, in particular OSA-associated cephalgia, are addressed. The effectiveness of therapy with constant positive airway pressure (CPAP therapy) and splint therapy for OSA has been shown for headaches associated with sleep apnea.                                                                                                                                                                                                                           1</span></span>
-<span><span class="co">#&gt; Hemicrania continua is a rare and debilitating headache disorder characterized by continuous, unilateral pain that responds to indomethacin but is often resistant to other treatments. This report presents the case of a 26-year-old female patient with refractory hemicrania continua and chronic migraine who achieved significant pain relief following a fluoroscopy-guided third occipital nerve block and subsequent radiofrequency ablation (RFA) of the C2-C3 facet joint. The procedure resulted in an immediate reduction of pain as evident from a reduction in the Visual Analog Scale (VAS) score from 10/10 to 0/10, with sustained relief (VAS 2/10) at three months and notable improvement in the patient's quality of life. This case highlights the potential efficacy of targeting the third occipital nerve for the management of hemicrania continua, with thermal RFA (COOLIEF, Avanos Medical, Inc., Alpharetta, GA) offering prolonged relief by ablating nociceptive fibers. Given the emerging evidence supporting the involvement of the third occipital nerve in headache pathophysiology, the third occipital nerve block and RFA represent promising strategies for refractory cases.                                                                                                                                                                                                           2</span></span>
-<span><span class="co">#&gt; Migraine is a heritable primary headache disorder which pathophysiology involves altered hypothalamic activity during migraine attacks. To explore the relationship between hypothalamic functional connectivity (HYPT FC) and genetic predisposition characterised by polygenic risk scores (PRS), in migraine, this research examines two types of PRS: one based on all migraine patients (PRSALL) regardless their time of diagnosis and other disorders, and another on "migraine-first" patients (PRSFIRST), whose first diagnosed condition was migraine in their lifetime. In an independent sample of 35 migraine patients and 38 healthy controls, using resting-state functional magnetic resonance (rfMRI, 3T) brain imaging, the study reveals significant hypoconnectivity of hypothalamus with the two investigated PRS scores but with different brain areas. While weakened hypothalamic connections in relations with PRSALL highlight regions involved in pain modulation, correlation with PRSFIRST emphasizes decreased connections with sensory and integrative brain areas, suggesting a link between migraine-first genetic risk and cortical hyperexcitability. Our results demonstrate that the polygenic risk of different migraine subgroups may advance our insight into the specific genetic and neural underpinnings of migraine, advancing precision medicine approaches in this field.           3</span></span>
-<span><span class="co">#&gt; Like Janus, the Roman god of beginnings, transitions, and endings, spreading depolarizations (SDs) can be depicted with two faces: one looking backward, waving a symbolic farewell to the end of a cortical seizure; the other forward looking, opening a darker door for a fatal wave in the brainstem that ends life. There is good agreement on the distinct electrical nature of both events, but neither role is yet proven in patients. SD is a slow-moving wave of cellular depolarization that steadily silences neuronal networks and depresses EEG amplitude, whereas seizures represent fast, intermittent synchronization of neural networks with highly variable EEG activation patterns. However, the thresholds triggering both events are neither fixed nor inseparable; indeed, their co-occurrence and interaction depend on dimly-lit intrinsic brain pathophysiology. New insights into single gene control of SD and seizure thresholds are beginning to illuminate the darkness. Here, we review recent data and consider the title's question at the end.                                                                                                                                                                                                                                                                                                                                                 4</span></span>
-<span><span class="co">#&gt; The article addresses the main mechanisms of migraine pathogenesis in terms of biochemical features (neurotransmitter metabolism, neurochemistry, neurophysiology, and neurogenetics). The effect of hormones, electrolytes (magnesium, calcium, sodium), vitamins (vitamin D, B12), and other biologically active molecules (melatonin, L-carnitine, L-tryptophan) on the course of the disease is considered. Including some laboratory tests in the migraine diagnostic algorithm helps identify the secondary nature of headache and/or dizziness, manage therapeutic approaches, and adjust the prognosis and treatment outcomes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            5</span></span>
-<span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         language</span></span>
-<span><span class="co">#&gt; Sleep disorders are often associated with painful ones, especially in patients with chronic syndromes. Cephalgia occupies an important place among such algic forms as fibromyalgia, back pain, and abdominal and joint pain. Headaches and sleep disturbances may be independent, derived from a single pathogenetic factor, or their relationship may be bidirectional. This review focuses on the reciprocal relationship between headaches and sleep disorders; particular attention is paid to the morning headache variant associated with obstructive sleep apnea (OSA). Modern data on the anatomical structures and pathophysiological mechanisms common to disorders in the regulation of the sleep-wake cycle and the perception of pain impulses are presented. Possible pathogenetic processes and nuances of differential diagnosis of headaches associated with sleep apnea are discussed. Methods of treating headaches associated with sleep disorders, in particular OSA-associated cephalgia, are addressed. The effectiveness of therapy with constant positive airway pressure (CPAP therapy) and splint therapy for OSA has been shown for headaches associated with sleep apnea.                                                                                                                                                                                                                       en</span></span>
-<span><span class="co">#&gt; Hemicrania continua is a rare and debilitating headache disorder characterized by continuous, unilateral pain that responds to indomethacin but is often resistant to other treatments. This report presents the case of a 26-year-old female patient with refractory hemicrania continua and chronic migraine who achieved significant pain relief following a fluoroscopy-guided third occipital nerve block and subsequent radiofrequency ablation (RFA) of the C2-C3 facet joint. The procedure resulted in an immediate reduction of pain as evident from a reduction in the Visual Analog Scale (VAS) score from 10/10 to 0/10, with sustained relief (VAS 2/10) at three months and notable improvement in the patient's quality of life. This case highlights the potential efficacy of targeting the third occipital nerve for the management of hemicrania continua, with thermal RFA (COOLIEF, Avanos Medical, Inc., Alpharetta, GA) offering prolonged relief by ablating nociceptive fibers. Given the emerging evidence supporting the involvement of the third occipital nerve in headache pathophysiology, the third occipital nerve block and RFA represent promising strategies for refractory cases.                                                                                                                                                                                                       en</span></span>
-<span><span class="co">#&gt; Migraine is a heritable primary headache disorder which pathophysiology involves altered hypothalamic activity during migraine attacks. To explore the relationship between hypothalamic functional connectivity (HYPT FC) and genetic predisposition characterised by polygenic risk scores (PRS), in migraine, this research examines two types of PRS: one based on all migraine patients (PRSALL) regardless their time of diagnosis and other disorders, and another on "migraine-first" patients (PRSFIRST), whose first diagnosed condition was migraine in their lifetime. In an independent sample of 35 migraine patients and 38 healthy controls, using resting-state functional magnetic resonance (rfMRI, 3T) brain imaging, the study reveals significant hypoconnectivity of hypothalamus with the two investigated PRS scores but with different brain areas. While weakened hypothalamic connections in relations with PRSALL highlight regions involved in pain modulation, correlation with PRSFIRST emphasizes decreased connections with sensory and integrative brain areas, suggesting a link between migraine-first genetic risk and cortical hyperexcitability. Our results demonstrate that the polygenic risk of different migraine subgroups may advance our insight into the specific genetic and neural underpinnings of migraine, advancing precision medicine approaches in this field.       en</span></span>
-<span><span class="co">#&gt; Like Janus, the Roman god of beginnings, transitions, and endings, spreading depolarizations (SDs) can be depicted with two faces: one looking backward, waving a symbolic farewell to the end of a cortical seizure; the other forward looking, opening a darker door for a fatal wave in the brainstem that ends life. There is good agreement on the distinct electrical nature of both events, but neither role is yet proven in patients. SD is a slow-moving wave of cellular depolarization that steadily silences neuronal networks and depresses EEG amplitude, whereas seizures represent fast, intermittent synchronization of neural networks with highly variable EEG activation patterns. However, the thresholds triggering both events are neither fixed nor inseparable; indeed, their co-occurrence and interaction depend on dimly-lit intrinsic brain pathophysiology. New insights into single gene control of SD and seizure thresholds are beginning to illuminate the darkness. Here, we review recent data and consider the title's question at the end.                                                                                                                                                                                                                                                                                                                                             en</span></span>
-<span><span class="co">#&gt; The article addresses the main mechanisms of migraine pathogenesis in terms of biochemical features (neurotransmitter metabolism, neurochemistry, neurophysiology, and neurogenetics). The effect of hormones, electrolytes (magnesium, calcium, sodium), vitamins (vitamin D, B12), and other biologically active molecules (melatonin, L-carnitine, L-tryptophan) on the course of the disease is considered. Including some laboratory tests in the migraine diagnostic algorithm helps identify the secondary nature of headache and/or dizziness, manage therapeutic approaches, and adjust the prognosis and treatment outcomes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        en</span></span></code></pre></div>
+<span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              abstract_id</span></span>
+<span><span class="co">#&gt; May-Thurner physiology (MTP) can lead to various congestion syndromes due to compression of the left common iliac vein (LCIV) by the right common iliac artery (RCIA). This compression may result in venous reflux through the lumbar vein, leading to congestion of the spinal epidural venous plexus (EVP), which could contribute to refractory headaches. This case report details the clinical course of a patient with severe refractory new daily persistent headache associated with MTP who underwent ascending lumbar vein (ALV) embolization. The patient is a 59-year-old female with a 3-year history of daily persistent headache which failed multiple migraine prevention therapies and minimally invasive procedures. Imaging studies revealed significant LCIV compression by the RCIA, retrograde ALV flow, and EVP congestion. The patient underwent ALV embolization, resulting in significant symptomatic relief. At the 22-month follow-up, headache severity reduced by 80%, with the patient no longer requiring routine headache medications. Additionally, treatment of associated pelvic congestion syndrome through gonadal vein embolization resolved longstanding associated pelvic pain and pressure. This case highlights the role of venous congestion in refractory headache syndromes and underscores the potential of targeted venous interventions, such as embolization, in their management. The findings expand on emerging evidence linking venous compression syndromes to headache pathophysiology and support exploring interventional strategies as viable treatment options for selected patients. Further research is needed to validate these findings and establish evidence-based guidelines for clinical practice.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                1</span></span>
+<span><span class="co">#&gt; BACKGROUND: Migraines are a prevalent neurological condition that significantly impacts quality of life, but the underlying pathophysiology remains unclear. This study aims to explore the relationship between inflammatory biomarkers and migraine prevalence in young and early middle-aged Americans. The inflammatory biomarkers considered include the Systemic Immune-Inflammation Index (SII), Systemic Inflammatory Response Index (SIRI), Platelet-to-Lymphocyte Ratio (PLR), Neutrophil-to-Lymphocyte Ratio (NLR), and Lymphocyte-to-Monocyte Ratio (LMR). METHODS: Data from the National Health and Nutrition Examination Survey (NHANES) 1999-2004 were utilized for this investigation. Subgroup analysis, smooth curve fitting, and multivariable logistic regression were employed to evaluate associations. Boruta's algorithm, alongside nine machine learning models, was applied to identify key features. SHapley Additive Explanations (SHAP) values were used to interpret the leading models and highlight influential features. RESULTS: The study revealed no significant differences in SII, SIRI, NLR, or PLR between individuals with and without migraines. However, a significantly higher LMR was observed in individuals with migraines (mean difference: 0.37, p &lt; 0.001). Multivariable logistic regression analysis demonstrated a strong positive correlation between LMR and migraine risk across multiple models (OR = 1.51, 95% CI: 1.14-2.00, p = 0.009). No significant associations were found for the other inflammatory biomarkers. Subgroup analyses further confirmed that the positive correlation between LMR and migraine risk remained consistent across different strata. Threshold effect analysis revealed a stable linear relationship between LMR and migraine risk up to a value of 1.61. Among the nine machine learning models, the LightGBM model exhibited the highest AUROC (0.9198), recall (93.3%), F1-score (0.896), and MCC (0.702). CONCLUSIONS: LMR may serve as a potential biomarker for assessing migraine risk, offering support for early diagnosis and personalized intervention strategies.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               2</span></span>
+<span><span class="co">#&gt; Increased understanding of the pathophysiology of migraine has resulted in the development of therapies targeting calcitonin gene-related peptide and its receptor. Ditans, which are serotonin 5HT1F receptor agonists, have demonstrated efficacy in acute management and bypass vascular risks associated with triptans, which are 5HT1B/1D receptor agonists. However, despite favourable safety and efficacy data, many patients do not respond to these therapies. Treatments targeting pituitary adenylate cyclase activating polypeptide and other potential targets, including amylin and adrenomedullin and their receptors, KATP and transient receptor potential ion channels, as well as neuronal nitric oxide synthase, are emerging. Improving our understanding of patient heterogeneity in migraine biology may pave the way for precision medicine in migraine management.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           3</span></span>
+<span><span class="co">#&gt; Chiari malformation types 1 and 1.5 can be treated with posterior fossa decompression, though surgical techniques vary considerably, with more aggressive approaches often considered for type 1.5. Given this variability, an objective intraoperative marker of adequate decompression would support more tailored surgery. While brainstem auditory evoked potentials (BAEPs) have been explored in pediatric populations, their utility in adults remains unstudied. We present a 26-year-old female with Chiari 1.5 and symptoms including migraines, visual disturbances, balance issues, and right-hand clumsiness. She underwent a BAEP-guided, minimally invasive decompression involving a C1 laminectomy, linear dural opening, and tonsillar cauterization. Intraoperative BAEP monitoring allowed for a targeted, less extensive decompression, resulting in significant clinical improvement. This case highlights the potential utility of BAEPs in adult Chiari decompression, suggesting a role for further investigation of this technique in optimizing outcomes while minimizing invasiveness.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     4</span></span>
+<span><span class="co">#&gt; BackgroundPeople with high-frequency episodic migraine or chronic migraine may have resistant or refractory forms. The lack of efficacy of pharmacologic therapies is a major clinical challenge that requires alternative strategies, including neuromodulation and exploration of new targets to improve disease management. The present study aimed to test the effectiveness of an accelerated protocol of theta burst stimulation (iTBS) via the dorso lateral prefrontal cortex (DLPFC) in a group of chronic migraine individuals who did not respond to monoclonal antibodies against calcitonin gene-related peptide (CGRP). The co-primary outcomes were the reduction in monthly headache frequency, use of symptomatic medication and perceived pain intensity. In parallel we wanted to understand the possible role of the prefrontal cortex in the emotional and cognitive functions likely responsible for treatment failure and to offer a possible non-pharmacologic option to individuals with difficult-to-treat migraine. To this end, we measured clinical outcomes along with an electroencephalogram (EEG) and behavioral responses to cognitive and emotional tests related to prefrontal functions.MethodsThis study was conducted in a controlled, single-blind design in 12 people with chronic refractory migraine. An accelerated protocol of iTBS on DLPFC was preceded by a sham session and followed by a two-month follow-up. Clinical data were collected and a neuropsychological assessment including anxiety, depression and cognitive profile was performed. Cognitive and emotional Stroop testing was performed at baseline, after sham and real stimulation, and at follow-up during high-density EEG recording to obtain event-related potentials (N2, N400 and late sustained potential (LP)). Stroop data from an age- and sex-matched control group were compared with those of migraine individuals.ResultsMonthly headache days, monthly medication days and headache intensity improved after real stimulation. A similar trend emerged for anxiety, depression, and cognitive performance. The Stroop test was impaired in the baseline, as evidenced by an increase in reaction time and a decrease in N2 and LP in the cognitive task, which returned to normal after real iTBS and at follow-up.ConclusionsThe results support the efficacy of iTBS as a non-invasive neuromodulation approach for the treatment of chronic, refractory migraine. They tentatively point to the role of cognitive fog and psychopathological symptoms in refractoriness to anti-CGRP drugs, which should be confirmed in larger multicenter studies, and suggest this non-pharmacological approach as another promising therapeutic option for people with difficult-to-treat migraine.           5</span></span>
+<span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              language</span></span>
+<span><span class="co">#&gt; May-Thurner physiology (MTP) can lead to various congestion syndromes due to compression of the left common iliac vein (LCIV) by the right common iliac artery (RCIA). This compression may result in venous reflux through the lumbar vein, leading to congestion of the spinal epidural venous plexus (EVP), which could contribute to refractory headaches. This case report details the clinical course of a patient with severe refractory new daily persistent headache associated with MTP who underwent ascending lumbar vein (ALV) embolization. The patient is a 59-year-old female with a 3-year history of daily persistent headache which failed multiple migraine prevention therapies and minimally invasive procedures. Imaging studies revealed significant LCIV compression by the RCIA, retrograde ALV flow, and EVP congestion. The patient underwent ALV embolization, resulting in significant symptomatic relief. At the 22-month follow-up, headache severity reduced by 80%, with the patient no longer requiring routine headache medications. Additionally, treatment of associated pelvic congestion syndrome through gonadal vein embolization resolved longstanding associated pelvic pain and pressure. This case highlights the role of venous congestion in refractory headache syndromes and underscores the potential of targeted venous interventions, such as embolization, in their management. The findings expand on emerging evidence linking venous compression syndromes to headache pathophysiology and support exploring interventional strategies as viable treatment options for selected patients. Further research is needed to validate these findings and establish evidence-based guidelines for clinical practice.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            en</span></span>
+<span><span class="co">#&gt; BACKGROUND: Migraines are a prevalent neurological condition that significantly impacts quality of life, but the underlying pathophysiology remains unclear. This study aims to explore the relationship between inflammatory biomarkers and migraine prevalence in young and early middle-aged Americans. The inflammatory biomarkers considered include the Systemic Immune-Inflammation Index (SII), Systemic Inflammatory Response Index (SIRI), Platelet-to-Lymphocyte Ratio (PLR), Neutrophil-to-Lymphocyte Ratio (NLR), and Lymphocyte-to-Monocyte Ratio (LMR). METHODS: Data from the National Health and Nutrition Examination Survey (NHANES) 1999-2004 were utilized for this investigation. Subgroup analysis, smooth curve fitting, and multivariable logistic regression were employed to evaluate associations. Boruta's algorithm, alongside nine machine learning models, was applied to identify key features. SHapley Additive Explanations (SHAP) values were used to interpret the leading models and highlight influential features. RESULTS: The study revealed no significant differences in SII, SIRI, NLR, or PLR between individuals with and without migraines. However, a significantly higher LMR was observed in individuals with migraines (mean difference: 0.37, p &lt; 0.001). Multivariable logistic regression analysis demonstrated a strong positive correlation between LMR and migraine risk across multiple models (OR = 1.51, 95% CI: 1.14-2.00, p = 0.009). No significant associations were found for the other inflammatory biomarkers. Subgroup analyses further confirmed that the positive correlation between LMR and migraine risk remained consistent across different strata. Threshold effect analysis revealed a stable linear relationship between LMR and migraine risk up to a value of 1.61. Among the nine machine learning models, the LightGBM model exhibited the highest AUROC (0.9198), recall (93.3%), F1-score (0.896), and MCC (0.702). CONCLUSIONS: LMR may serve as a potential biomarker for assessing migraine risk, offering support for early diagnosis and personalized intervention strategies.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           en</span></span>
+<span><span class="co">#&gt; Increased understanding of the pathophysiology of migraine has resulted in the development of therapies targeting calcitonin gene-related peptide and its receptor. Ditans, which are serotonin 5HT1F receptor agonists, have demonstrated efficacy in acute management and bypass vascular risks associated with triptans, which are 5HT1B/1D receptor agonists. However, despite favourable safety and efficacy data, many patients do not respond to these therapies. Treatments targeting pituitary adenylate cyclase activating polypeptide and other potential targets, including amylin and adrenomedullin and their receptors, KATP and transient receptor potential ion channels, as well as neuronal nitric oxide synthase, are emerging. Improving our understanding of patient heterogeneity in migraine biology may pave the way for precision medicine in migraine management.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       en</span></span>
+<span><span class="co">#&gt; Chiari malformation types 1 and 1.5 can be treated with posterior fossa decompression, though surgical techniques vary considerably, with more aggressive approaches often considered for type 1.5. Given this variability, an objective intraoperative marker of adequate decompression would support more tailored surgery. While brainstem auditory evoked potentials (BAEPs) have been explored in pediatric populations, their utility in adults remains unstudied. We present a 26-year-old female with Chiari 1.5 and symptoms including migraines, visual disturbances, balance issues, and right-hand clumsiness. She underwent a BAEP-guided, minimally invasive decompression involving a C1 laminectomy, linear dural opening, and tonsillar cauterization. Intraoperative BAEP monitoring allowed for a targeted, less extensive decompression, resulting in significant clinical improvement. This case highlights the potential utility of BAEPs in adult Chiari decompression, suggesting a role for further investigation of this technique in optimizing outcomes while minimizing invasiveness.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 en</span></span>
+<span><span class="co">#&gt; BackgroundPeople with high-frequency episodic migraine or chronic migraine may have resistant or refractory forms. The lack of efficacy of pharmacologic therapies is a major clinical challenge that requires alternative strategies, including neuromodulation and exploration of new targets to improve disease management. The present study aimed to test the effectiveness of an accelerated protocol of theta burst stimulation (iTBS) via the dorso lateral prefrontal cortex (DLPFC) in a group of chronic migraine individuals who did not respond to monoclonal antibodies against calcitonin gene-related peptide (CGRP). The co-primary outcomes were the reduction in monthly headache frequency, use of symptomatic medication and perceived pain intensity. In parallel we wanted to understand the possible role of the prefrontal cortex in the emotional and cognitive functions likely responsible for treatment failure and to offer a possible non-pharmacologic option to individuals with difficult-to-treat migraine. To this end, we measured clinical outcomes along with an electroencephalogram (EEG) and behavioral responses to cognitive and emotional tests related to prefrontal functions.MethodsThis study was conducted in a controlled, single-blind design in 12 people with chronic refractory migraine. An accelerated protocol of iTBS on DLPFC was preceded by a sham session and followed by a two-month follow-up. Clinical data were collected and a neuropsychological assessment including anxiety, depression and cognitive profile was performed. Cognitive and emotional Stroop testing was performed at baseline, after sham and real stimulation, and at follow-up during high-density EEG recording to obtain event-related potentials (N2, N400 and late sustained potential (LP)). Stroop data from an age- and sex-matched control group were compared with those of migraine individuals.ResultsMonthly headache days, monthly medication days and headache intensity improved after real stimulation. A similar trend emerged for anxiety, depression, and cognitive performance. The Stroop test was impaired in the baseline, as evidenced by an increase in reaction time and a decrease in N2 and LP in the cognitive task, which returned to normal after real iTBS and at follow-up.ConclusionsThe results support the efficacy of iTBS as a non-invasive neuromodulation approach for the treatment of chronic, refractory migraine. They tentatively point to the role of cognitive fog and psychopathological symptoms in refractoriness to anti-CGRP drugs, which should be confirmed in larger multicenter studies, and suggest this non-pharmacological approach as another promising therapeutic option for people with difficult-to-treat migraine.       en</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -323,7 +323,7 @@ recognition:</p>
 <span>  source <span class="op">=</span> <span class="st">"mesh"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: disease[MeSH]</span></span>
-<span><span class="co">#&gt; Found 193563 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 193984 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 5</span></span>
@@ -348,7 +348,7 @@ recognition:</p>
 <span>  source <span class="op">=</span> <span class="st">"mesh"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: pharmaceutical preparations[MeSH]</span></span>
-<span><span class="co">#&gt; Found 985543 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 999301 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 2</span></span>
@@ -386,34 +386,35 @@ dictionaries:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Sanitizing dictionary with 8 terms...</span></span>
 <span><span class="co">#&gt; Sanitization complete. 8 terms remaining (100% of original)</span></span>
-<span><span class="co">#&gt; Extracting entities from 98 documents...</span></span>
-<span><span class="co">#&gt; Extracted 36 entity mentions:</span></span>
-<span><span class="co">#&gt;   disease: 36</span></span>
+<span><span class="co">#&gt; Extracting entities from 100 documents...</span></span>
+<span><span class="co">#&gt; Processing document 100 of 100</span></span>
+<span><span class="co">#&gt; Extracted 27 entity mentions:</span></span>
+<span><span class="co">#&gt;   disease: 27</span></span>
 <span></span>
 <span><span class="co"># View some extracted entities</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">entities</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"doc_id"</span>, <span class="st">"entity"</span>, <span class="st">"entity_type"</span>, <span class="st">"sentence"</span><span class="op">)</span><span class="op">]</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    doc_id  entity entity_type</span></span>
 <span><span class="co">#&gt; 1       5 Disease     disease</span></span>
-<span><span class="co">#&gt; 2      10 Disease     disease</span></span>
-<span><span class="co">#&gt; 3      22 Disease     disease</span></span>
-<span><span class="co">#&gt; 4      22 Disease     disease</span></span>
-<span><span class="co">#&gt; 5      31 Disease     disease</span></span>
-<span><span class="co">#&gt; 6      41 Disease     disease</span></span>
-<span><span class="co">#&gt; 7      44 Disease     disease</span></span>
-<span><span class="co">#&gt; 8      45 Disease     disease</span></span>
-<span><span class="co">#&gt; 9      47 Disease     disease</span></span>
-<span><span class="co">#&gt; 10     54 Disease     disease</span></span>
-<span><span class="co">#&gt;                                                                                                                                                                                                                                 sentence</span></span>
-<span><span class="co">#&gt; 1               The effect of hormones, electrolytes (magnesium, calcium, sodium), vitamins (vitamin D, B12), and other biologically active molecules (melatonin, L-carnitine, L-tryptophan) on the course of the disease is considered.</span></span>
-<span><span class="co">#&gt; 2                                                The the prevalence of aura (p = 0.028), age (p = 0.001) and mean disease duration (p &lt; 0.001, t=-4.257) were significantly higher in migraine patients with WMH than those without WMH.</span></span>
-<span><span class="co">#&gt; 3                                                                                                                                                       Neuroimaging has contributed to a better understanding of VSS disease mechanism.</span></span>
-<span><span class="co">#&gt; 4                                                                                       Given the complexity of its disease state, multidisciplinary therapeutic approaches appear to be required for more effective symptom management.</span></span>
-<span><span class="co">#&gt; 5                                                                                 Ménière's disease (4%) and vestibular neuritis/labyrinthitis (3.9%) were associated with younger patients and unilateral or asymmetrical hearing loss.</span></span>
-<span><span class="co">#&gt; 6  Therefore, although migraine with and without aura are considered two types of the same disease, more research should focus on their differences, thus finally enabling better specific treatment options for both types of migraine.</span></span>
-<span><span class="co">#&gt; 7                                                                                                                                                      Common comorbidities were hypertension, diabetes, and polycystic ovarian disease.</span></span>
-<span><span class="co">#&gt; 8                                                             CONCLUSIONS: Our study shows that UFs share substantial genetic basis with traits related to BP, obesity, diabetes, and migraine, a predominantly female vascular disease.</span></span>
-<span><span class="co">#&gt; 9                  BACKGROUND: Coronavirus disease 2019 (COVID-19), caused by the SARS-CoV-2 virus, placed unprecedented pressure on public health systems due to its mortality and global panic-and later due to long COVID challenges.</span></span>
-<span><span class="co">#&gt; 10                        Central nervous system (CNS) disorders, such as Alzheimer's disease (AD), Parkinson's disease (PD), multiple sclerosis (MS), and migraines, rank among the most prevalent and concerning conditions worldwide.</span></span></code></pre></div>
+<span><span class="co">#&gt; 2       7 Disease     disease</span></span>
+<span><span class="co">#&gt; 3      12 Disease     disease</span></span>
+<span><span class="co">#&gt; 4      16 Disease     disease</span></span>
+<span><span class="co">#&gt; 5      28 Disease     disease</span></span>
+<span><span class="co">#&gt; 6      31 Disease     disease</span></span>
+<span><span class="co">#&gt; 7      36 Disease     disease</span></span>
+<span><span class="co">#&gt; 8      36 Disease     disease</span></span>
+<span><span class="co">#&gt; 9      38 Disease     disease</span></span>
+<span><span class="co">#&gt; 10     38 Disease     disease</span></span>
+<span><span class="co">#&gt;                                                                                                                                                                                                                           sentence</span></span>
+<span><span class="co">#&gt; 1                      The lack of efficacy of pharmacologic therapies is a major clinical challenge that requires alternative strategies, including neuromodulation and exploration of new targets to improve disease management.</span></span>
+<span><span class="co">#&gt; 2                                                                                        These criteria may also increase attention to this population's disease burden to help advocate for them as a specific migraine subgroup.</span></span>
+<span><span class="co">#&gt; 3                                                                 Cognitive performance is modulated by disease severity, chronification, hormonal fluctuations, psychiatric comorbidities, sleep disturbances and medication use.</span></span>
+<span><span class="co">#&gt; 4                               CONCLUSIONS: These findings indicate the importance of considering individual differences in VM research and may offer insights for precise diagnosis and individualized treatment of the disease.</span></span>
+<span><span class="co">#&gt; 5                                                                       Increasing evidence points to an overlap between migraine and cerebral small vessel disease (SVD), implicating vascular dysfunction in HM pathophysiology.</span></span>
+<span><span class="co">#&gt; 6                                       in cerebral autosomal dominant arteriopathy with subcortical infarcts and leukoencephalopathy (CADASIL) or epileptic seizures, or treatment of a primary independent chronic disease (e.g.</span></span>
+<span><span class="co">#&gt; 7                                                     Disease presentation varies in symptoms and duration, including vertigo, hearing loss, visual disturbances, migraine-like headaches, and central nervous system dysfunction.</span></span>
+<span><span class="co">#&gt; 8  The current classification of SuS remains unclear due to a lack of pathophysiology and many hypotheses have been suggested, such as genetic predisposition and/or previous immune challenge causing SuS as a secondary disease.</span></span>
+<span><span class="co">#&gt; 9                                            RESULTS: Four studies met the inclusion criteria, with an additional eight found through citation analysis that analyzed tens of thousands of patients with migraine disease overall.</span></span>
+<span><span class="co">#&gt; 10                                                                                                                        Six studies demonstrated an association between temperature or temperature changes and migraine disease.</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="complete-entity-extraction-workflow">Complete Entity Extraction Workflow<a class="anchor" aria-label="anchor" href="#complete-entity-extraction-workflow"></a>
@@ -458,7 +459,7 @@ extraction workflow:</p>
 <span><span class="co">#&gt; Creating dummy dictionary for gene</span></span>
 <span><span class="co">#&gt;   Added 20 terms from gene (local)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: proteins[MeSH]</span></span>
-<span><span class="co">#&gt; Found 7579035 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 7656074 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 5</span></span>
@@ -474,7 +475,7 @@ extraction workflow:</p>
 <span><span class="co">#&gt; Retrieved 105 unique terms from MeSH</span></span>
 <span><span class="co">#&gt;   Added 105 terms from protein (mesh)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: metabolic networks and pathways[MeSH]</span></span>
-<span><span class="co">#&gt; Found 184983 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 188790 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 1</span></span>
@@ -490,23 +491,24 @@ extraction workflow:</p>
 <span><span class="co">#&gt;   Removed 107 terms that did not match their claimed entity types</span></span>
 <span><span class="co">#&gt;   Removed 42 terms with non-alphanumeric characters (final cleanup)</span></span>
 <span><span class="co">#&gt; Sanitization complete. 14 terms remaining (8.2% of original)</span></span>
-<span><span class="co">#&gt; Extracting entities from 98 documents...</span></span>
+<span><span class="co">#&gt; Extracting entities from 100 documents...</span></span>
 <span><span class="co">#&gt; Processing batch 1/1</span></span>
-<span><span class="co">#&gt; Extracting entities from 98 documents...</span></span>
-<span><span class="co">#&gt; Extracted 662 entity mentions:</span></span>
-<span><span class="co">#&gt;   disease: 533</span></span>
-<span><span class="co">#&gt;   protein: 13</span></span>
-<span><span class="co">#&gt;   symptom: 116</span></span>
-<span><span class="co">#&gt; Extracted 662 entity mentions in 0.14 minutes</span></span>
-<span><span class="co">#&gt;   disease: 533</span></span>
-<span><span class="co">#&gt;   protein: 13</span></span>
-<span><span class="co">#&gt;   symptom: 116</span></span>
+<span><span class="co">#&gt; Extracting entities from 100 documents...</span></span>
+<span><span class="co">#&gt; Processing document 100 of 100</span></span>
+<span><span class="co">#&gt; Extracted 702 entity mentions:</span></span>
+<span><span class="co">#&gt;   disease: 530</span></span>
+<span><span class="co">#&gt;   protein: 17</span></span>
+<span><span class="co">#&gt;   symptom: 155</span></span>
+<span><span class="co">#&gt; Extracted 702 entity mentions in 0.14 minutes</span></span>
+<span><span class="co">#&gt;   disease: 530</span></span>
+<span><span class="co">#&gt;   protein: 17</span></span>
+<span><span class="co">#&gt;   symptom: 155</span></span>
 <span></span>
 <span><span class="co"># View summary of entity types</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">entities_workflow</span><span class="op">$</span><span class="va">entity_type</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; disease protein symptom </span></span>
-<span><span class="co">#&gt;     533      13     116</span></span></code></pre></div>
+<span><span class="co">#&gt;     530      17     155</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="customizing-entity-extraction">Customizing Entity Extraction<a class="anchor" aria-label="anchor" href="#customizing-entity-extraction"></a>
@@ -558,21 +560,22 @@ additional MeSH queries or custom dictionaries:</p>
 <span><span class="co">#&gt;   Removed 107 terms that did not match their claimed entity types</span></span>
 <span><span class="co">#&gt;   Removed 42 terms with non-alphanumeric characters (final cleanup)</span></span>
 <span><span class="co">#&gt; Sanitization complete. 14 terms remaining (8.2% of original)</span></span>
-<span><span class="co">#&gt; Extracting entities from 98 documents...</span></span>
+<span><span class="co">#&gt; Extracting entities from 100 documents...</span></span>
 <span><span class="co">#&gt; Processing batch 1/1</span></span>
-<span><span class="co">#&gt; Extracting entities from 98 documents...</span></span>
-<span><span class="co">#&gt; Extracted 736 entity mentions:</span></span>
-<span><span class="co">#&gt;   anatomy: 2</span></span>
-<span><span class="co">#&gt;   biological_process: 8</span></span>
-<span><span class="co">#&gt;   disease: 533</span></span>
-<span><span class="co">#&gt;   protein: 77</span></span>
-<span><span class="co">#&gt;   symptom: 116</span></span>
-<span><span class="co">#&gt; Extracted 736 entity mentions in 0.01 minutes</span></span>
-<span><span class="co">#&gt;   anatomy: 2</span></span>
-<span><span class="co">#&gt;   biological_process: 8</span></span>
-<span><span class="co">#&gt;   disease: 533</span></span>
-<span><span class="co">#&gt;   protein: 77</span></span>
-<span><span class="co">#&gt;   symptom: 116</span></span>
+<span><span class="co">#&gt; Extracting entities from 100 documents...</span></span>
+<span><span class="co">#&gt; Processing document 100 of 100</span></span>
+<span><span class="co">#&gt; Extracted 775 entity mentions:</span></span>
+<span><span class="co">#&gt;   anatomy: 1</span></span>
+<span><span class="co">#&gt;   biological_process: 9</span></span>
+<span><span class="co">#&gt;   disease: 530</span></span>
+<span><span class="co">#&gt;   protein: 80</span></span>
+<span><span class="co">#&gt;   symptom: 155</span></span>
+<span><span class="co">#&gt; Extracted 775 entity mentions in 0.01 minutes</span></span>
+<span><span class="co">#&gt;   anatomy: 1</span></span>
+<span><span class="co">#&gt;   biological_process: 9</span></span>
+<span><span class="co">#&gt;   disease: 530</span></span>
+<span><span class="co">#&gt;   protein: 80</span></span>
+<span><span class="co">#&gt;   symptom: 155</span></span>
 <span></span>
 <span><span class="co"># View custom entities</span></span>
 <span><span class="va">custom_entities</span><span class="op">[</span><span class="va">custom_entities</span><span class="op">$</span><span class="va">source</span> <span class="op">==</span> <span class="st">"custom"</span>, <span class="op">]</span></span>
@@ -637,7 +640,7 @@ MeSH or UMLS:</p>
 <span>  similarity_threshold <span class="op">=</span> <span class="fl">0.8</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: disease[MeSH]</span></span>
-<span><span class="co">#&gt; Found 193563 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 193984 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 5</span></span>
@@ -680,69 +683,69 @@ corpus:</p>
 <span><span class="co"># View top terms for each topic</span></span>
 <span><span class="va">topics</span><span class="op">$</span><span class="va">topics</span></span>
 <span><span class="co">#&gt; $`Topic 1`</span></span>
-<span><span class="co">#&gt;                term    weight</span></span>
-<span><span class="co">#&gt; migraine   migraine 158.54694</span></span>
-<span><span class="co">#&gt; cgrp           cgrp  33.93941</span></span>
-<span><span class="co">#&gt; aura           aura  28.48012</span></span>
-<span><span class="co">#&gt; headache   headache  26.85610</span></span>
-<span><span class="co">#&gt; pain           pain  26.52241</span></span>
-<span><span class="co">#&gt; between     between  23.21742</span></span>
-<span><span class="co">#&gt; patients   patients  20.81965</span></span>
-<span><span class="co">#&gt; study         study  20.37030</span></span>
-<span><span class="co">#&gt; related     related  20.09579</span></span>
-<span><span class="co">#&gt; treatment treatment  19.25877</span></span>
+<span><span class="co">#&gt;                  term    weight</span></span>
+<span><span class="co">#&gt; receptor     receptor 1.9657181</span></span>
+<span><span class="co">#&gt; receptors   receptors 1.9253816</span></span>
+<span><span class="co">#&gt; cgrp             cgrp 1.1020609</span></span>
+<span><span class="co">#&gt; family         family 0.9929711</span></span>
+<span><span class="co">#&gt; calcitonin calcitonin 0.9924144</span></span>
+<span><span class="co">#&gt; atogepant   atogepant 0.9653846</span></span>
+<span><span class="co">#&gt; ubrogepant ubrogepant 0.9550745</span></span>
+<span><span class="co">#&gt; rat               rat 0.9461572</span></span>
+<span><span class="co">#&gt; data             data 0.6556991</span></span>
+<span><span class="co">#&gt; human           human 0.6190749</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 2`</span></span>
-<span><span class="co">#&gt;                    term    weight</span></span>
-<span><span class="co">#&gt; progression progression 37.439073</span></span>
-<span><span class="co">#&gt; migraine       migraine 36.013245</span></span>
-<span><span class="co">#&gt; 634                 634 10.570779</span></span>
-<span><span class="co">#&gt; definitions definitions 10.570779</span></span>
-<span><span class="co">#&gt; midas             midas  9.241191</span></span>
-<span><span class="co">#&gt; mhd                 mhd  8.808983</span></span>
-<span><span class="co">#&gt; increase       increase  7.308507</span></span>
-<span><span class="co">#&gt; odds               odds  7.052829</span></span>
-<span><span class="co">#&gt; year               year  7.047243</span></span>
-<span><span class="co">#&gt; definition   definition  7.047186</span></span>
+<span><span class="co">#&gt;                  term   weight</span></span>
+<span><span class="co">#&gt; headache     headache 3.176157</span></span>
+<span><span class="co">#&gt; sleep           sleep 2.414030</span></span>
+<span><span class="co">#&gt; between       between 2.409866</span></span>
+<span><span class="co">#&gt; index           index 2.167505</span></span>
+<span><span class="co">#&gt; quality       quality 2.133990</span></span>
+<span><span class="co">#&gt; function     function 1.530117</span></span>
+<span><span class="co">#&gt; dti               dti 1.508792</span></span>
+<span><span class="co">#&gt; alps             alps 1.508792</span></span>
+<span><span class="co">#&gt; glymphatic glymphatic 1.508792</span></span>
+<span><span class="co">#&gt; patients     patients 1.437619</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 3`</span></span>
-<span><span class="co">#&gt;                    term   weight</span></span>
-<span><span class="co">#&gt; patients       patients 44.09683</span></span>
-<span><span class="co">#&gt; brain             brain 40.43149</span></span>
-<span><span class="co">#&gt; asd                 asd 39.81409</span></span>
-<span><span class="co">#&gt; mwoa               mwoa 39.58473</span></span>
-<span><span class="co">#&gt; stroke           stroke 34.74475</span></span>
-<span><span class="co">#&gt; after             after 31.86060</span></span>
-<span><span class="co">#&gt; network         network 29.71455</span></span>
-<span><span class="co">#&gt; significant significant 28.73627</span></span>
-<span><span class="co">#&gt; compared       compared 26.71239</span></span>
-<span><span class="co">#&gt; individuals individuals 25.19733</span></span>
+<span><span class="co">#&gt;                              term    weight</span></span>
+<span><span class="co">#&gt; light                       light 0.9386107</span></span>
+<span><span class="co">#&gt; hypersensitivity hypersensitivity 0.8763295</span></span>
+<span><span class="co">#&gt; isdn                         isdn 0.8286756</span></span>
+<span><span class="co">#&gt; mechanical             mechanical 0.8252680</span></span>
+<span><span class="co">#&gt; cephalic                 cephalic 0.7710377</span></span>
+<span><span class="co">#&gt; migraine                 migraine 0.7508415</span></span>
+<span><span class="co">#&gt; induced                   induced 0.5407903</span></span>
+<span><span class="co">#&gt; both                         both 0.5389988</span></span>
+<span><span class="co">#&gt; treatment               treatment 0.4254265</span></span>
+<span><span class="co">#&gt; sexes                       sexes 0.4178799</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 4`</span></span>
-<span><span class="co">#&gt;                    term   weight</span></span>
-<span><span class="co">#&gt; migraine       migraine 73.11895</span></span>
-<span><span class="co">#&gt; covid             covid 60.29671</span></span>
-<span><span class="co">#&gt; patients       patients 48.10263</span></span>
-<span><span class="co">#&gt; long               long 33.81408</span></span>
-<span><span class="co">#&gt; individuals individuals 31.86965</span></span>
-<span><span class="co">#&gt; headache       headache 27.79943</span></span>
-<span><span class="co">#&gt; symptoms       symptoms 25.11927</span></span>
-<span><span class="co">#&gt; without         without 20.33448</span></span>
-<span><span class="co">#&gt; sex                 sex 15.35365</span></span>
-<span><span class="co">#&gt; study             study 15.23040</span></span>
+<span><span class="co">#&gt;                              term   weight</span></span>
+<span><span class="co">#&gt; symptoms                 symptoms 60.43327</span></span>
+<span><span class="co">#&gt; patients                 patients 41.65392</span></span>
+<span><span class="co">#&gt; cyst                         cyst 35.33360</span></span>
+<span><span class="co">#&gt; colloid                   colloid 30.91690</span></span>
+<span><span class="co">#&gt; aura                         aura 29.69046</span></span>
+<span><span class="co">#&gt; neuropsychiatric neuropsychiatric 22.08350</span></span>
+<span><span class="co">#&gt; clinical                 clinical 17.85787</span></span>
+<span><span class="co">#&gt; diagnosis               diagnosis 17.16393</span></span>
+<span><span class="co">#&gt; reported                 reported 17.04440</span></span>
+<span><span class="co">#&gt; psychiatric           psychiatric 16.86371</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 5`</span></span>
-<span><span class="co">#&gt;                      term   weight</span></span>
-<span><span class="co">#&gt; migraine         migraine 78.23895</span></span>
-<span><span class="co">#&gt; group               group 28.04809</span></span>
-<span><span class="co">#&gt; patients         patients 24.72097</span></span>
-<span><span class="co">#&gt; study               study 16.40871</span></span>
-<span><span class="co">#&gt; between           between 15.56503</span></span>
-<span><span class="co">#&gt; edema               edema 11.28163</span></span>
-<span><span class="co">#&gt; perilesional perilesional 11.28163</span></span>
-<span><span class="co">#&gt; days                 days 11.08811</span></span>
-<span><span class="co">#&gt; scores             scores 10.27279</span></span>
-<span><span class="co">#&gt; compared         compared 10.20141</span></span></code></pre></div>
+<span><span class="co">#&gt;                            term    weight</span></span>
+<span><span class="co">#&gt; migraine               migraine 514.22370</span></span>
+<span><span class="co">#&gt; pain                       pain 103.60331</span></span>
+<span><span class="co">#&gt; chronic                 chronic  88.83474</span></span>
+<span><span class="co">#&gt; headache               headache  82.94794</span></span>
+<span><span class="co">#&gt; studies                 studies  78.83151</span></span>
+<span><span class="co">#&gt; patients               patients  76.21948</span></span>
+<span><span class="co">#&gt; pathophysiology pathophysiology  57.05345</span></span>
+<span><span class="co">#&gt; potential             potential  53.91623</span></span>
+<span><span class="co">#&gt; may                         may  48.62655</span></span>
+<span><span class="co">#&gt; levels                   levels  45.15590</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -756,7 +759,7 @@ corpus:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>

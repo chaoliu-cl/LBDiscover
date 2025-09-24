@@ -1,11 +1,11 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   Intro_to_Literature-Based_Discovery: Intro_to_Literature-Based_Discovery.html
   Text_Preprocessing: Text_Preprocessing.html
   Work_with_Discovery_Models: Work_with_Discovery_Models.html
-last_built: 2025-05-15T19:59Z
+last_built: 2025-09-24T03:13Z
 urls:
   reference: https://liu-chao.site/LBDiscover/reference
   article: https://liu-chao.site/LBDiscover/articles
