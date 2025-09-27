@@ -131,6 +131,58 @@ incorporate into the entity extraction process.</p></dd>
     <p>A data frame with extracted entities, their types, and positions.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create example text data</span></span></span>
+<span class="r-in"><span><span class="va">text_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  doc_id <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>,</span></span>
+<span class="r-in"><span>  abstract <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"Migraine is a neurological disorder."</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"Serotonin plays a role in headache."</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Extract entities using workflow</span></span></span>
+<span class="r-in"><span><span class="va">entities</span> <span class="op">&lt;-</span> <span class="fu">extract_entities_workflow</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">text_data</span>,</span></span>
+<span class="r-in"><span>  entity_types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"disease"</span>, <span class="st">"chemical"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  dictionary_sources <span class="op">=</span> <span class="st">"local"</span>,</span></span>
+<span class="r-in"><span>  max_terms_per_type <span class="op">=</span> <span class="fl">10</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Running in R CMD check environment. Disabling parallel processing.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Entity type 'chemical' not supported by local source. Using MeSH instead.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating dictionaries for entity extraction...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading dictionaries sequentially...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Package not installed or dictionary not found. Using example dictionaries.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Creating dummy dictionary for disease</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   Added 5 terms from disease (local)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Searching MeSH database for: chemicals[MeSH]</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Trying direct MeSH database search...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Processing batch 1 of 1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracted 2 unique terms from MeSH text format</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Retrieved 2 unique terms from MeSH</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   Added 2 terms from chemical (mesh)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Created combined dictionary with 7 unique terms</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sanitizing dictionary with 7 terms...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   Removed 2 terms that did not match their claimed entity types</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   Removed 2 terms with non-alphanumeric characters (final cleanup)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sanitization complete. 3 terms remaining (42.9% of original)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting entities from 2 documents...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Processing batch 1/1</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracting entities from 2 documents...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracted 2 entity mentions:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   disease: 2</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Extracted 2 entity mentions in 0.04 minutes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   disease: 2</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">entities</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     entity entity_type doc_id start_pos end_pos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 disorder     disease      1        28      35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 migraine     disease      1         1       8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                               sentence frequency</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Migraine is a neurological disorder.         1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Migraine is a neurological disorder.         1</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

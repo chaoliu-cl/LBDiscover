@@ -90,6 +90,31 @@ creating placeholder data if necessary.</p>
     <p>A data frame with sufficient results for visualization</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create example diverse results (empty case)</span></span></span>
+<span class="r-in"><span><span class="va">diverse_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">top_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  a_term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="st">"migraine"</span>, <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  b_term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"serotonin"</span>, <span class="st">"CGRP"</span>, <span class="st">"cortisol"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  c_term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sumatriptan"</span>, <span class="st">"fremanezumab"</span>, <span class="st">"propranolol"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  abc_score <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.7</span>, <span class="fl">0.6</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Ensure minimum results</span></span></span>
+<span class="r-in"><span><span class="va">final_results</span> <span class="op">&lt;-</span> <span class="fu">min_results</span><span class="op">(</span><span class="va">diverse_results</span>, <span class="va">top_results</span>, <span class="st">"migraine"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> No results found. Creating a placeholder result for demonstration.</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">final_results</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     a_term                        b_term      c_term a_b_score b_c_score</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 migraine                     serotonin sumatriptan      0.05      0.08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 migraine                          CGRP  topiramate      0.04      0.07</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 migraine cortical spreading depression propranolol      0.03      0.06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   abc_score p_value significant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1      0.04     0.1       FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2      0.03     0.2       FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3      0.02     0.3       FALSE</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

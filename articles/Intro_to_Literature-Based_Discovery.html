@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Getting Started with Literature-Based Discovery</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-09-24</h4>
+            <h4 data-toc-skip class="date">2025-09-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Intro_to_Literature-Based_Discovery.Rmd" class="external-link"><code>vignettes/Intro_to_Literature-Based_Discovery.Rmd</code></a></small>
       <div class="d-none name"><code>Intro_to_Literature-Based_Discovery.Rmd</code></div>
@@ -150,7 +150,7 @@ treatment.</p>
 <span><span class="co"># Combine and remove duplicates</span></span>
 <span><span class="va">all_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_results.html">merge_results</a></span><span class="op">(</span><span class="va">migraine_articles</span>, <span class="va">drug_articles</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Retrieved"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span>, <span class="st">"unique articles\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Retrieved 1930 unique articles</span></span></code></pre></div>
+<span><span class="co">#&gt; Retrieved 1933 unique articles</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="extract-variations-of-the-primary-term">4. Extract variations of the primary term<a class="anchor" aria-label="anchor" href="#extract-variations-of-the-primary-term"></a>
@@ -161,7 +161,7 @@ treatment.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">primary_term_variations</span><span class="op">)</span>, <span class="st">"variations of"</span>, <span class="va">primary_term</span>, <span class="st">"in the corpus:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Found 15 variations of migraine in the corpus:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">primary_term_variations</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "migraine"    "Migraine"    "MigrainE"    "MIGRAINE"    "Migraines"  </span></span>
+<span><span class="co">#&gt;  [1] "Migraine"    "migraine"    "MigrainE"    "MIGRAINE"    "Migraines"  </span></span>
 <span><span class="co">#&gt;  [6] "migraines"   "migraineur"  "ofmigraine"  "migraineurs" "Migraineurs"</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -268,7 +268,7 @@ treatment.</p>
 <span>  <span class="va">standard_entities</span>,</span>
 <span>  <span class="va">primary_term</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Combined 6290 custom entities with 8568 standard entities.</span></span>
+<span><span class="co">#&gt; Combined 6277 custom entities with 6948 standard entities.</span></span>
 <span></span>
 <span><span class="co"># Filter entities to ensure only relevant biomedical terms are included</span></span>
 <span><span class="va">filtered_entities</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/valid_entities.html">valid_entities</a></span><span class="op">(</span></span>
@@ -277,31 +277,31 @@ treatment.</p>
 <span>  <span class="va">primary_term_variations</span>,</span>
 <span>  validation_function <span class="op">=</span> <span class="va">is_valid_biomedical_entity</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Filtered from 8964 to 8964 validated entities</span></span>
+<span><span class="co">#&gt; Filtered from 7339 to 7339 validated entities</span></span>
 <span></span>
 <span><span class="co"># View the first few extracted entities</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">filtered_entities</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         entity entity_type doc_id start_pos end_pos</span></span>
-<span><span class="co">#&gt; 1 antimigraine     disease    129      1488    1499</span></span>
-<span><span class="co">#&gt; 2 antimigraine     disease    136      1671    1682</span></span>
-<span><span class="co">#&gt; 3 antimigraine     disease    432       368     379</span></span>
-<span><span class="co">#&gt; 4 antimigraine     disease    432       667     678</span></span>
-<span><span class="co">#&gt; 5 antimigraine     disease    474      1188    1199</span></span>
-<span><span class="co">#&gt; 6 antimigraine     disease    474       876     887</span></span>
+<span><span class="co">#&gt; 1 antimigraine     disease    132      1488    1499</span></span>
+<span><span class="co">#&gt; 2 antimigraine     disease    139      1671    1682</span></span>
+<span><span class="co">#&gt; 3 antimigraine     disease    435       667     678</span></span>
+<span><span class="co">#&gt; 4 antimigraine     disease    435       368     379</span></span>
+<span><span class="co">#&gt; 5 antimigraine     disease    477       876     887</span></span>
+<span><span class="co">#&gt; 6 antimigraine     disease    477      1188    1199</span></span>
 <span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                    sentence</span></span>
 <span><span class="co">#&gt; 1                                                                                         CONCLUSION AND IMPLICATIONS: DOP-mediated antimigraine effect is stronger in female than male rats and appears to be mediated in chronic conditions through peripheral DOPs in females and central DOPs in males.</span></span>
 <span><span class="co">#&gt; 2                                                                                                                                    Our results suggest that the antagonism on the alpha-CGRP isoform plays a relevant role in the antimigraine action of mABs but not in the development of constipation.</span></span>
-<span><span class="co">#&gt; 3                                               However, the administration of antimigraine drugs in conventional oral pharmaceutical dosage forms is a challenge, since many molecules have difficulty crossing the blood-brain barrier (BBB) to reach the brain, which leads to bioavailability problems.</span></span>
-<span><span class="co">#&gt; 4                                                                                                                                                                                                         Efforts have been made to find alternative delivery systems and/or routes for antimigraine drugs.</span></span>
-<span><span class="co">#&gt; 5 The existence of patients with medication-resistant migraine may be due to the: (i) complex migraine pathophysiology, in which several systems appear to be deregulated before, during, and after a migraine attack; and (ii) pharmacodynamic and pharmacokinetic properties of antimigraine medications.</span></span>
-<span><span class="co">#&gt; 6                                                                                                                                        EXPERT OPINION: Current anti-CGRPergic medications, although effective, have limitations, such as side effects and lack of antimigraine efficacy in some patients.</span></span>
+<span><span class="co">#&gt; 3                                                                                                                                                                                                         Efforts have been made to find alternative delivery systems and/or routes for antimigraine drugs.</span></span>
+<span><span class="co">#&gt; 4                                               However, the administration of antimigraine drugs in conventional oral pharmaceutical dosage forms is a challenge, since many molecules have difficulty crossing the blood-brain barrier (BBB) to reach the brain, which leads to bioavailability problems.</span></span>
+<span><span class="co">#&gt; 5                                                                                                                                        EXPERT OPINION: Current anti-CGRPergic medications, although effective, have limitations, such as side effects and lack of antimigraine efficacy in some patients.</span></span>
+<span><span class="co">#&gt; 6 The existence of patients with medication-resistant migraine may be due to the: (i) complex migraine pathophysiology, in which several systems appear to be deregulated before, during, and after a migraine attack; and (ii) pharmacodynamic and pharmacokinetic properties of antimigraine medications.</span></span>
 <span><span class="co">#&gt;   frequency</span></span>
-<span><span class="co">#&gt; 1        24</span></span>
-<span><span class="co">#&gt; 2        24</span></span>
-<span><span class="co">#&gt; 3        24</span></span>
-<span><span class="co">#&gt; 4        24</span></span>
-<span><span class="co">#&gt; 5        24</span></span>
-<span><span class="co">#&gt; 6        24</span></span></code></pre></div>
+<span><span class="co">#&gt; 1        22</span></span>
+<span><span class="co">#&gt; 2        22</span></span>
+<span><span class="co">#&gt; 3        22</span></span>
+<span><span class="co">#&gt; 4        22</span></span>
+<span><span class="co">#&gt; 5        22</span></span>
+<span><span class="co">#&gt; 6        22</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="create-co-occurrence-matrix">8. Create co-occurrence matrix<a class="anchor" aria-label="anchor" href="#create-co-occurrence-matrix"></a>
@@ -326,7 +326,7 @@ treatment.</p>
 <span></span>
 <span><span class="co"># Check matrix dimensions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 19 19</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 13 13</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="apply-the-improved-abc-model">9. Apply the improved ABC model<a class="anchor" aria-label="anchor" href="#apply-the-improved-abc-model"></a>
@@ -348,9 +348,11 @@ treatment.</p>
 <span>  similarity_threshold <span class="op">=</span> <span class="fl">0.7</span>,    <span class="co"># Relatively strict similarity threshold</span></span>
 <span>  enforce_strict_typing <span class="op">=</span> <span class="cn">TRUE</span>   <span class="co"># Enable strict entity type validation</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Filtered 8 B terms (61.5%) that weren't valid biomedical entities</span></span>
-<span><span class="co">#&gt; Filtered 5 B terms that didn't match specified entity types: protein, gene, pathway, chemical</span></span>
-<span><span class="co">#&gt; No suitable B terms found with association score &gt; 0.001 after filtering</span></span>
+<span><span class="co">#&gt; Filtered 8 B terms (72.7%) that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; Filtered 2 B terms that didn't match specified entity types: protein, gene, pathway, chemical</span></span>
+<span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.7)</span></span>
+<span><span class="co">#&gt; Filtered 9 potential C terms that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; No potential C terms found matching the specified entity types: drug, chemical, protein, gene</span></span>
 <span></span>
 <span><span class="co"># If we don't have enough results, try with less stringent criteria</span></span>
 <span><span class="va">min_desired_results</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
@@ -372,21 +374,32 @@ treatment.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Not enough results with strict filtering. Trying with less stringent criteria...</span></span>
-<span><span class="co">#&gt; Filtered 8 B terms (61.5%) that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; Filtered 8 B terms (72.7%) that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.8)</span></span>
 <span><span class="co">#&gt; Filtered 9 potential C terms that weren't valid biomedical entities</span></span>
-<span><span class="co">#&gt; Identifying potential C terms via 5 B terms...</span></span>
-<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==============                                                        |  20%  |                                                                              |============================                                          |  40%  |                                                                              |==========================================                            |  60%  |                                                                              |========================================================              |  80%  |                                                                              |======================================================================| 100%</span></span>
+<span><span class="co">#&gt; Identifying potential C terms via 3 B terms...</span></span>
+<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================================| 100%</span></span>
+<span><span class="co">#&gt; No ABC connections found</span></span>
 <span></span>
-<span><span class="co"># View top results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a_term"</span>, <span class="st">"b_term"</span>, <span class="st">"c_term"</span>, <span class="st">"abc_score"</span>, <span class="st">"b_type"</span>, <span class="st">"c_type"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               a_term     b_term       c_term  abc_score  b_type c_type</span></span>
-<span><span class="co">#&gt; thrombosis1 migraine thrombosis      heparin 0.09961923 disease   drug</span></span>
-<span><span class="co">#&gt; headache2   migraine   headache      heparin 0.05811442 symptom   drug</span></span>
-<span><span class="co">#&gt; headache    migraine   headache azithromycin 0.05256587 symptom   drug</span></span>
-<span><span class="co">#&gt; headache3   migraine   headache  tocilizumab 0.05163691 symptom   drug</span></span>
-<span><span class="co">#&gt; headache1   migraine   headache   enoxaparin 0.05115447 symptom   drug</span></span>
-<span><span class="co">#&gt; fatigue     migraine    fatigue  tocilizumab 0.01577138 symptom   drug</span></span></code></pre></div>
+<span><span class="co"># Check if we have results and what columns are available</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Available columns in abc_results:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">", "</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># Safely display results with available columns</span></span>
+<span>  <span class="va">display_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a_term"</span>, <span class="st">"b_term"</span>, <span class="st">"c_term"</span>, <span class="st">"abc_score"</span>, <span class="st">"b_type"</span>, <span class="st">"c_type"</span><span class="op">)</span>, </span>
+<span>                           <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">display_cols</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># View top results</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">[</span>, <span class="va">display_cols</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="co"># If specific columns aren't available, show first few columns</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">)</span><span class="op">)</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"No ABC results found\n"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; No ABC results found</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="apply-statistical-validation-to-the-results">10. Apply statistical validation to the results<a class="anchor" aria-label="anchor" href="#apply-statistical-validation-to-the-results"></a>
@@ -409,25 +422,29 @@ treatment.</p>
 <span>  <span class="va">abc_results</span><span class="op">$</span><span class="va">significant</span> <span class="op">&lt;-</span> <span class="va">abc_results</span><span class="op">$</span><span class="va">p_value</span> <span class="op">&lt;</span> <span class="fl">0.1</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">abc_results</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Using optimized approach for large matrix validation...</span></span>
-<span><span class="co">#&gt; Using metadata for document count: 1689</span></span>
-<span><span class="co">#&gt; Calculating statistical significance using hypergeometric test...</span></span>
-<span><span class="co">#&gt; 0.0% of connections are statistically significant (p &lt; 0.10, BH correction)</span></span>
+<span><span class="co">#&gt; ABC results are empty</span></span>
 <span></span>
 <span><span class="co"># Sort by ABC score and take top results</span></span>
 <span><span class="va">validated_results</span> <span class="op">&lt;-</span> <span class="va">validated_results</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="op">-</span><span class="va">validated_results</span><span class="op">$</span><span class="va">abc_score</span><span class="op">)</span>, <span class="op">]</span></span>
 <span><span class="va">top_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">validated_results</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Larger top N for diversification</span></span>
 <span><span class="va">top_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">validated_results</span>, <span class="va">top_n</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># View top validated results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a_term"</span>, <span class="st">"b_term"</span>, <span class="st">"c_term"</span>, <span class="st">"abc_score"</span>, <span class="st">"p_value"</span>, <span class="st">"significant"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;               a_term     b_term       c_term  abc_score p_value significant</span></span>
-<span><span class="co">#&gt; thrombosis1 migraine thrombosis      heparin 0.09961923       1       FALSE</span></span>
-<span><span class="co">#&gt; headache2   migraine   headache      heparin 0.05811442       1       FALSE</span></span>
-<span><span class="co">#&gt; headache    migraine   headache azithromycin 0.05256587       1       FALSE</span></span>
-<span><span class="co">#&gt; headache3   migraine   headache  tocilizumab 0.05163691       1       FALSE</span></span>
-<span><span class="co">#&gt; headache1   migraine   headache   enoxaparin 0.05115447       1       FALSE</span></span>
-<span><span class="co">#&gt; fatigue     migraine    fatigue  tocilizumab 0.01577138       1       FALSE</span></span></code></pre></div>
+<span><span class="co"># Check available columns and display safely</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">display_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"a_term"</span>, <span class="st">"b_term"</span>, <span class="st">"c_term"</span>, <span class="st">"abc_score"</span>, <span class="st">"p_value"</span>, <span class="st">"significant"</span><span class="op">)</span>, </span>
+<span>                           <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">display_cols</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># View top validated results</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">[</span>, <span class="va">display_cols</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="co"># Show available columns</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fl">6</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">top_results</span><span class="op">)</span><span class="op">)</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"No validated results available\n"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="co">#&gt; No validated results available</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="diversify-and-ensure-minimum-results">11. Diversify and ensure minimum results<a class="anchor" aria-label="anchor" href="#diversify-and-ensure-minimum-results"></a>
@@ -441,6 +458,7 @@ treatment.</p>
 <span>  min_score <span class="op">=</span> <span class="fl">0.0001</span>,</span>
 <span>  min_results <span class="op">=</span> <span class="fl">5</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; ABC results are empty</span></span>
 <span></span>
 <span><span class="co"># Ensure we have enough results for visualization</span></span>
 <span><span class="va">diverse_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/min_results.html">min_results</a></span><span class="op">(</span></span>
@@ -448,7 +466,8 @@ treatment.</p>
 <span>  <span class="va">top_results</span>,</span>
 <span>  <span class="va">a_term</span>,</span>
 <span>  min_results <span class="op">=</span> <span class="fl">3</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; No results found. Creating a placeholder result for demonstration.</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualize-the-results">12. Visualize the results<a class="anchor" aria-label="anchor" href="#visualize-the-results"></a>
@@ -465,6 +484,9 @@ treatment.</p>
 <span>  color_palette <span class="op">=</span> <span class="st">"blues"</span>,</span>
 <span>  show_entity_types <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in vis_heatmap(results, top_n = min(top_n, nrow(results)), min_score =</span></span>
+<span><span class="co">#&gt; min_score, : Entity types not found in results. Setting show_entity_types =</span></span>
+<span><span class="co">#&gt; FALSE</span></span>
 <span><span class="co">#&gt; No connections are statistically significant (p &lt; 0.05)</span></span>
 <span><span class="co">#&gt; Created heatmap visualization: migraine_heatmap.png</span></span>
 <span></span>
@@ -482,6 +504,9 @@ treatment.</p>
 <span>  show_entity_types <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  label_size <span class="op">=</span> <span class="fl">1.0</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in vis_network(results, top_n = min(top_n, nrow(results)), min_score =</span></span>
+<span><span class="co">#&gt; min_score, : Entity types not found in results. Setting show_entity_types =</span></span>
+<span><span class="co">#&gt; FALSE</span></span>
 <span><span class="co">#&gt; Created network visualization: migraine_network.png</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -505,9 +530,9 @@ treatment.</p>
 <span>  min_score <span class="op">=</span> <span class="fl">0.0001</span>,</span>
 <span>  open <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Number of unique terms: 8</span></span>
-<span><span class="co">#&gt; First few terms: migraine, thrombosis, headache, fatigue, heparin</span></span>
-<span><span class="co">#&gt; Role assignments: A=1, B=3, C=4</span></span></code></pre></div>
+<span><span class="co">#&gt; Number of unique terms: 7</span></span>
+<span><span class="co">#&gt; First few terms: migraine, serotonin, CGRP, cortical spreading depression, sumatriptan</span></span>
+<span><span class="co">#&gt; Role assignments: A=1, B=3, C=3</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="evaluate-literature-support-and-generate-report">14. Evaluate literature support and generate report<a class="anchor" aria-label="anchor" href="#evaluate-literature-support-and-generate-report"></a>
@@ -523,44 +548,30 @@ treatment.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; === Evaluation of Top Results ===</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Evaluating potential treatment: heparin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0996 </span></span>
-<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
-<span><span class="co">#&gt; Connection through intermediary: thrombosis</span></span>
-<span><span class="co">#&gt; Found 4 articles directly linking migraine and heparin </span></span>
-<span><span class="co">#&gt; Most recent article: Stroke Following Blunt Head Trauma: A Case Report and Review of the Literature. </span></span>
+<span><span class="co">#&gt; Evaluating potential treatment: sumatriptan  </span></span>
+<span><span class="co">#&gt; ABC score: 0.04 </span></span>
+<span><span class="co">#&gt; P-value: 0.1 - Not statistically significant </span></span>
+<span><span class="co">#&gt; Connection through intermediary: serotonin</span></span>
+<span><span class="co">#&gt; Found 5 articles directly linking migraine and sumatriptan </span></span>
+<span><span class="co">#&gt; Most recent article: Current Trends in Management of Migraine: A Review of Current Practice and Recent Advances. </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Evaluating potential treatment: heparin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0581 </span></span>
-<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
-<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
-<span><span class="co">#&gt; Found 4 articles directly linking migraine and heparin </span></span>
-<span><span class="co">#&gt; Most recent article: Stroke Following Blunt Head Trauma: A Case Report and Review of the Literature. </span></span>
+<span><span class="co">#&gt; Evaluating potential treatment: topiramate  </span></span>
+<span><span class="co">#&gt; ABC score: 0.03 </span></span>
+<span><span class="co">#&gt; P-value: 0.2 - Not statistically significant </span></span>
+<span><span class="co">#&gt; Connection through intermediary: CGRP</span></span>
+<span><span class="co">#&gt; Found 5 articles directly linking migraine and topiramate </span></span>
+<span><span class="co">#&gt; Most recent article: Oral preventive medications for migraine in adults aged 18-65: a network meta-analysis. </span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Evaluating potential treatment: azithromycin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0526 </span></span>
-<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
-<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
-<span><span class="co">#&gt; Found 1 articles directly linking migraine and azithromycin </span></span>
-<span><span class="co">#&gt; Most recent article: A comparison of ciprofloxacin, norfloxacin, ofloxacin, azithromycin and cefixime examined by observational cohort studies. </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Evaluating potential treatment: tocilizumab  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0516 </span></span>
-<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
-<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
-<span><span class="co">#&gt; Found 1 articles directly linking migraine and tocilizumab </span></span>
-<span><span class="co">#&gt; Most recent article: Lingual necrosis in giant-cell arteritis: a case-based review. </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Evaluating potential treatment: enoxaparin  (drug) </span></span>
-<span><span class="co">#&gt; ABC score: 0.0512 </span></span>
-<span><span class="co">#&gt; P-value: 1 - Not statistically significant </span></span>
-<span><span class="co">#&gt; Connection through intermediary: headache</span></span>
-<span><span class="co">#&gt; Found 5 articles directly linking migraine and enoxaparin </span></span>
-<span><span class="co">#&gt; Most recent article: Cerebral Venous Sinus Thrombosis Following Varicella Infection: A Case Report.</span></span>
+<span><span class="co">#&gt; Evaluating potential treatment: propranolol  </span></span>
+<span><span class="co">#&gt; ABC score: 0.02 </span></span>
+<span><span class="co">#&gt; P-value: 0.3 - Not statistically significant </span></span>
+<span><span class="co">#&gt; Connection through intermediary: cortical spreading depression</span></span>
+<span><span class="co">#&gt; Found 5 articles directly linking migraine and propranolol </span></span>
+<span><span class="co">#&gt; Most recent article: Oral preventive medications for migraine in adults aged 18-65: a network meta-analysis.</span></span>
 <span></span>
 <span><span class="co"># Prepare articles for report generation</span></span>
 <span><span class="va">articles_with_years</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prep_articles.html">prep_articles</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Found 1930 articles with valid publication years</span></span>
+<span><span class="co">#&gt; Found 1933 articles with valid publication years</span></span>
 <span></span>
 <span><span class="co"># Store results for report</span></span>
 <span><span class="va">results_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>abc <span class="op">=</span> <span class="va">diverse_results</span><span class="op">)</span></span>

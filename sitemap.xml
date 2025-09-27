@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://liu-chao.site/LBDiscover/404.html</loc></url>
+<url><loc>https://liu-chao.site/LBDiscover/CONTRIBUTING.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/articles/Intro_to_Literature-Based_Discovery.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/articles/Text_Preprocessing.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/articles/Work_with_Discovery_Models.html</loc></url>
@@ -69,6 +70,7 @@
 <url><loc>https://liu-chao.site/LBDiscover/reference/get_term_vars.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/get_type_dist.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/get_umls_semantic_types.html</loc></url>
+<url><loc>https://liu-chao.site/LBDiscover/reference/has_general_biomedical_characteristics.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/index.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/is_valid_biomedical_entity.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/list_to_df.html</loc></url>
@@ -111,6 +113,7 @@
 <url><loc>https://liu-chao.site/LBDiscover/reference/validate_biomedical_entity.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/validate_entity_comprehensive.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/validate_entity_with_nlp.html</loc></url>
+<url><loc>https://liu-chao.site/LBDiscover/reference/validate_term_by_type.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/validate_umls_key.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/vec_preprocess.html</loc></url>
 <url><loc>https://liu-chao.site/LBDiscover/reference/vis_abc_heatmap.html</loc></url>

@@ -82,6 +82,28 @@
     <p>A data frame with sanitized terms.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create a dictionary with problematic terms</span></span></span>
+<span class="r-in"><span><span class="va">dirty_dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"migraine"</span>, <span class="st">"europe"</span>, <span class="st">"optimization"</span>, <span class="st">"receptor"</span>, <span class="st">"123"</span>, <span class="st">""</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"disease"</span>, <span class="st">"location"</span>, <span class="st">"process"</span>, <span class="st">"protein"</span>, <span class="st">"number"</span>, <span class="st">"empty"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Sanitize the dictionary</span></span></span>
+<span class="r-in"><span><span class="va">clean_dict</span> <span class="op">&lt;-</span> <span class="fu">sanitize_dictionary</span><span class="op">(</span><span class="va">dirty_dict</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sanitizing dictionary with 6 terms...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   Removing 1 empty terms</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   Removed 1 terms consisting solely of numbers</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sanitization complete. 4 terms remaining (80% of original)</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">clean_dict</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           term     type</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     migraine  disease</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       europe location</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 optimization  process</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     receptor  protein</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
