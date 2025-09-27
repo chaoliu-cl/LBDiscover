@@ -29,3 +29,14 @@ A data frame with sanitized terms.
 \description{
 This function sanitizes dictionary terms to ensure they're valid for entity extraction.
 }
+\examples{
+# Create a dictionary with problematic terms
+dirty_dict <- data.frame(
+  term = c("migraine", "europe", "optimization", "receptor", "123", ""),
+  type = c("disease", "location", "process", "protein", "number", "empty")
+)
+
+# Sanitize the dictionary
+clean_dict <- sanitize_dictionary(dirty_dict)
+print(clean_dict)
+}

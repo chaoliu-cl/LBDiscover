@@ -927,8 +927,20 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
   }
 
   # Filter and sort results
-  results <- abc_results[abc_results$abc_score >= min_score, ]
-  results <- results[order(-results$abc_score), ]
+  # Use abc_score if available, otherwise use a default score column or create one
+  if ("abc_score" %in% colnames(abc_results)) {
+    score_col <- "abc_score"
+  } else if ("score" %in% colnames(abc_results)) {
+    score_col <- "score"
+  } else {
+    # Create a default score if none exists
+    abc_results$default_score <- 1
+    score_col <- "default_score"
+    min_score <- 0  # Reset min_score since we're using default scores
+  }
+
+  results <- abc_results[abc_results[[score_col]] >= min_score, ]
+  results <- results[order(-results[[score_col]]), ]
   if (nrow(results) > top_n) {
     results <- results[1:top_n, ]
   }
@@ -938,21 +950,40 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
     stop("No results remain after filtering")
   }
 
-  # Create edge list
-  edges_a_b <- data.frame(
-    from = results$a_term,
-    to = results$b_term,
-    weight = results$a_b_score,
-    stringsAsFactors = FALSE
-  )
-  edges_a_b <- unique(edges_a_b)
+  # Create edge list with appropriate weight columns
+  # Check if a_b_score and b_c_score exist, otherwise use the main score or default weights
+  if (all(c("a_b_score", "b_c_score") %in% colnames(results))) {
+    edges_a_b <- data.frame(
+      from = results$a_term,
+      to = results$b_term,
+      weight = results$a_b_score,
+      stringsAsFactors = FALSE
+    )
+    edges_b_c <- data.frame(
+      from = results$b_term,
+      to = results$c_term,
+      weight = results$b_c_score,
+      stringsAsFactors = FALSE
+    )
+  } else {
+    # Use the main score for both connections or default weight
+    default_weight <- if (score_col != "default_score") results[[score_col]] else rep(0.5, nrow(results))
 
-  edges_b_c <- data.frame(
-    from = results$b_term,
-    to = results$c_term,
-    weight = results$b_c_score,
-    stringsAsFactors = FALSE
-  )
+    edges_a_b <- data.frame(
+      from = results$a_term,
+      to = results$b_term,
+      weight = default_weight,
+      stringsAsFactors = FALSE
+    )
+    edges_b_c <- data.frame(
+      from = results$b_term,
+      to = results$c_term,
+      weight = default_weight,
+      stringsAsFactors = FALSE
+    )
+  }
+
+  edges_a_b <- unique(edges_a_b)
   edges_b_c <- unique(edges_b_c)
 
   # Combine edges
@@ -997,7 +1028,6 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
   })
 
   # Assign node labels with entity types if requested
-  # Modified: Only include the entity type if show_entity_types is TRUE
   if (show_entity_types && has_entity_types) {
     nodes$label <- paste0(nodes$name, "\n(", nodes$type, ")")
   } else {
@@ -1018,7 +1048,6 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
   })
 
   # Calculate layout using igraph's Fruchterman-Reingold algorithm
-  # MODIFIED: Increase the width parameter to spread out nodes more
   set.seed(42)  # For consistent layout
   layout <- igraph::layout_with_fr(graph, niter = 1000)
 
@@ -1026,7 +1055,7 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
   nodes$x <- layout[, 1]
   nodes$y <- layout[, 2]
 
-  # Map node types to colors
+  # Map node types to colors (using static_data)
   if (color_by %in% colnames(nodes)) {
     node_categories <- unique(nodes[[color_by]])
     node_categories <- node_categories[!is.na(node_categories)]
@@ -1036,39 +1065,11 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
     node_categories <- unique(nodes$role)
   }
 
-  # Define a rich color palette for entity types
-  entity_type_colors <- c(
-    "disease" = "#FF5733",     # reddish orange
-    "drug" = "#33FF57",        # bright green
-    "gene" = "#3357FF",        # bright blue
-    "protein" = "#FF33F5",     # bright pink
-    "pathway" = "#FFFC33",     # bright yellow
-    "symptom" = "#FF9033",     # light orange
-    "cell" = "#33FFE0",        # turquoise
-    "organism" = "#A233FF",    # purple
-    "chemical" = "#FF3366",    # rose
-    "biological_process" = "#33FFA8", # mint green
-    "molecular_function" = "#33A8FF", # sky blue
-    "cellular_component" = "#FF33C1", # magenta
-    "tissue" = "#D4FF33",      # lime
-    "cell_line" = "#33FFD4",   # seafoam
-    "phenotype" = "#FF5733",   # coral
-    "anatomy" = "#FFCC33",     # orange
-    "diagnostic_procedure" = "#33A8FF", # light blue
-    "therapeutic_procedure" = "#33FF57", # green
-    "organism" = "#A233FF",    # purple
-    "unknown" = "#AAAAAA",     # gray
-    # Role-based colors (for when entity types aren't available)
-    "A" = "#E41A1C",           # red
-    "B" = "#377EB8",           # blue
-    "C" = "#4DAF4A"            # green
-  )
-
-  # Assign colors based on node categories
+  # Assign colors based on node categories (using static_data)
   node_colors <- c()
   for (category in node_categories) {
-    if (category %in% names(entity_type_colors)) {
-      node_colors[category] <- entity_type_colors[category]
+    if (category %in% names(static_data$entity_type_colors)) {
+      node_colors[category] <- static_data$entity_type_colors[[category]]
     } else {
       # Generate a new color for unknown categories
       node_colors[category] <- grDevices::rainbow(1)
@@ -1142,8 +1143,7 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
   }
 
   # Set up plot area
-  # MODIFIED: Increase plot margin to allow for more spreading
-  plot_margin <- 0.25  # Increased from 0.15
+  plot_margin <- 0.25
   x_range <- range(nodes$x)
   y_range <- range(nodes$y)
   x_margin <- diff(x_range) * plot_margin
@@ -1169,7 +1169,6 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
       to_idx <- which(nodes$name == edges$to[i])
 
       if (length(from_idx) > 0 && length(to_idx) > 0) {
-        # Calculate arrow position, but adjust to stop at the node boundary
         x1 <- nodes$x[from_idx]
         y1 <- nodes$y[from_idx]
         x2 <- nodes$x[to_idx]
@@ -1181,26 +1180,22 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
         dist <- sqrt(dx^2 + dy^2)
 
         # Adjust end points to stop at node boundaries
-        # Use normalized direction vector and node sizes
-        from_radius <- nodes$size[from_idx] / 5  # Scale down for aesthetics
+        from_radius <- nodes$size[from_idx] / 5
         to_radius <- nodes$size[to_idx] / 5
 
-        # Only adjust if distance is greater than sum of radii
         if (dist > (from_radius + to_radius)) {
-          # Normalize
           dx_norm <- dx / dist
           dy_norm <- dy / dist
 
-          # Adjust points
           x1_adj <- x1 + dx_norm * from_radius
           y1_adj <- y1 + dy_norm * from_radius
           x2_adj <- x2 - dx_norm * to_radius
           y2_adj <- y2 - dy_norm * to_radius
 
-          # Normalize edge width based on weight and avoid edges that are too thin
+          # Normalize edge width based on weight
           edge_width <- 1 + (edges$weight[i] / max(edges$weight)) * 3
 
-          # Draw line instead of arrow
+          # Draw line
           segments(x1_adj, y1_adj, x2_adj, y2_adj,
                    lwd = edge_width,
                    col = "gray70")
@@ -1216,18 +1211,15 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
       to_idx <- which(nodes$name == edges$to[i])
 
       if (length(from_idx) > 0 && length(to_idx) > 0) {
-        # Calculate arrow position with same boundary adjustments as above
         x1 <- nodes$x[from_idx]
         y1 <- nodes$y[from_idx]
         x2 <- nodes$x[to_idx]
         y2 <- nodes$y[to_idx]
 
-        # Calculate direction vector
         dx <- x2 - x1
         dy <- y2 - y1
         dist <- sqrt(dx^2 + dy^2)
 
-        # Adjust endpoints
         from_radius <- nodes$size[from_idx] / 5
         to_radius <- nodes$size[to_idx] / 5
 
@@ -1240,10 +1232,9 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
           x2_adj <- x2 - dx_norm * to_radius
           y2_adj <- y2 - dy_norm * to_radius
 
-          # Edge width based on weight
           edge_width <- 1 + (edges$weight[i] / max(edges$weight)) * 3
 
-          # Draw significant edge with bright red color, but without arrow
+          # Draw significant edge with bright red color
           segments(x1_adj, y1_adj, x2_adj, y2_adj,
                    lwd = edge_width,
                    col = "#E41A1C") # Bright red for significance
@@ -1252,7 +1243,7 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
     }
   }
 
-  # Draw nodes in layers: first B, then C, then A (so A nodes are on top)
+  # Draw nodes in layers: first B, then C, then A
   node_layers <- c("B", "C", "A")
   for (layer in node_layers) {
     layer_nodes <- which(nodes$role == layer)
@@ -1262,7 +1253,7 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
       points(nodes$x[i], nodes$y[i],
              pch = 19,  # Filled circle
              col = nodes$color[i],
-             cex = nodes$size[i] / 5)  # Scale size for better display
+             cex = nodes$size[i] / 5)
 
       # Add border
       points(nodes$x[i], nodes$y[i],
@@ -1272,25 +1263,11 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
     }
   }
 
-  # Function to draw text with a shadow/background for better readability
-  # MODIFIED: Simplified function to avoid redundant text shadow effect
-  shadow_text <- function(x, y, labels, col = "black",
-                          pos = NULL, offset = 0.5, cex = 1, ...) {
-    if (!is.null(pos)) {
-      text(x, y, labels, col = col, pos = pos, offset = offset, cex = cex, ...)
-    } else {
-      text(x, y, labels, col = col, cex = cex, ...)
-    }
-  }
-
-  # Add node labels with better spacing and readability
-  # MODIFIED: Using smarter positioning and increased label spacing
+  # Add node labels
   label_cex <- 0.8 * label_size
   for (i in 1:nrow(nodes)) {
-    # Use smart positioning for labels based on graph region
-    # MODIFIED: Increased offset for better spacing between nodes and labels
     pos <- NULL
-    label_offset <- 1.0  # Increased from 0.5
+    label_offset <- 1.0
 
     if (nodes$x[i] < mean(x_range)) {
       pos <- 2  # Left
@@ -1304,15 +1281,13 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
 
     # Enhance visibility of important nodes (A and C)
     if (nodes$role[i] %in% c("A", "C")) {
-      # Add white background for important node labels
-      shadow_text(nodes$x[i], nodes$y[i],
-                  labels = nodes$label[i],
-                  pos = pos,
-                  offset = label_offset,
-                  cex = label_cex,
-                  col = "black")
+      text(nodes$x[i], nodes$y[i],
+           labels = nodes$label[i],
+           pos = pos,
+           offset = label_offset,
+           cex = label_cex,
+           col = "black")
     } else {
-      # Standard text for B nodes
       text(nodes$x[i], nodes$y[i],
            labels = nodes$label[i],
            pos = pos,
@@ -1321,19 +1296,16 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
     }
   }
 
-  # Add legend for node colors and entity types
+  # Add legend for node colors
   legend_items <- names(node_colors)
   legend_colors <- unname(node_colors)
 
-  # Only add legend if we have items
   if (length(legend_items) > 0) {
-    # Create a meaningful legend title based on color_by
     legend_title <- switch(color_by,
                            "type" = "Entity Type",
                            "role" = "Node Role",
                            color_by)
 
-    # Add legend in top-right
     legend("topright",
            legend = legend_items,
            col = legend_colors,
@@ -1342,7 +1314,7 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
            cex = 0.8,
            pt.cex = 1.5,
            inset = c(-0.2, 0),
-           xpd = TRUE)  # Allow legend outside plot area
+           xpd = TRUE)
   }
 
   # Add significance legend if showing significance
@@ -1355,7 +1327,6 @@ vis_network <- function(abc_results, top_n = 25, min_score = 0.1,
            inset = c(0.05, 0.05))
   }
 
-  # Return invisible NULL
   invisible(NULL)
 }
 

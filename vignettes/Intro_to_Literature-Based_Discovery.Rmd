@@ -339,8 +339,24 @@ if (nrow(abc_results) < min_desired_results) {
   )
 }
 
-# View top results
-head(abc_results[, c("a_term", "b_term", "c_term", "abc_score", "b_type", "c_type")])
+# Check if we have results and what columns are available
+if (nrow(abc_results) > 0) {
+  cat("Available columns in abc_results:", paste(colnames(abc_results), collapse = ", "), "\n")
+  
+  # Safely display results with available columns
+  display_cols <- intersect(c("a_term", "b_term", "c_term", "abc_score", "b_type", "c_type"), 
+                           colnames(abc_results))
+  
+  if (length(display_cols) > 0) {
+    # View top results
+    head(abc_results[, display_cols, drop = FALSE])
+  } else {
+    # If specific columns aren't available, show first few columns
+    head(abc_results[, 1:min(6, ncol(abc_results)), drop = FALSE])
+  }
+} else {
+  cat("No ABC results found\n")
+}
 ```
 
 ### 10. Apply statistical validation to the results
@@ -369,8 +385,21 @@ validated_results <- validated_results[order(-validated_results$abc_score), ]
 top_n <- min(100, nrow(validated_results))  # Larger top N for diversification
 top_results <- head(validated_results, top_n)
 
-# View top validated results
-head(top_results[, c("a_term", "b_term", "c_term", "abc_score", "p_value", "significant")])
+# Check available columns and display safely
+if (nrow(top_results) > 0) {
+  display_cols <- intersect(c("a_term", "b_term", "c_term", "abc_score", "p_value", "significant"), 
+                           colnames(top_results))
+  
+  if (length(display_cols) > 0) {
+    # View top validated results
+    head(top_results[, display_cols, drop = FALSE])
+  } else {
+    # Show available columns
+    head(top_results[, 1:min(6, ncol(top_results)), drop = FALSE])
+  }
+} else {
+  cat("No validated results available\n")
+}
 ```
 
 ### 11. Diversify and ensure minimum results

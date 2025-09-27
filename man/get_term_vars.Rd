@@ -19,3 +19,17 @@ A character vector of unique term variations, sorted by length
 \description{
 This function identifies variations of a primary term within a corpus of articles.
 }
+\examples{
+# Create example articles
+articles <- data.frame(
+  abstract = c(
+    "Migraine headaches are debilitating",
+    "Migraines affect quality of life",
+    "Migraine disorders require treatment"
+  )
+)
+
+# Get term variations
+variations <- get_term_vars(articles, "migrain")
+print(variations)
+}

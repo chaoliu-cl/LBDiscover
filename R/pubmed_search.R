@@ -512,6 +512,9 @@ retry_api_call <- function(fun, ..., verbose = FALSE, retry_count = 3, retry_del
 #'
 #' @return NULL invisibly
 #' @export
+#' @examples
+#' # Clear the PubMed cache (always safe to run)
+#' clear_pubmed_cache()
 clear_pubmed_cache <- function() {
   # Get the cache environment
   pubmed_cache <- get_pubmed_cache()

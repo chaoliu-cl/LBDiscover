@@ -18,3 +18,14 @@ A data frame of articles with validated publication years
 This function ensures article data is valid for report generation,
 particularly handling publication years.
 }
+\examples{
+# Create example article data
+articles <- data.frame(
+  title = c("Migraine Study 1", "Headache Research"),
+  publication_year = c("2020", "not_a_year")
+)
+
+# Prepare articles
+prepared <- prep_articles(articles)
+print(prepared)
+}

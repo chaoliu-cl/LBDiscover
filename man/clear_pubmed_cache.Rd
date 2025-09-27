@@ -12,3 +12,7 @@ NULL invisibly
 \description{
 Removes all cached PubMed search results
 }
+\examples{
+# Clear the PubMed cache (always safe to run)
+clear_pubmed_cache()
+}

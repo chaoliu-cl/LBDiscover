@@ -45,3 +45,17 @@ A data frame containing the dictionary.
 \description{
 This function loads pre-defined biomedical dictionaries or fetches terms from MeSH/UMLS.
 }
+\examples{
+# Load a disease dictionary from local source
+disease_dict <- load_dictionary("disease", source = "local")
+head(disease_dict)
+
+# Load with custom terms
+custom_dict <- data.frame(
+  term = c("migraine", "headache", "photophobia"),
+  type = c("disease", "symptom", "symptom"),
+  id = c("D001", "D002", "D003"),
+  source = rep("custom", 3)
+)
+print(custom_dict)
+}

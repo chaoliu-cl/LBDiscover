@@ -30,3 +30,19 @@ Invisible output_file path
 This function creates a comprehensive HTML report from discovery results
 and visualizations.
 }
+\examples{
+# Create example data for report generation
+results_list <- list(
+  abc_results = data.frame(
+    a_term = "migraine",
+    c_term = "sumatriptan",
+    abc_score = 0.8
+  )
+)
+
+\donttest{
+# Generate report to temporary file
+temp_file <- tempfile(fileext = ".html")
+gen_report(results_list, output_file = temp_file)
+}
+}

@@ -111,36 +111,45 @@ vis_abc_heatmap <- function(abc_results, top_n = 25, min_score = 0.1,
     par(mar = c(bottom_margin, left_margin, 3, 2))
 
     # Create proper coordinates for x and y
-    x_coords <- seq_len(nrow(heat_matrix))
-    y_coords <- seq_len(ncol(heat_matrix))
+    # x represents C terms (columns), y represents B terms (rows)
+    x_coords <- 1:length(a_c_terms)  # C terms (will be on x-axis)
+    y_coords <- 1:length(a_b_terms)  # B terms (will be on y-axis)
 
-    # Draw the heatmap with explicit x and y coordinates
+    # Transpose the matrix so dimensions match: C x B
+    z_matrix <- t(heat_matrix)
+
+    # Draw the heatmap
     image(x = x_coords,
           y = y_coords,
-          z = t(heat_matrix),
+          z = z_matrix,
           col = color_palette,
           axes = FALSE,
           xlab = "", ylab = "",
           main = if (n_a_terms > 1) paste("A Term:", a_term) else title)
 
-    # Add row and column labels with appropriate cex based on number of items
-    b_cex <- min(0.8, 5 / length(a_b_terms))
+    # Add column and row labels with appropriate cex based on number of items
     c_cex <- min(0.8, 5 / length(a_c_terms))
+    b_cex <- min(0.8, 5 / length(a_b_terms))
 
-    axis(1, at = x_coords, labels = a_b_terms, las = 2, cex.axis = b_cex)
-    axis(2, at = y_coords, labels = a_c_terms, las = 2, cex.axis = c_cex)
+    axis(1, at = x_coords, labels = a_c_terms, las = 2, cex.axis = c_cex)
+    axis(2, at = y_coords, labels = a_b_terms, las = 2, cex.axis = b_cex)
 
     # Add titles for axes
-    mtext("B Terms", side = 1, line = bottom_margin - 2, cex = 0.8)
-    mtext("C Terms", side = 2, line = left_margin - 2, cex = 0.8)
+    mtext("C Terms", side = 1, line = bottom_margin - 2, cex = 0.8)
+    mtext("B Terms", side = 2, line = left_margin - 2, cex = 0.8)
 
     # Add score labels if requested
     if (show_labels) {
       label_cex <- min(0.7, 3 / max(length(a_b_terms), length(a_c_terms)))
-      for (i in 1:nrow(heat_matrix)) {
-        for (j in 1:ncol(heat_matrix)) {
-          if (!is.na(heat_matrix[i, j])) {
-            text(i, j, round(heat_matrix[i, j], 2), cex = label_cex)
+      # After transpose, z_matrix[i,j] corresponds to C term i and B term j
+      # In image coordinates: x=i (C term), y=j (B term)
+      # Original heat_matrix[j,i] has B term j and C term i
+      for (i in 1:length(a_c_terms)) {
+        for (j in 1:length(a_b_terms)) {
+          # Get value from original matrix: heat_matrix[B, C]
+          value <- heat_matrix[j, i]
+          if (!is.na(value)) {
+            text(i, j, round(value, 2), cex = label_cex)
           }
         }
       }

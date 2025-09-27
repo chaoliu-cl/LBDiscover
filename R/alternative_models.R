@@ -42,32 +42,10 @@ anc_model <- function(co_matrix, a_term, n_b_terms = 3,
   # Remove A term from B terms if present
   b_terms <- b_terms[b_terms != a_term]
 
-  # Define explicit blacklist of problematic terms
-  blacklisted_terms <- c(
-    # Common language terms that aren't biomedical
-    "the", "of", "and", "in", "to", "a", "is", "that", "for", "it", "with", "as", "was",
-    "on", "be", "by", "this", "an", "we", "our", "these", "those", "which", "or", "if",
-    "have", "has", "had", "are", "were", "can", "could", "would", "should", "may", "might",
-    "will", "must", "also", "only", "very", "such", "so", "but", "than", "when", "where",
-    "how", "what", "who", "whom", "whose", "why", "not", "all", "any", "each", "every",
-    "some", "many", "few", "most", "more", "less", "other", "another", "same", "different",
-    "CENTRAL", "remain", "attention", "Delay", "highlight", "highlights", "highlighting",
-    "indicate", "suggests", "demonstrated", "show", "shown", "shows", "reveal", "revealed",
-    "further", "findings", "results", "find", "found", "into", "across", "both", "several",
-    "provide", "provides", "provided", "crucial", "critical", "important", "notably",
-    "particularly", "specific", "associated", "related", "linked", "while", "however",
-    "advanced", "advancing", "development", "potential", "potentially", "novel", "insights",
-
-    # Generic research terms
-    "method", "approach", "analysis", "assessment", "evaluation", "procedure", "technique",
-    "protocol", "intervention", "treatment", "outcome", "result", "effect", "impact",
-    "value", "study", "trial", "research", "experiment", "observation", "publication"
-  )
-
   # Apply strict biomedical term filtering if requested
   if (enforce_biomedical_terms) {
-    # Remove blacklisted terms
-    b_terms <- b_terms[!tolower(b_terms) %in% tolower(blacklisted_terms)]
+    # Remove blacklisted terms (using static_data)
+    b_terms <- b_terms[!tolower(b_terms) %in% static_data$blacklisted_terms]
 
     # Filter B terms by entity type if available and types specified
     if (has_entity_types && !is.null(b_term_types)) {
@@ -132,8 +110,8 @@ anc_model <- function(co_matrix, a_term, n_b_terms = 3,
 
   # Apply the same biomedical term filtering to C terms
   if (enforce_biomedical_terms) {
-    # Remove blacklisted terms from potential C terms
-    potential_c_terms <- potential_c_terms[!tolower(potential_c_terms) %in% tolower(blacklisted_terms)]
+    # Remove blacklisted terms from potential C terms (using static_data)
+    potential_c_terms <- potential_c_terms[!tolower(potential_c_terms) %in% static_data$blacklisted_terms]
 
     # Additional biomedical entity validation for C terms
     message("Validating biomedical relevance of C terms...")
@@ -421,8 +399,7 @@ bitola_model <- function(co_matrix, a_term, a_semantic_type = NULL,
 #' LSI model with enhanced biomedical term filtering and NLP verification
 #'
 #' This function implements an improved LSI model that more rigorously filters out
-#' non-biomedical terms from the results to ensure clinical relevance. It adds
-#' NLP-based validation as an additional layer of filtering.
+#' non-biomedical terms from the results to ensure clinical relevance.
 #'
 #' @param term_doc_matrix A term-document matrix.
 #' @param a_term Character string, the source term (A).
@@ -495,138 +472,6 @@ lsi_model <- function(term_doc_matrix, a_term, n_factors = 100, n_results = 100,
   # Remove A term from results
   similarities[a_idx] <- -1
 
-  # Define GREATLY expanded blacklist of problematic terms - now with many more academic terms
-  blacklisted_terms <- c(
-    # Common language terms that aren't biomedical
-    "the", "of", "and", "in", "to", "a", "is", "that", "for", "it", "with", "as", "was",
-    "on", "be", "by", "this", "an", "we", "our", "these", "those", "which", "or", "if",
-    "have", "has", "had", "are", "were", "can", "could", "would", "should", "may", "might",
-    "will", "must", "also", "only", "very", "such", "so", "but", "than", "when", "where",
-    "how", "what", "who", "whom", "whose", "why", "not", "all", "any", "each", "every",
-    "some", "many", "few", "most", "more", "less", "other", "another", "same", "different",
-    "remain", "attention", "delay", "highlight", "highlights", "highlighting",
-    "indicate", "suggests", "demonstrated", "show", "shown", "shows", "reveal", "revealed",
-    "further", "findings", "results", "find", "found", "into", "across", "both", "several",
-    "provide", "provides", "provided", "crucial", "critical", "important", "notably",
-    "particularly", "specific", "associated", "related", "linked", "while", "however",
-    "advanced", "advancing", "development", "potential", "potentially", "novel", "insights",
-    "thus", "well", "early", "ad", "notably", "remains", "particularly", "specific",
-
-    # Academic language and research paper terminology - EXPANDED
-    "demonstrate", "within", "alongside", "investigate", "explain", "integrate", "elucidate",
-    "certain", "debate", "state", "recapitulate", "phase", "translate", "modulate",
-    "ultimate", "whole", "varied", "role", "speculate", "side", "academia",
-    "considerable", "consistent", "substantial", "significant", "relevant", "important",
-    "interesting", "promising", "similar", "different", "distinct", "specific", "particular",
-    "major", "minor", "key", "main", "essential", "necessary", "sufficient", "adequate",
-    "proper", "appropriate", "suitable", "consecutive", "simultaneous", "various",
-    "variable", "concurrent", "concomitant", "overall", "entire", "whole", "optimum",
-    "optimal", "ideal", "better", "best", "worse", "worst", "efficacious", "limited",
-    "extensive", "intensive", "widespread", "reliable", "reproducible", "repeatable",
-    "comparable", "varied", "useful", "valuable", "successful", "unsuccessful",
-    "effective", "ineffective", "minimum", "maximum", "exhibit", "display", "present",
-    "observe", "notice", "examine", "investigate", "explore", "clarify", "elucidate",
-    "interpret", "understand", "establish", "confirm", "validate", "verify", "question",
-    "challenge", "refute", "contradict", "support", "substantiate", "corroborate",
-    "reinforce", "review", "summarize", "analyze", "solve", "resolve", "address",
-    "tackle", "overcome", "approach", "strategy", "plan", "method", "way", "means",
-    "technique", "perspective", "viewpoint", "standpoint", "opinion", "belief", "view",
-    "understanding", "knowledge", "insight", "wisdom", "expertise", "mechanism",
-    "process", "pathway", "proceed", "progress", "proceed", "move", "advance", "achieve",
-    "accomplish", "complete", "conclude", "finalize", "implement", "execute", "identify",
-    "recognition", "indication", "evidence", "proof", "report", "account", "description",
-    "example", "instance", "case", "account", "description", "statement", "proposition",
-    "theory", "hypothesis", "postulate", "assumption", "premise", "thesis", "conclusion",
-    "deduction", "inference", "idea", "concept", "notion", "thought", "point", "matter",
-    "issue", "subject", "topic", "aspect", "dimension", "element", "component", "part",
-    "section", "segment", "fragment", "piece", "portion", "sample", "individual", "single",
-    "separate", "isolated", "distributed", "allocated", "assigned", "documented", "reported",
-    "reported", "described", "defined", "characterized", "identified", "recognized",
-    "detected", "observed", "monitored", "tracked", "followed", "traced", "explored",
-    "investigated", "studied", "analyzed", "evaluated", "assessed", "measured", "quantified",
-    "calculated", "computed", "estimated", "approximated", "improved", "enhanced",
-    "boosted", "augmented", "increased", "decreased", "reduced", "lowered", "inhibited",
-    "suppressed", "attenuated", "abolished", "eliminated", "removed", "cleared", "purged",
-    "figure", "table", "chart", "graph", "diagram", "schematic", "illustration", "image",
-    "picture", "photo", "photograph", "drawing", "sketch", "outline", "draft", "plan",
-    "design", "layout", "structure", "arrangement", "organization", "composition",
-    "construction", "configuration", "formation", "constitution", "build", "composition",
-    "makeup", "preparation", "formulation", "fabrication", "synthesis", "creation",
-    "production", "generation", "formation", "emergence", "appearance", "manifestation",
-    "expression", "articulation", "formulation", "presentation", "proposal", "suggestion",
-    "recommendation", "advice", "guidance", "direction", "instruction", "indication",
-    "specification", "stipulation", "requirement", "prerequisite", "precondition",
-    "qualification", "condition", "standard", "criterion", "benchmark",
-
-    # NEW: Additional problematic academic terms from the LSI Results
-    "generate", "incorporate", "intricate", "facilitate", "mitigate", "implicate",
-    "ensure", "enable", "enhance", "expand", "extend", "maintain", "preserve",
-    "promote", "leverage", "utilize", "employ", "deploy", "apply", "implement",
-    "integrate", "combine", "coordinate", "align", "adapt", "adjust", "modify",
-    "tailor", "customize", "personalize", "standardize", "normalize", "conceptualize",
-    "formulate", "develop", "evolve", "emerge", "derive", "originate", "construct",
-    "reconstruct", "deconstruct", "synthesize", "compile", "assemble", "gather",
-    "collect", "accumulate", "aggregate", "designate", "allocate", "distribute",
-    "disseminate", "propagate", "widespread", "comprehensive", "thorough", "detailed",
-    "precise", "accurate", "exact", "robust", "rigorous", "systematic", "methodical",
-    "innovative", "creative", "novel", "unique", "diverse", "heterogeneous", "homogeneous",
-    "uniform", "equivalent", "comparative", "relative", "absolute", "objective", "subjective",
-    "empirical", "theoretical", "conceptual", "abstract", "concrete", "tangible", "intangible",
-    "explicit", "implicit", "inherent", "intrinsic", "extrinsic", "underlying", "fundamental",
-    "pioneering", "groundbreaking", "transformative", "revolutionary", "evolutionary",
-    "progressive", "regressive", "retrospective", "prospective", "longitudinal", "cross-sectional",
-    "temporal", "spatial", "multidimensional", "interdisciplinary", "multidisciplinary",
-    "intersectional", "collaborative", "cooperative", "continuous", "discrete", "incremental",
-    "gradual", "sudden", "abrupt", "dramatic", "pronounced", "subtle", "nuanced", "complex",
-    "complicated", "elaborate", "intricate", "sophisticated", "advanced", "elementary",
-    "rudimentary", "basic", "primary", "secondary", "tertiary", "complementary", "supplementary",
-    "auxiliary", "adjunct", "peripheral", "central", "pivotal", "crucial", "definitive",
-    "widespread", "selectively", "readily", "primarily", "predominantly", "frequently",
-    "commonly", "typically", "generally", "usually", "always", "never", "rarely", "occasionally",
-    "sometimes", "often", "continuously", "persistently", "consistently", "intermittently",
-    "subsequently", "consecutively", "concurrently", "simultaneously", "consequently",
-    "sequentially", "ultimately", "eventually", "finally", "traditionally", "conventionally",
-    "classically", "recently", "evidently", "apparently", "supposedly", "presumably",
-    "purportedly", "allegedly", "arguably", "conceivably", "seemingly", "strikingly",
-    "remarkably", "notably", "markedly", "considerably", "substantially", "significantly",
-    "moderately", "marginally", "slightly", "minimally", "negligibly", "profoundly",
-    "deeply", "thoroughly", "entirely", "completely", "fully", "partially", "partly",
-    "incompletely", "inadequately", "insufficiently", "excessively", "disproportionately",
-    "outweigh", "underscore", "emphasize", "highlight", "accentuate", "exacerbate",
-    "ameliorate", "worsen", "diminish", "heighten", "strengthen", "weaken", "intensify",
-    "attenuate", "modulate", "regulate", "mediate", "influence", "impact", "affect",
-    "effect", "induce", "trigger", "stimulate", "activate", "initiate", "commence",
-    "begin", "end", "terminate", "cease", "discontinue", "continue", "persist", "endure",
-    "prevail", "predominate", "recur", "recurrence", "relapse", "remission", "resolution",
-    "reversal", "inversion", "conversion", "transition", "transformation", "alteration",
-    "modification", "deviation", "variation", "fluctuation", "oscillation",
-
-    # Generic research terms
-    "method", "approach", "analysis", "assessment", "evaluation", "procedure", "technique",
-    "protocol", "intervention", "treatment", "outcome", "result", "effect", "impact",
-    "value", "study", "trial", "research", "experiment", "observation", "publication",
-    "test", "measure", "detection", "identification", "classification", "characterization",
-    "determination", "calculation", "examination", "investigation", "exploration",
-    "screening", "monitoring", "surveillance", "survey", "review", "overview", "summary",
-    "score", "grade", "rating", "ranking", "stratification", "categorization", "grouping",
-    "framework", "structure", "process", "system", "model", "theory", "concept",
-    "principle", "paradigm", "perspective", "viewpoint", "approach", "strategy",
-    "direction", "scheme", "plan", "proposal", "project", "program", "objective",
-    "aim", "goal", "target", "purpose", "intention", "motivation", "reason", "rationale",
-    "justification", "significance", "importance", "relevance", "value", "benefit",
-    "advantage", "merit", "worth", "quality", "attribute", "characteristic", "feature",
-
-    # Statistical terms
-    "average", "mean", "median", "mode", "range", "variance", "standard", "deviation",
-    "correlation", "regression", "association", "relationship", "factor", "variable",
-    "parameter", "statistic", "significance", "confidence", "interval", "margin",
-    "error", "probability", "likelihood", "chance", "odds", "ratio", "proportion",
-    "percentage", "fraction", "decimal", "number", "quantity", "amount", "level",
-    "degree", "extent", "magnitude", "size", "dimension", "area", "volume", "duration",
-    "frequency", "incidence", "prevalence", "rate", "speed", "velocity", "acceleration",
-    "force", "pressure", "temperature", "dose", "concentration"
-  )
-
   # Get all term indices
   all_indices <- 1:length(similarities)
 
@@ -635,8 +480,8 @@ lsi_model <- function(term_doc_matrix, a_term, n_factors = 100, n_results = 100,
     # Filter out terms with length less than min_word_length
     short_term_indices <- which(nchar(rownames(term_doc_matrix)) < min_word_length)
 
-    # Filter out blacklisted terms (case-insensitive)
-    blacklist_indices <- which(tolower(rownames(term_doc_matrix)) %in% tolower(blacklisted_terms))
+    # Filter out blacklisted terms (case-insensitive) (using static_data)
+    blacklist_indices <- which(tolower(rownames(term_doc_matrix)) %in% static_data$blacklisted_terms)
 
     # Combine all indices to exclude
     exclude_indices <- unique(c(a_idx, short_term_indices, blacklist_indices))
@@ -671,8 +516,6 @@ lsi_model <- function(term_doc_matrix, a_term, n_factors = 100, n_results = 100,
         if (use_nlp) {
           nlp_valid <- tryCatch({
             # Try to apply NLP-based entity recognition
-            # This could be a call to spaCy, NLTK, or other NLP tools
-            # For now, we'll use our existing validation_entity_with_nlp function
             if (exists("validate_entity_with_nlp", mode="function")) {
               validate_entity_with_nlp(term, term_type)
             } else {
@@ -694,39 +537,15 @@ lsi_model <- function(term_doc_matrix, a_term, n_factors = 100, n_results = 100,
         # Add points for passing NLP validation
         if (nlp_valid) term_score <- term_score + 0.5
 
-        # Check for known biomedical entity patterns
+        # Check for known biomedical entity patterns (using static_data)
         term_lower <- tolower(term)
 
-        # Biomedical entity patterns
-        biomed_patterns <- list(
-          # Disease/pathology patterns
-          "disease" = c("itis$", "emia$", "oma$", "pathy$", "osis$", "algia$", "disease", "disorder",
-                        "syndrome", "infection", "injury", "lesion", "trauma", "cancer", "tumor",
-                        "carcinoma", "sarcoma", "lymphoma", "melanoma", "leukemia"),
-
-          # Anatomical/physiological patterns
-          "anatomy" = c("nerve", "neural", "neuron", "brain", "spinal", "cardiac", "heart", "liver",
-                        "renal", "kidney", "pulmonary", "lung", "vascular", "artery", "vein", "blood",
-                        "tissue", "muscle", "bone", "joint", "cell", "plasma", "serum"),
-
-          # Molecular/biochemical patterns
-          "molecular" = c("protein", "peptide", "enzyme", "gene", "receptor", "antibody", "hormone",
-                          "cytokine", "kinase", "ase$", "factor", "growth", "channel", "transporter",
-                          "signaling", "pathway"),
-
-          # Pharmaceutical/therapeutic patterns
-          "pharma" = c("drug", "therapy", "treatment", "medication", "dose", "clinical", "therapeutic",
-                       "inhibitor", "agonist", "antagonist", "blocker", "vaccine", "antibiotics",
-                       "mab$", "statin$", "pril$", "sone$", "olol$")
-        )
-
-        # Check for pattern matches
-        for (category in names(biomed_patterns)) {
-          for (pattern in biomed_patterns[[category]]) {
-            if (grepl(pattern, term_lower)) {
-              term_score <- term_score + 0.25  # Add points for pattern matches
-              break  # Only count one match per category
-            }
+        # Check for pattern matches using static_data
+        for (category in names(static_data$biomedical_patterns)) {
+          pattern <- static_data$biomedical_patterns[[category]]
+          if (grepl(pattern, term_lower)) {
+            term_score <- term_score + 0.25  # Add points for pattern matches
+            break  # Only count one match per category
           }
         }
 

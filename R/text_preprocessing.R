@@ -7,6 +7,10 @@
 #' Get dictionary cache environment
 #' @return The environment containing cached dictionary data
 #' @export
+#' @examples
+#' # Get the dictionary cache environment
+#' cache_env <- get_dict_cache()
+#' print(ls(cache_env))
 get_dict_cache <- function() {
   .dict_cache_env
 }
@@ -155,6 +159,26 @@ preprocess_text <- function(text_data, text_column = "abstract",
 #'
 #' @return A data frame with extracted entities, their types, and positions.
 #' @export
+#' @examples
+#' # Create example text data
+#' text_data <- data.frame(
+#'   doc_id = 1:3,
+#'   abstract = c(
+#'     "Migraine is a neurological disorder causing severe headache and photophobia.",
+#'     "Serotonin receptors play a role in migraine pathophysiology.",
+#'     "Sumatriptan is an effective treatment for migraine attacks."
+#'   )
+#' )
+#'
+#' # Create example dictionary
+#' dictionary <- data.frame(
+#'   term = c("migraine", "headache", "photophobia", "serotonin", "sumatriptan"),
+#'   type = c("disease", "symptom", "symptom", "chemical", "drug")
+#' )
+#'
+#' # Extract entities
+#' entities <- extract_entities(text_data, dictionary = dictionary)
+#' print(entities)
 extract_entities <- function(text_data, text_column = "abstract",
                              dictionary = NULL,
                              case_sensitive = FALSE,
@@ -410,6 +434,19 @@ extract_entities <- function(text_data, text_column = "abstract",
 #'
 #' @return A data frame containing the dictionary.
 #' @export
+#' @examples
+#' # Load a disease dictionary from local source
+#' disease_dict <- load_dictionary("disease", source = "local")
+#' head(disease_dict)
+#'
+#' # Load with custom terms
+#' custom_dict <- data.frame(
+#'   term = c("migraine", "headache", "photophobia"),
+#'   type = c("disease", "symptom", "symptom"),
+#'   id = c("D001", "D002", "D003"),
+#'   source = rep("custom", 3)
+#' )
+#' print(custom_dict)
 load_dictionary <- function(dictionary_type = NULL,
                             custom_path = NULL,
                             source = c("local", "mesh", "umls"),
@@ -596,25 +633,13 @@ load_from_mesh <- function(dictionary_type, n_terms = 200, query = NULL) {
     stop("The xml2 package is required for parsing MeSH data. Install it with: install.packages('xml2')")
   }
 
-  # Build query based on dictionary type - expanded for more categories
-  mesh_query_map <- list(
-    "disease" = "disease[MeSH]",
-    "drug" = "pharmaceutical preparations[MeSH]",
-    "gene" = "genes[MeSH]",
-    "protein" = "proteins[MeSH]",
-    "chemical" = "chemicals[MeSH]",
-    "pathway" = "metabolic networks and pathways[MeSH]",
-    "anatomy" = "anatomy[MeSH]",
-    "organism" = "organisms[MeSH]",
-    "biological_process" = "biological phenomena[MeSH]",
-    "cell" = "cells[MeSH]",
-    "tissue" = "tissues[MeSH]",
-    "symptom" = "signs and symptoms[MeSH]",
-    "diagnostic_procedure" = "diagnostic techniques and procedures[MeSH]",
-    "therapeutic_procedure" = "therapeutics[MeSH]",
-    "phenotype" = "phenotype[MeSH]",
-    "molecular_function" = "molecular biology[MeSH]"
-  )
+  # Build query based on dictionary type (using static_data)
+  if (is.null(dictionary_type) || !dictionary_type %in% names(static_data$mesh_query_map)) {
+    # If dictionary_type is not specified or not in our mapping, use a general search
+    base_query <- "mesh[sb]"
+  } else {
+    base_query <- static_data$mesh_query_map[[dictionary_type]]
+  }
 
   if (is.null(dictionary_type) || !dictionary_type %in% names(mesh_query_map)) {
     # If dictionary_type is not specified or not in our mapping, use a general search
@@ -1497,49 +1522,18 @@ validate_umls_key <- function(api_key, validator_api_key = NULL) {
 create_dummy_dictionary <- function(dictionary_type) {
   message("Creating dummy dictionary for ", dictionary_type)
 
-  if (dictionary_type == "disease") {
-    dict <- data.frame(
-      term = c("covid-19", "sars-cov-2", "coronavirus", "pneumonia", "fever",
-               "cough", "dyspnea", "migraine", "headache", "hypertension",
-               "diabetes", "asthma", "cancer", "obesity", "myocarditis",
-               "thrombosis", "stroke", "anosmia", "fatigue", "hypoxemia"),
-      id = paste0("D", sprintf("%06d", 1:20)),
-      type = rep("disease", 20),
-      source = rep("dummy", 20),
-      stringsAsFactors = FALSE
-    )
-  } else if (dictionary_type == "drug") {
-    dict <- data.frame(
-      term = c("remdesivir", "dexamethasone", "hydroxychloroquine", "azithromycin",
-               "favipiravir", "tocilizumab", "heparin", "aspirin", "ibuprofen",
-               "paracetamol", "acetaminophen", "statins", "metformin", "insulin",
-               "warfarin", "enoxaparin", "ivermectin", "lopinavir", "ritonavir", "oseltamivir"),
-      id = paste0("D", sprintf("%06d", 21:40)),
-      type = rep("drug", 20),
-      source = rep("dummy", 20),
-      stringsAsFactors = FALSE
-    )
-  } else if (dictionary_type == "gene") {
-    dict <- data.frame(
-      term = c("ACE2", "TMPRSS2", "IL6", "IL1B", "TNF", "IFNG", "CXCL10",
-               "CCL2", "TNFRSF1A", "NFKB1", "TLR3", "TLR7", "MYD88", "IRF3",
-               "IRF7", "STAT1", "STAT3", "JAK1", "JAK2", "MAPK1"),
-      id = paste0("G", sprintf("%06d", 1:20)),
-      type = rep("gene", 20),
-      source = rep("dummy", 20),
-      stringsAsFactors = FALSE
-    )
+  if (dictionary_type %in% names(static_data$dummy_dictionaries)) {
+    return(static_data$dummy_dictionaries[[dictionary_type]])
   } else {
-    dict <- data.frame(
+    # Return empty dictionary for unknown types
+    return(data.frame(
       term = character(0),
       id = character(0),
       type = character(0),
       source = character(0),
       stringsAsFactors = FALSE
-    )
+    ))
   }
-
-  return(dict)
 }
 
 # Helper function to search UMLS by semantic type
@@ -2137,50 +2131,11 @@ extract_topics <- function(text_data, text_column = "abstract", n_topics = 5,
 #' @return Vector of UMLS semantic type identifiers
 #' @keywords internal
 get_umls_semantic_types <- function(dictionary_type) {
-  # Create a comprehensive mapping of dictionary types to UMLS semantic types
-  semantic_types <- list(
-    # Original mappings
-    "disease" = c("T047", "T048", "T019", "T046"), # Disease and Syndrome, Mental Disorder, Congenital Abnormality, Pathologic Function
-    "drug" = c("T116", "T121", "T195", "T200"), # Amino Acid, Lipid, Antibiotic, Clinical Drug
-    "gene" = c("T028", "T087", "T123"), # Gene, Amino Acid Sequence, Nucleotide Sequence
-
-    # New expanded mappings
-    "protein" = c("T116", "T126", "T125"), # Amino Acid, Peptide/Protein, Enzyme
-    "chemical" = c("T103", "T104", "T109", "T196"), # Chemical, Chemical Viewed Structurally, Organic Chemical, Element, Ion, or Isotope
-    "pathway" = c("T044", "T042", "T045"), # Molecular Function, Organ or Tissue Function, Genetic Function
-    "anatomy" = c("T017", "T018", "T023", "T024"), # Anatomical Structure, Embryonic Structure, Body Part, Organ, or Organ Component, Tissue
-    "organism" = c("T001", "T002", "T004", "T005", "T007"), # Organism, Plant, Fungus, Virus, Bacterium
-    "biological_process" = c("T038", "T039", "T040", "T041"), # Biologic Function, Physiologic Function, Organism Function, Mental Process
-    "cellular_component" = c("T026", "T025", "T029"), # Cell Component, Cell, Body Location or Region
-    "molecular_function" = c("T044", "T045", "T118"), # Molecular Function, Genetic Function, Carbohydrate
-    "diagnostic_procedure" = c("T059", "T060"), # Laboratory Procedure, Diagnostic Procedure
-    "therapeutic_procedure" = c("T061", "T058"), # Therapeutic or Preventive Procedure, Health Care Activity
-    "phenotype" = c("T046", "T047", "T048", "T020"), # Pathologic Function, Disease or Syndrome, Mental or Behavioral Dysfunction, Acquired Abnormality
-    "symptom" = c("T184", "T046", "T048"), # Sign or Symptom, Pathologic Function, Mental or Behavioral Dysfunction
-    "cell" = c("T025"), # Cell
-    "tissue" = c("T024"), # Tissue
-    "mental_process" = c("T041", "T048"), # Mental Process, Mental or Behavioral Dysfunction
-    "physiologic_function" = c("T039", "T040"), # Physiologic Function, Organism Function
-    "laboratory_procedure" = c("T059") # Laboratory Procedure
-  )
-
-  if (!is.null(dictionary_type) && dictionary_type %in% names(semantic_types)) {
-    return(semantic_types[[dictionary_type]])
+  if (!is.null(dictionary_type) && dictionary_type %in% names(static_data$umls_semantic_types)) {
+    return(static_data$umls_semantic_types[[dictionary_type]])
   } else {
     return(NULL)
   }
-
-  if (verbose && nrow(safe_dict) < original_count) {
-    message("  Removed ", original_count - nrow(safe_dict),
-            " terms with non-alphanumeric characters (final cleanup)")
-  }
-
-  if (verbose) {
-    message("Sanitization complete. ", nrow(safe_dict), " terms remaining (",
-            round(nrow(safe_dict) / nrow(dictionary) * 100, 1), "% of original)")
-  }
-
-  return(safe_dict)
 }
 
 #' Enhanced sanitize dictionary function
@@ -2195,6 +2150,16 @@ get_umls_semantic_types <- function(dictionary_type) {
 #'
 #' @return A data frame with sanitized terms.
 #' @export
+#' @examples
+#' # Create a dictionary with problematic terms
+#' dirty_dict <- data.frame(
+#'   term = c("migraine", "europe", "optimization", "receptor", "123", ""),
+#'   type = c("disease", "location", "process", "protein", "number", "empty")
+#' )
+#'
+#' # Sanitize the dictionary
+#' clean_dict <- sanitize_dictionary(dirty_dict)
+#' print(clean_dict)
 sanitize_dictionary <- function(dictionary, term_column = "term", type_column = "type",
                                 validate_types = TRUE, verbose = TRUE) {
   # Check input
@@ -2283,111 +2248,8 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
   # Step 4: Remove common conjunctive adverbs and non-medical terms
   original_count <- nrow(safe_dict)
 
-  # Expanded list of common non-medical terms and general terminology
-  common_adverbs <- c(
-    "however", "therefore", "furthermore", "moreover", "consequently",
-    "nevertheless", "accordingly", "thus", "hence", "meanwhile", "subsequently",
-    "conversely", "indeed", "instead", "likewise", "namely", "regardless",
-    "similarly", "specifically", "undoubtedly", "whereas", "annotation", "annotated",
-    "nonetheless", "meanwhile", "absolutely", "accordingly", "additionally",
-    "afterwards", "albeit", "although", "altogether", "anyway", "certainly",
-    "clearly", "considering", "despite", "earlier", "especially", "essentially",
-    "eventually", "exactly", "evidently", "finally", "further", "generally",
-    "granted", "fortunately", "hopefully", "importantly", "incidentally",
-    "initially", "ironically", "literally", "merely", "naturally", "obviously",
-    "occasionally", "otherwise", "particularly", "perhaps", "possibly",
-    "presumably", "previously", "primarily", "probably", "rather",
-    "regardless", "relatively", "reportedly", "seemingly", "seriously",
-    "significantly", "simultaneously", "specifically", "strangely", "surprisingly",
-    "ultimately", "unfortunately", "whereby"
-  )
-
-  # List of common abbreviations and academic terms
-  common_abbrevs <- c(
-    "et al", "fig", "etc", "ie", "eg", "viz", "vs", "ref", "refs",
-    "approx", "ca", "cf", "cp", "ed", "eds", "eq", "eqn", "eqns", "intro",
-    "min", "max", "nb", "no", "non", "vol", "vols", "yr", "yrs",
-    "abstract", "table", "figure", "chart", "graph", "analysis", "summary",
-    "introduction", "conclusion", "discussion", "result", "results", "method",
-    "methods", "protocol", "review", "sample", "case", "cases", "control",
-    "controls", "subject", "subjects", "participant", "participants",
-    "pubmed", "embase", "medline", "cochrane", "meta", "database", "databases"
-  )
-
-  # Common non-specific terms that are incorrectly appearing in our results
-  common_nonspecific <- c(
-    "effect", "effects", "affect", "affects", "influence", "influences",
-    "impact", "impacts", "association", "associated", "associations",
-    "correlation", "correlations", "relationship", "relationships",
-    "connection", "connections", "link", "links", "cause", "causes",
-    "causing", "caused", "increase", "increases", "increasing",
-    "decrease", "decreases", "decreasing", "demonstrate", "demonstrates",
-    "demonstrated", "show", "shows", "shown", "find", "finds", "found",
-    "observe", "observes", "observed", "report", "reports", "reported",
-    "reveal", "reveals", "revealed", "suggest", "suggests", "suggested",
-    "indicates", "indicated", "document", "documented", "value", "values",
-    "level", "levels", "measure", "measures", "measured", "significant",
-    "significance", "compare", "compared", "comparing", "determine",
-    "determined", "determining", "identify", "identified", "identifying",
-    "estimate", "estimated", "estimating", "total", "high", "higher",
-    "highest", "low", "lower", "lowest", "new", "novel", "recent", "previous",
-    "older", "younger", "early", "earlier", "late", "later", "frequently",
-    "frequently", "rarely", "common", "commonly", "rare", "rarely", "severe",
-    "severity", "mild", "moderate", "normal", "abnormal", "improvement",
-    "improved", "improving", "worsening", "worsened", "detection", "detected",
-    "detecting", "prevention", "prevented", "preventing", "assessment",
-    "assessed", "assessing", "evaluation", "evaluated", "evaluating",
-    "investigation", "investigated", "investigating", "calculation",
-    "calculated", "calculating", "classification", "classified", "classifying",
-    "stat", "stats", "clinical", "treatment", "patient", "patients", "outcome",
-    "outcomes", "intervention", "interventions", "agent", "agents", "order",
-    "orders", "ample", "amples", "population", "play", "negative", "accuracy",
-    "leading", "baseline", "evidence", "efficacy", "effectiveness", "placebo",
-    "follow", "following", "design", "trial", "trials", "quality", "recommendation",
-    "recommendations", "response", "responses", "safe", "safety", "adverse",
-    "profile", "profiles", "interaction", "interactions", "combination",
-    "combinations", "standard", "standards", "guideline", "guidelines",
-    "first", "second", "third", "fourth", "fifth", "primary", "secondary",
-    "tertiary", "initial", "final", "potential", "beneficial", "beneficial",
-    "strategy", "strategies", "approach", "approaches", "method", "methods",
-    "technique", "techniques", "procedure", "procedures", "process", "processes",
-    "long", "short", "term", "single", "double", "multiple", "simple", "complex",
-    "positive", "subsequent", "beneficial", "harmful", "randomized", "randomised",
-    "controlled", "substantial", "significant", "consistent", "considerable",
-    "relevant", "important", "interesting", "promising", "similar", "different",
-    "distinct", "specific", "particular", "major", "minor", "key", "main",
-    "essential", "necessary", "sufficient", "adequate", "proper", "appropriate",
-    "suitable", "consecutive", "simultaneous", "various", "variable", "concurrent",
-    "concomitant", "overall", "entire", "whole", "optimum", "optimal", "ideal",
-    "better", "best", "worse", "worst", "efficacious", "limited", "extensive",
-    "intensive", "widespread", "reliable", "reproducible", "repeatable",
-    "comparable", "varied", "useful", "valuable", "successful", "unsuccessful",
-    "effective", "ineffective", "extensive", "intensive", "minimum", "maximum"
-  )
-
-  # New: Medical jargon that's too general to be useful biomedical entities
-  medical_jargon <- c(
-    "acute", "chronic", "condition", "conditions", "diagnosis", "diagnoses",
-    "diagnostic", "diagnostics", "disorder", "disorders", "dose", "doses",
-    "dosage", "dosages", "progressive", "regressive", "regimen", "regimens",
-    "symptom", "symptoms", "syndrome", "syndromes", "therapeutic", "therapy",
-    "therapies", "onset", "remission", "recurrent", "relapse", "relapses",
-    "treatment", "treatments", "manageable", "unmanageable", "intensive",
-    "supportive", "palliative", "preventive", "preventative", "prophylactic",
-    "prophylaxis", "maintenance", "induction", "consolidation", "adjuvant",
-    "neoadjuvant", "first-line", "second-line", "rescue", "salvage",
-    "empiric", "empirical", "targeted", "systemic", "topical", "local",
-    "regional", "general", "medical", "surgical", "pharmacological",
-    "behavioral", "behavioural", "psychological", "physical", "occupational",
-    "alternative", "complementary", "conventional", "standard", "novel",
-    "experimental", "investigational", "established", "emerging", "conventional"
-  )
-
-  # Combine all terms to filter out
-  terms_to_filter <- unique(c(common_adverbs, common_abbrevs, common_nonspecific, medical_jargon))
-
-  # Make term filtering case-insensitive
-  safe_dict <- safe_dict[!tolower(safe_dict[[term_column]]) %in% terms_to_filter, ]
+  # Make term filtering case-insensitive (using static_data)
+  safe_dict <- safe_dict[!tolower(safe_dict[[term_column]]) %in% static_data$blacklisted_terms, ]
 
   if (verbose && nrow(safe_dict) < original_count) {
     message("  Removed ", original_count - nrow(safe_dict),
@@ -2402,94 +2264,13 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
 
   # Step 5: Apply term-type corrections for commonly misclassified terms
   if (validate_types && type_column %in% colnames(safe_dict)) {
-    # Additional term-type corrections for common misclassified terms
-    term_type_corrections <- list(
-      # Analytical techniques/methods that are often misclassified as chemicals
-      "faers" = "method",              # FDA Adverse Event Reporting System
-      "bcpnn" = "method",              # Bayesian Confidence Propagation Neural Network
-      "uplc" = "method",               # Ultra Performance Liquid Chromatography
-      "frap" = "method",               # Fluorescence Recovery After Photobleaching
-      "hplc" = "method",               # High Performance Liquid Chromatography
-      "lc-ms" = "method",              # Liquid Chromatography-Mass Spectrometry
-      "gc-ms" = "method",              # Gas Chromatography-Mass Spectrometry
-      "maldi" = "method",              # Matrix-Assisted Laser Desorption/Ionization
-      "elisa" = "method",              # Enzyme-Linked Immunosorbent Assay
-      "ft-ir" = "method",              # Fourier Transform Infrared Spectroscopy
-      "nmr" = "method",                # Nuclear Magnetic Resonance
-      "pcr" = "method",                # Polymerase Chain Reaction
-      "sem" = "method",                # Scanning Electron Microscopy
-      "tem" = "method",                # Transmission Electron Microscopy
-      "xrd" = "method",                # X-Ray Diffraction
-      "saxs" = "method",               # Small-Angle X-ray Scattering
-      "uv-vis" = "method",             # Ultraviolet-Visible Spectroscopy
-      "ms" = "method",                 # Mass Spectrometry
-      "ms/ms" = "method",              # Tandem Mass Spectrometry
-      "lc" = "method",                 # Liquid Chromatography
-      "gc" = "method",                 # Gas Chromatography
-      "tga" = "method",                # Thermogravimetric Analysis
-      "dsc" = "method",                # Differential Scanning Calorimetry
-      "uv" = "method",                 # Ultraviolet
-      "ir" = "method",                 # Infrared
-      "rna-seq" = "method",            # RNA Sequencing
-      "qtof" = "method",               # Quadrupole Time-of-Flight
-
-      # Common biostatistical methods incorrectly classified as chemicals
-      "anova" = "method",              # Analysis of Variance
-      "ancova" = "method",             # Analysis of Covariance
-      "manova" = "method",             # Multivariate Analysis of Variance
-      "pca" = "method",                # Principal Component Analysis
-      "sem" = "method",                # Structural Equation Modeling
-      "glm" = "method",                # Generalized Linear Model
-      "lda" = "method",                # Linear Discriminant Analysis
-      "svm" = "method",                # Support Vector Machine
-      "ann" = "method",                # Artificial Neural Network
-      "kmeans" = "method",             # K-means clustering
-      "roc" = "method",                # Receiver Operating Characteristic
-      "auc" = "method",                # Area Under the Curve
-
-      # Symptoms that are often misclassified
-      "pain" = "symptom",
-      "headache" = "symptom",
-      "migraine" = "disease",
-      "nausea" = "symptom",
-      "vomiting" = "symptom",
-      "dizziness" = "symptom",
-      "fatigue" = "symptom",
-      "weakness" = "symptom",
-      "aura" = "symptom",
-      "photophobia" = "symptom",
-      "phonophobia" = "symptom",
-
-      # Proteins and receptors
-      "receptor" = "protein",
-      "receptors" = "protein",
-      "channel" = "protein",
-      "channels" = "protein",
-      "transporter" = "protein",
-      "transporters" = "protein",
-
-      # Biological processes
-      "inflammation" = "biological_process",
-      "signaling" = "biological_process",
-      "activation" = "biological_process",
-      "inhibition" = "biological_process",
-      "regulation" = "biological_process",
-      "phosphorylation" = "biological_process",
-
-      # Diseases
-      "migraine" = "disease",
-      "malformation" = "disease",
-      "disorder" = "disease",
-      "syndrome" = "disease"
-    )
-
-    # Apply corrections to dictionary
+    # Apply corrections to dictionary (using static_data)
     corrections_made <- 0
     for (i in 1:nrow(safe_dict)) {
       term_lower <- tolower(safe_dict[[term_column]][i])
-      if (term_lower %in% names(term_type_corrections)) {
+      if (term_lower %in% names(static_data$term_type_mappings)) {
         # Get the correct type
-        correct_type <- term_type_corrections[[term_lower]]
+        correct_type <- static_data$term_type_mappings[[term_lower]]
 
         # If current type is different from the correct type
         if (safe_dict[[type_column]][i] != correct_type) {
@@ -2800,6 +2581,24 @@ load_mesh_terms_from_pubmed <- function(mesh_queries, max_results = 50, min_term
 #'
 #' @return A data frame with extracted entities, their types, and positions.
 #' @export
+#' @examples
+#' # Create example text data
+#' text_data <- data.frame(
+#'   doc_id = 1:2,
+#'   abstract = c(
+#'     "Migraine is a neurological disorder.",
+#'     "Serotonin plays a role in headache."
+#'   )
+#' )
+#'
+#' # Extract entities using workflow
+#' entities <- extract_entities_workflow(
+#'   text_data,
+#'   entity_types = c("disease", "chemical"),
+#'   dictionary_sources = "local",
+#'   max_terms_per_type = 10
+#' )
+#' print(head(entities))
 extract_entities_workflow <- function(text_data, text_column = "abstract",
                                       entity_types = c("disease", "drug", "gene"),
                                       dictionary_sources = c("local", "mesh", "umls"),

@@ -54,3 +54,21 @@ A data frame with ranked discovery results.
 This function implements the ABC model for literature-based discovery with
 enhanced term filtering and validation.
 }
+\examples{
+# Create a simple example co-occurrence matrix
+set.seed(123)
+terms <- c("migraine", "headache", "pain", "serotonin", "sumatriptan", "CGRP")
+n_terms <- length(terms)
+co_matrix <- matrix(runif(n_terms^2, 0, 1), nrow = n_terms, ncol = n_terms)
+rownames(co_matrix) <- colnames(co_matrix) <- terms
+diag(co_matrix) <- 1  # Perfect self-similarity
+
+# Add entity types
+entity_types <- c("disease", "symptom", "symptom", "chemical", "drug", "protein")
+names(entity_types) <- terms
+attr(co_matrix, "entity_types") <- entity_types
+
+# Apply ABC model
+results <- abc_model(co_matrix, a_term = "migraine", min_score = 0.1, n_results = 5)
+print(results)
+}

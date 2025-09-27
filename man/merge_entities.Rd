@@ -30,3 +30,29 @@ A data frame of combined entities
 This function combines custom and standard entity datasets, handling the case
 where one or both might be empty, and removes duplicates.
 }
+\examples{
+# Create example entity datasets
+custom_entities <- data.frame(
+  doc_id = c(1, 1, 2),
+  entity = c("migraine", "headache", "pain"),
+  entity_type = c("disease", "symptom", "symptom"),
+  start_pos = c(1, 10, 5),
+  end_pos = c(8, 18, 9),
+  sentence = c("sent1", "sent1", "sent2"),
+  frequency = c(2, 1, 1)
+)
+
+standard_entities <- data.frame(
+  doc_id = c(1, 2, 2),
+  entity = c("serotonin", "migraine", "therapy"),
+  entity_type = c("chemical", "disease", "treatment"),
+  start_pos = c(20, 1, 15),
+  end_pos = c(29, 8, 22),
+  sentence = c("sent1", "sent2", "sent2"),
+  frequency = c(1, 1, 1)
+)
+
+# Merge entities
+merged <- merge_entities(custom_entities, standard_entities, "migraine")
+print(merged)
+}

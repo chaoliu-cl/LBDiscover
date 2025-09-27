@@ -36,3 +36,16 @@ A data frame of diversified results
 This function diversifies ABC results to avoid redundancy, with error handling
 to ensure results are always returned.
 }
+\examples{
+# Create example results
+top_results <- data.frame(
+  a_term = rep("migraine", 6),
+  b_term = c("serotonin", "serotonin", "CGRP", "CGRP", "cortisol", "dopamine"),
+  c_term = c("sumatriptan", "rizatriptan", "fremanezumab", "galcanezumab", "propranolol", "amitriptyline"),
+  abc_score = c(0.8, 0.75, 0.7, 0.65, 0.6, 0.55)
+)
+
+# Apply diversification
+diverse_results <- safe_diversify(top_results, max_per_group = 2)
+print(diverse_results)
+}

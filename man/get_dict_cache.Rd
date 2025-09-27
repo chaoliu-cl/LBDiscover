@@ -12,3 +12,8 @@ The environment containing cached dictionary data
 \description{
 Get dictionary cache environment
 }
+\examples{
+# Get the dictionary cache environment
+cache_env <- get_dict_cache()
+print(ls(cache_env))
+}

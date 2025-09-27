@@ -626,6 +626,19 @@ compare_terms <- function(corpus1, corpus2, text_column = "abstract",
 #'
 #' @return A character vector of unique term variations, sorted by length
 #' @export
+#' @examples
+#' # Create example articles
+#' articles <- data.frame(
+#'   abstract = c(
+#'     "Migraine headaches are debilitating",
+#'     "Migraines affect quality of life",
+#'     "Migraine disorders require treatment"
+#'   )
+#' )
+#'
+#' # Get term variations
+#' variations <- get_term_vars(articles, "migrain")
+#' print(variations)
 get_term_vars <- function(articles, primary_term, text_col = "abstract") {
   # Extract all occurrences of primary term with context
   variations <- character(0)
@@ -662,6 +675,31 @@ get_term_vars <- function(articles, primary_term, text_col = "abstract") {
 #'
 #' @return A data frame of combined entities
 #' @export
+#' @examples
+#' # Create example entity datasets
+#' custom_entities <- data.frame(
+#'   doc_id = c(1, 1, 2),
+#'   entity = c("migraine", "headache", "pain"),
+#'   entity_type = c("disease", "symptom", "symptom"),
+#'   start_pos = c(1, 10, 5),
+#'   end_pos = c(8, 18, 9),
+#'   sentence = c("sent1", "sent1", "sent2"),
+#'   frequency = c(2, 1, 1)
+#' )
+#'
+#' standard_entities <- data.frame(
+#'   doc_id = c(1, 2, 2),
+#'   entity = c("serotonin", "migraine", "therapy"),
+#'   entity_type = c("chemical", "disease", "treatment"),
+#'   start_pos = c(20, 1, 15),
+#'   end_pos = c(29, 8, 22),
+#'   sentence = c("sent1", "sent2", "sent2"),
+#'   frequency = c(1, 1, 1)
+#' )
+#'
+#' # Merge entities
+#' merged <- merge_entities(custom_entities, standard_entities, "migraine")
+#' print(merged)
 merge_entities <- function(custom_entities, standard_entities,
                            primary_term, primary_type = "disease",
                            verbose = TRUE) {
@@ -716,6 +754,16 @@ merge_entities <- function(custom_entities, standard_entities,
 #'
 #' @return A data frame of filtered entities
 #' @export
+#' @examples
+#' # Create example entities
+#' entities <- data.frame(
+#'   entity = c("migraine", "optimization", "receptor", "europe"),
+#'   entity_type = c("disease", "process", "protein", "location")
+#' )
+#'
+#' # Validate entities
+#' validated <- valid_entities(entities, "migraine", c("migrain", "headache"))
+#' print(validated)
 valid_entities <- function(entities, primary_term, primary_term_variations = NULL,
                            validation_function = NULL,
                            verbose = TRUE,
@@ -789,6 +837,15 @@ valid_entities <- function(entities, primary_term, primary_term_variations = NUL
 #'
 #' @return The found term (either exact match or variation)
 #' @export
+#' @examples
+#' # Create example co-occurrence matrix
+#' terms <- c("migraine", "headache", "pain", "serotonin")
+#' co_matrix <- matrix(runif(16, 0, 1), nrow = 4, ncol = 4)
+#' rownames(co_matrix) <- colnames(co_matrix) <- terms
+#'
+#' # Find term in matrix
+#' found_term <- find_term(co_matrix, "migraine")
+#' print(found_term)
 find_term <- function(co_matrix, primary_term, verbose = TRUE) {
   matrix_terms <- rownames(co_matrix)
 
@@ -829,6 +886,18 @@ find_term <- function(co_matrix, primary_term, verbose = TRUE) {
 #'
 #' @return A data frame of diversified results
 #' @export
+#' @examples
+#' # Create example results
+#' top_results <- data.frame(
+#'   a_term = rep("migraine", 6),
+#'   b_term = c("serotonin", "serotonin", "CGRP", "CGRP", "cortisol", "dopamine"),
+#'   c_term = c("sumatriptan", "rizatriptan", "fremanezumab", "galcanezumab", "propranolol", "amitriptyline"),
+#'   abc_score = c(0.8, 0.75, 0.7, 0.65, 0.6, 0.55)
+#' )
+#'
+#' # Apply diversification
+#' diverse_results <- safe_diversify(top_results, max_per_group = 2)
+#' print(diverse_results)
 safe_diversify <- function(top_results, diversity_method = "both",
                            max_per_group = 5, min_score = 0.0001,
                            min_results = 5, fallback_count = 15,
@@ -873,6 +942,19 @@ safe_diversify <- function(top_results, diversity_method = "both",
 #'
 #' @return A data frame with sufficient results for visualization
 #' @export
+#' @examples
+#' # Create example diverse results (empty case)
+#' diverse_results <- data.frame()
+#' top_results <- data.frame(
+#'   a_term = rep("migraine", 3),
+#'   b_term = c("serotonin", "CGRP", "cortisol"),
+#'   c_term = c("sumatriptan", "fremanezumab", "propranolol"),
+#'   abc_score = c(0.8, 0.7, 0.6)
+#' )
+#'
+#' # Ensure minimum results
+#' final_results <- min_results(diverse_results, top_results, "migraine")
+#' print(final_results)
 min_results <- function(diverse_results, top_results, a_term,
                         min_results = 3, fallback_count = 15,
                         verbose = TRUE) {
@@ -927,6 +1009,22 @@ min_results <- function(diverse_results, top_results, a_term,
 #'
 #' @return Invisible NULL (creates a file as a side effect)
 #' @export
+#' @examples
+#' # Create example results for visualization
+#' results <- data.frame(
+#'   a_term = rep("migraine", 4),
+#'   b_term = c("serotonin", "CGRP", "cortisol", "dopamine"),
+#'   c_term = c("sumatriptan", "fremanezumab", "propranolol", "amitriptyline"),
+#'   abc_score = c(0.8, 0.7, 0.6, 0.5),
+#'   b_type = c("chemical", "protein", "hormone", "chemical"),
+#'   c_type = rep("drug", 4)
+#' )
+#'
+#' \donttest{
+#' # These require graphics capabilities
+#' plot_heatmap(results, output_file = tempfile(fileext = ".png"))
+#' plot_network(results, output_file = tempfile(fileext = ".png"))
+#' }
 plot_heatmap <- function(results, output_file = "heatmap.png",
                          width = 1200, height = 900, resolution = 120,
                          top_n = 15, min_score = 0.0001,
@@ -979,6 +1077,22 @@ plot_heatmap <- function(results, output_file = "heatmap.png",
 #'
 #' @return Invisible NULL (creates a file as a side effect)
 #' @export
+#' @examples
+#' # Create example results for visualization
+#' results <- data.frame(
+#'   a_term = rep("migraine", 4),
+#'   b_term = c("serotonin", "CGRP", "cortisol", "dopamine"),
+#'   c_term = c("sumatriptan", "fremanezumab", "propranolol", "amitriptyline"),
+#'   abc_score = c(0.8, 0.7, 0.6, 0.5),
+#'   b_type = c("chemical", "protein", "hormone", "chemical"),
+#'   c_type = rep("drug", 4)
+#' )
+#'
+#' \donttest{
+#' # These require graphics capabilities
+#' plot_heatmap(results, output_file = tempfile(fileext = ".png"))
+#' plot_network(results, output_file = tempfile(fileext = ".png"))
+#' }
 plot_network <- function(results, output_file = "network.png",
                          width = 1200, height = 900, resolution = 120,
                          top_n = 15, min_score = 0.0001,
@@ -1028,6 +1142,21 @@ plot_network <- function(results, output_file = "network.png",
 #'
 #' @return A list containing evaluation results
 #' @export
+#' @examples
+#' # Create example results for evaluation
+#' results <- data.frame(
+#'   a_term = rep("migraine", 2),
+#'   b_term = c("serotonin", "CGRP"),
+#'   c_term = c("sumatriptan", "fremanezumab"),
+#'   abc_score = c(0.8, 0.7),
+#'   c_type = rep("drug", 2)
+#' )
+#'
+#' \dontrun{
+#' # This requires internet connection for PubMed search
+#' evaluation <- eval_evidence(results, max_results = 2, base_term = "migraine")
+#' print(names(evaluation))
+#' }
 eval_evidence <- function(results, max_results = 5, base_term = NULL,
                           max_articles = 5, verbose = TRUE) {
   # If base_term is NULL, try to use the a_term from the first row
@@ -1140,6 +1269,16 @@ eval_evidence <- function(results, max_results = 5, base_term = NULL,
 #'
 #' @return A data frame of articles with validated publication years
 #' @export
+#' @examples
+#' # Create example article data
+#' articles <- data.frame(
+#'   title = c("Migraine Study 1", "Headache Research"),
+#'   publication_year = c("2020", "not_a_year")
+#' )
+#'
+#' # Prepare articles
+#' prepared <- prep_articles(articles)
+#' print(prepared)
 prep_articles <- function(articles, verbose = TRUE) {
   # Return NULL if input is NULL
   if (is.null(articles)) {
@@ -1180,6 +1319,21 @@ prep_articles <- function(articles, verbose = TRUE) {
 #'
 #' @return Invisible output_file path
 #' @export
+#' @examples
+#' # Create example data for report generation
+#' results_list <- list(
+#'   abc_results = data.frame(
+#'     a_term = "migraine",
+#'     c_term = "sumatriptan",
+#'     abc_score = 0.8
+#'   )
+#' )
+#'
+#' \donttest{
+#' # Generate report to temporary file
+#' temp_file <- tempfile(fileext = ".html")
+#' gen_report(results_list, output_file = temp_file)
+#' }
 gen_report <- function(results_list, visualizations = NULL,
                        articles = NULL, output_file = "discoveries.html",
                        verbose = TRUE) {

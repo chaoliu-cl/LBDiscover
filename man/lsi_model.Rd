@@ -46,6 +46,5 @@ A data frame with ranked discovery results.
 }
 \description{
 This function implements an improved LSI model that more rigorously filters out
-non-biomedical terms from the results to ensure clinical relevance. It adds
-NLP-based validation as an additional layer of filtering.
+non-biomedical terms from the results to ensure clinical relevance.
 }

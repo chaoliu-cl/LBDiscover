@@ -58,3 +58,22 @@ A data frame with extracted entities, their types, and positions.
 This function provides a complete workflow for extracting entities from text
 using dictionaries from multiple sources, with improved performance and robust error handling.
 }
+\examples{
+# Create example text data
+text_data <- data.frame(
+  doc_id = 1:2,
+  abstract = c(
+    "Migraine is a neurological disorder.",
+    "Serotonin plays a role in headache."
+  )
+)
+
+# Extract entities using workflow
+entities <- extract_entities_workflow(
+  text_data,
+  entity_types = c("disease", "chemical"),
+  dictionary_sources = "local",
+  max_terms_per_type = 10
+)
+print(head(entities))
+}

@@ -36,3 +36,14 @@ A data frame of filtered entities
 This function applies validation to ensure only legitimate biomedical entities
 are included, while preserving trusted terms.
 }
+\examples{
+# Create example entities
+entities <- data.frame(
+  entity = c("migraine", "optimization", "receptor", "europe"),
+  entity_type = c("disease", "process", "protein", "location")
+)
+
+# Validate entities
+validated <- valid_entities(entities, "migraine", c("migrain", "headache"))
+print(validated)
+}

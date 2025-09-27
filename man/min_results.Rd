@@ -33,3 +33,17 @@ A data frame with sufficient results for visualization
 This function ensures there are sufficient results for visualization,
 creating placeholder data if necessary.
 }
+\examples{
+# Create example diverse results (empty case)
+diverse_results <- data.frame()
+top_results <- data.frame(
+  a_term = rep("migraine", 3),
+  b_term = c("serotonin", "CGRP", "cortisol"),
+  c_term = c("sumatriptan", "fremanezumab", "propranolol"),
+  abc_score = c(0.8, 0.7, 0.6)
+)
+
+# Ensure minimum results
+final_results <- min_results(diverse_results, top_results, "migraine")
+print(final_results)
+}

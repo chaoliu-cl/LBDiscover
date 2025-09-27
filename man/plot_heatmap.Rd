@@ -44,3 +44,20 @@ Invisible NULL (creates a file as a side effect)
 \description{
 This function creates a heatmap visualization from ABC results.
 }
+\examples{
+# Create example results for visualization
+results <- data.frame(
+  a_term = rep("migraine", 4),
+  b_term = c("serotonin", "CGRP", "cortisol", "dopamine"),
+  c_term = c("sumatriptan", "fremanezumab", "propranolol", "amitriptyline"),
+  abc_score = c(0.8, 0.7, 0.6, 0.5),
+  b_type = c("chemical", "protein", "hormone", "chemical"),
+  c_type = rep("drug", 4)
+)
+
+\donttest{
+# These require graphics capabilities
+plot_heatmap(results, output_file = tempfile(fileext = ".png"))
+plot_network(results, output_file = tempfile(fileext = ".png"))
+}
+}

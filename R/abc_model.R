@@ -173,6 +173,12 @@ create_comat <- function(entity_data,
 #' @param claimed_type Character string, the claimed entity type of the term
 #' @return Logical, TRUE if the term is likely a valid biomedical entity, FALSE otherwise
 #' @export
+#' @examples
+#' # Test biomedical entity validation
+#' is_valid_biomedical_entity("migraine", "disease")  # Should return TRUE
+#' is_valid_biomedical_entity("receptor", "protein")  # Should return TRUE
+#' is_valid_biomedical_entity("optimization", "chemical")  # Should return FALSE
+#' is_valid_biomedical_entity("europe", "disease")  # Should return FALSE
 is_valid_biomedical_entity <- function(term, claimed_type = NULL) {
   # Skip empty terms
   if (is.null(term) || is.na(term) || term == "") {
@@ -185,100 +191,9 @@ is_valid_biomedical_entity <- function(term, claimed_type = NULL) {
     claimed_type <- tolower(claimed_type)
   }
 
-  # Dictionary of specific problematic acronyms and their correct types
-  acronym_corrections <- list(
-    # Analytical techniques/methods that are often misclassified as chemicals
-    "faers" = "method",              # FDA Adverse Event Reporting System
-    "bcpnn" = "method",              # Bayesian Confidence Propagation Neural Network
-    "uplc" = "method",               # Ultra Performance Liquid Chromatography
-    "frap" = "method",               # Fluorescence Recovery After Photobleaching
-    "hplc" = "method",               # High Performance Liquid Chromatography
-    "lc-ms" = "method",              # Liquid Chromatography-Mass Spectrometry
-    "gc-ms" = "method",              # Gas Chromatography-Mass Spectrometry
-    "maldi" = "method",              # Matrix-Assisted Laser Desorption/Ionization
-    "elisa" = "method",              # Enzyme-Linked Immunosorbent Assay
-    "ft-ir" = "method",              # Fourier Transform Infrared Spectroscopy
-    "nmr" = "method",                # Nuclear Magnetic Resonance
-    "pcr" = "method",                # Polymerase Chain Reaction
-    "sem" = "method",                # Scanning Electron Microscopy
-    "tem" = "method",                # Transmission Electron Microscopy
-    "xrd" = "method",                # X-Ray Diffraction
-    "saxs" = "method",               # Small-Angle X-ray Scattering
-    "uv-vis" = "method",             # Ultraviolet-Visible Spectroscopy
-    "ms" = "method",                 # Mass Spectrometry
-    "ms/ms" = "method",              # Tandem Mass Spectrometry
-    "lc" = "method",                 # Liquid Chromatography
-    "gc" = "method",                 # Gas Chromatography
-    "tga" = "method",                # Thermogravimetric Analysis
-    "dsc" = "method",                # Differential Scanning Calorimetry
-    "uv" = "method",                 # Ultraviolet
-    "ir" = "method",                 # Infrared
-    "rna-seq" = "method",            # RNA Sequencing
-    "qtof" = "method",               # Quadrupole Time-of-Flight
-    "mri" = "method",                # Magnetic Resonance Imaging
-    "ct" = "method",                 # Computed Tomography
-    "pet" = "method",                # Positron Emission Tomography
-    "spect" = "method",              # Single-Photon Emission Computed Tomography
-    "ecg" = "method",                # Electrocardiogram
-    "eeg" = "method",                # Electroencephalogram
-    "emg" = "method",                # Electromyography
-    "fmri" = "method",               # Functional Magnetic Resonance Imaging
-    "qsar" = "method",               # Quantitative Structure-Activity Relationship
-    "qspr" = "method",               # Quantitative Structure-Property Relationship
-
-    # Common biostatistical methods incorrectly classified as chemicals
-    "anova" = "method",              # Analysis of Variance
-    "ancova" = "method",             # Analysis of Covariance
-    "manova" = "method",             # Multivariate Analysis of Variance
-    "pca" = "method",                # Principal Component Analysis
-    "sem" = "method",                # Structural Equation Modeling
-    "glm" = "method",                # Generalized Linear Model
-    "lda" = "method",                # Linear Discriminant Analysis
-    "svm" = "method",                # Support Vector Machine
-    "ann" = "method",                # Artificial Neural Network
-    "kmeans" = "method",             # K-means clustering
-    "roc" = "method",                # Receiver Operating Characteristic
-    "auc" = "method",                # Area Under the Curve
-
-    # Database and algorithm acronyms
-    "kegg" = "database",             # Kyoto Encyclopedia of Genes and Genomes
-    "smiles" = "method",             # Simplified Molecular-Input Line-Entry System
-    "blast" = "method",              # Basic Local Alignment Search Tool
-    "mace" = "method",               # Major Adverse Cardiac Events
-
-    # Correct classifications for symptoms
-    "pain" = "symptom",
-    "headache" = "symptom",
-    "migraine" = "disease",
-    "nausea" = "symptom",
-    "vomiting" = "symptom",
-    "dizziness" = "symptom",
-    "fatigue" = "symptom",
-    "weakness" = "symptom",
-    "aura" = "symptom",
-    "photophobia" = "symptom",
-    "phonophobia" = "symptom",
-
-    # Proteins and receptors
-    "receptor" = "protein",
-    "receptors" = "protein",
-    "channel" = "protein",
-    "channels" = "protein",
-    "transporter" = "protein",
-    "transporters" = "protein",
-
-    # Biological processes
-    "inflammation" = "biological_process",
-    "signaling" = "biological_process",
-    "activation" = "biological_process",
-    "inhibition" = "biological_process",
-    "regulation" = "biological_process",
-    "phosphorylation" = "biological_process"
-  )
-
   # If the term is an acronym in our dictionary, check against claimed_type
-  if (term_lower %in% names(acronym_corrections)) {
-    correct_type <- acronym_corrections[[term_lower]]
+  if (term_lower %in% names(static_data$acronym_corrections)) {
+    correct_type <- static_data$acronym_corrections[[term_lower]]
 
     # If a claimed type is provided, check if it matches our correction
     if (!is.null(claimed_type)) {
@@ -305,760 +220,108 @@ is_valid_biomedical_entity <- function(term, claimed_type = NULL) {
     return(FALSE)
   }
 
-  # List of geographic locations that should never be biomedical entities
-  geographic_locations <- c(
-    "africa", "america", "asia", "australia", "europe", "north america", "south america",
-    "central america", "western europe", "eastern europe", "northern europe", "southern europe",
-    "middle east", "southeast asia", "east asia", "central asia", "south asia", "north africa",
-    "sub-saharan africa", "oceania", "antarctica", "arctic", "caribbean", "mediterranean",
-    "scandinavia", "benelux", "balkans", "pacific", "atlantic", "central europe",
-    "usa", "china", "japan", "germany", "uk", "france", "italy", "spain", "russia",
-    "brazil", "india", "canada", "mexico", "australia", "switzerland", "sweden", "norway"
-  )
-
   # Immediately reject if the term is a geographic location
-  if (term_lower %in% geographic_locations) {
+  if (term_lower %in% static_data$geographic_locations) {
     return(FALSE)
   }
 
   # Specific terms that should be rejected based on our examples
-  problematic_specific_terms <- c(
-    "europe", "vehicle", "optimization", "retention", "malformation" # Terms mentioned in the issues
-  )
-
-  if (term_lower %in% problematic_specific_terms) {
+  if (term_lower %in% static_data$problematic_specific_terms) {
     # Special exception for malformation if it's being claimed as a disease
     if (term_lower == "malformation" && !is.null(claimed_type) && claimed_type == "disease") {
-      # Allow "malformation" when it's claimed to be a disease
       return(TRUE)
     }
     return(FALSE)
   }
 
-  # Very common English words and non-scientific terms (expanded list)
-  common_words <- c(
-    # Original list
-    "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on",
-    "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we",
-    "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there", "their",
-    "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when", "make",
-    "can", "like", "time", "no", "just", "him", "know", "take", "people", "into", "year", "your",
-    "good", "some", "could", "them", "see", "other", "than", "then", "now", "look", "only",
-    "come", "its", "over", "think", "also", "back", "after", "use", "two", "how", "our", "work",
-    "first", "well", "way", "even", "new", "want", "because", "any", "these", "give", "day",
-    "most", "us", "very", "although", "much", "should", "still", "something", "find", "many",
-
-    # Extended list of non-scientific terms
-    "through", "more", "before", "those", "between", "same", "another", "around", "while",
-    "however", "therefore", "furthermore", "moreover", "consequently", "nevertheless",
-    "accordingly", "thus", "hence", "meanwhile", "subsequently", "indeed", "instead", "likewise",
-    "namely", "regardless", "similarly", "specifically", "undoubtedly", "whereas", "mean",
-    "analysis", "result", "method", "find", "show", "increase", "decrease", "effect", "study",
-    "research", "data", "information", "measure", "value", "level", "report", "test", "change",
-    "control", "development", "management", "system", "process", "model", "determine", "identify",
-    "observed", "recorded", "analyzed", "evaluated", "assessed", "examined", "investigated",
-    "considered", "described", "presented", "demonstrated", "indicated", "suggested", "revealed",
-
-    # Demographic/socioeconomic terms
-    "sociodemographic", "demographic", "social", "economic", "education", "income", "status",
-    "cultural", "ethical", "society", "community", "population", "questionnaire", "survey",
-    "interview", "assessment", "scale", "score", "index", "measurement", "evaluation",
-    "analysis", "nationality", "ethnicity", "race", "gender", "sex", "age", "occupation",
-    "employment", "marital", "household", "residence", "urban", "rural", "metropolitan",
-    "suburban", "literacy", "socioeconomic",
-
-    # Statistical terms
-    "significant", "correlation", "regression", "association", "relationship", "analysis",
-    "statistical", "clinically", "percentage", "proportion", "ratio", "factor", "variable",
-    "parameter", "confidence", "interval", "probability", "likelihood", "odds", "risk",
-    "hazard", "prevalence", "incidence", "rate", "frequency", "distribution", "sample",
-    "population", "cohort", "group", "control", "case", "participant", "subject", "patient",
-    "individual", "person", "people", "characteristic", "feature", "aspect", "element",
-    "component", "quality", "quantity", "measure", "metric", "indicator", "predictor",
-    "outcome", "result", "finding", "evidence",
-
-    # Additional problematic terms from the example
-    "vehicle", "optimization", "retention", "europe", "africa", "asia", "america", "australia"
-  )
-
-  if (term_lower %in% common_words) {
+  # Very common English words and non-scientific terms
+  if (term_lower %in% static_data$common_words) {
     return(FALSE)
   }
 
   # STAGE 2: Type-specific validation (positive identification)
   if (!is.null(claimed_type)) {
     # Check if term matches characteristics of claimed type
-    # This is a positive identification approach - we check if the term has
-    # characteristics typical of its claimed type
-
-    # Is an acronym (common for genes, proteins, etc.)
-    is_acronym <- grepl("^[A-Z0-9]{2,}$", term)
-
-    # Check for commonly misclassified acronyms (analytical methods, etc.)
-    if (is_acronym && claimed_type == "chemical") {
-      # List of commonly misclassified analytical method acronyms
-      method_acronyms <- c(
-        "FAERS", "BCPNN", "UPLC", "FRAP", "HPLC", "LCMS", "GCMS", "MALDI",
-        "ELISA", "FTIR", "NMR", "PCR", "SEM", "TEM", "XRD", "SAXS", "UVVIS",
-        "MS", "MSMS", "LC", "GC", "TGA", "DSC", "UV", "IR", "RNASEQ", "QTOF",
-        "MRI", "CT", "PET", "SPECT", "ECG", "EEG", "EMG", "FMRI", "QSAR", "QSPR",
-        "ANOVA", "ANCOVA", "MANOVA", "PCA", "GLM", "LDA", "SVM", "ANN"
-      )
-
-      # Check if the acronym is in our list of analytical methods
-      if (toupper(term) %in% method_acronyms) {
-        return(FALSE)  # This is not a chemical, but an analytical method
-      }
-    }
-
-    # Type-specific checks with expanded patterns
-    if (claimed_type == "gene") {
-      # Genes often match these patterns
-      gene_patterns <- c(
-        "gene", "receptor", "factor", "kinase", "transcription", "regulatory",
-        "promoter", "repressor", "activator", "enhancer", "suppressor", "oncogene",
-        "family", "homolog", "ortholog", "paralog", "allele", "mutant", "variant",
-        "dna", "rna", "nucleotide", "sequence", "locus", "chromosome", "genome",
-        "exon", "intron", "codon", "amplification", "deletion", "insertion",
-        "duplication", "polymorphism", "snp", "mutation", "translocation", "inversion"
-      )
-
-      # Check for common gene naming patterns (e.g., BRCA1, TP53)
-      has_gene_pattern <- any(sapply(gene_patterns, function(p) grepl(p, term_lower)))
-
-      # Many genes are 2-5 letter acronyms followed by numbers
-      is_typical_gene_format <- grepl("^[A-Z]{2,5}[0-9]*$", term)
-
-      return(is_acronym || has_gene_pattern || is_typical_gene_format)
-    }
-    else if (claimed_type == "protein") {
-      # Proteins often match these patterns
-      protein_patterns <- c(
-        "protein", "enzyme", "receptor", "channel", "transporter", "carrier", "hormone",
-        "cytokine", "chemokine", "antibody", "immunoglobulin", "kinase", "phosphatase",
-        "protease", "ligase", "ase$", "in$", "globulin", "albumin", "peptide", "factor",
-        "subunit", "domain", "chain", "complex", "binding", "helicase", "reductase",
-        "transferase", "polymerase", "dehydrogenase", "oxidase", "integrin", "fibrinogen",
-        "collagen", "elastin", "myosin", "actin", "globin", "hemoglobin", "thrombin",
-        "trypsin", "pepsin", "lipase", "amylase", "catalase", "lactase", "synthetase"
-      )
-
-      has_protein_pattern <- any(sapply(protein_patterns, function(p) grepl(p, term_lower)))
-
-      # Special case: "receptor" and "receptors" should always be proteins
-      if (term_lower == "receptor" || term_lower == "receptors") {
-        return(TRUE)
-      }
-
-      return(is_acronym || has_protein_pattern)
-    }
-    else if (claimed_type == "drug") {
-      # Common drug name suffixes
-      drug_suffixes <- c(
-        "caine$", "mycin$", "oxacin$", "dronate$", "olol$", "pril$", "sartan$", "mab$",
-        "nib$", "gliptin$", "prazole$", "vastatin$", "dine$", "zosin$", "parin$", "ide$",
-        "ane$", "ene$", "azole$", "azepam$", "idine$", "dipine$", "tadine$", "rubicin$",
-        "citabine$", "mustine$", "phylline$", "racil$", "profen$", "sulfa$", "micin$",
-        "fungin$", "nacin$", "bicin$", "trexate$", "pamide$", "semide$", "setron$",
-        "ridone$", "tidine$", "afil$", "lukast$", "xaban$", "orphan$", "tretin$",
-        "stigmine$", "curium$", "parib$", "tinib$", "cycline$", "tinel$", "cereb$",
-        "navir$", "stat$", "thiazide$", "fibrate$", "glumide$", "glitazone$"
-      )
-
-      # Common drug classes
-      drug_classes <- c(
-        "antibiotic", "inhibitor", "antagonist", "agonist", "blocker", "vaccine",
-        "antidepressant", "antipsychotic", "antiepileptic", "sedative", "stimulant",
-        "antihistamine", "analgesic", "hormone", "antiviral", "anticancer",
-        "antihypertensive", "antiinflammatory", "antidiabetic", "anticoagulant",
-        "antithrombotic", "antiemetic", "anticonvulsant", "antiarrhythmic",
-        "medication", "medicine", "drug", "tablet", "capsule", "solution", "injection",
-        "infusion", "suspension", "syrup", "elixir", "tincture", "suppository",
-        "ointment", "cream", "lotion", "gel", "patch", "implant", "spray", "inhaler",
-        "antibacterial", "antifungal", "antimalarial", "antiparasitic", "antitussive",
-        "bronchodilator", "decongestant", "expectorant", "laxative", "diuretic",
-        "antispasmodic", "antiseptic", "anesthetic", "anxiolytic", "hypnotic",
-        "antihypertensive", "cardiotonic", "vasodilator", "vasoconstrictor", "statin",
-        "cytotoxic", "immunosuppressant", "immunomodulator", "antiretroviral",
-        "antiepileptic", "antiemetic", "antimigraine", "muscle relaxant"
-      )
-
-      has_drug_suffix <- any(sapply(drug_suffixes, function(s) grepl(s, term_lower)))
-      has_drug_class <- any(sapply(drug_classes, function(c) grepl(c, term_lower)))
-
-      return(has_drug_suffix || has_drug_class)
-    }
-    else if (claimed_type == "disease") {
-      # Common disease patterns
-      disease_patterns <- c(
-        "disease$", "disorder$", "syndrome$", "itis$", "emia$", "pathy$", "oma$", "osis$",
-        "iasis$", "itis$", "algia$", "cancer", "tumor", "tumour", "infection", "deficiency",
-        "failure", "dysfunction", "lesion", "malformation", "abnormality", "poisoning",
-        "injury", "trauma", "stroke", "attack", "seizure", "allergy", "addiction",
-        "sclerosis", "palsy", "dystrophy", "atrophy", "hypertrophy", "hyperplasia",
-        "hypoplasia", "dysplasia", "neoplasia", "carcinoma", "sarcoma", "leukemia",
-        "lymphoma", "melanoma", "adenoma", "hepatoma", "nephroma", "retinopathy",
-        "neuropathy", "myopathy", "encephalopathy", "vasculopathy", "arthropathy",
-        "gastritis", "colitis", "hepatitis", "nephritis", "bronchitis", "sinusitis",
-        "dermatitis", "meningitis", "encephalitis", "myocarditis", "pancreatitis",
-        "anemia", "leukemia", "thrombocytopenia", "neutropenia", "lymphopenia",
-        "hyperglycemia", "hypoglycemia", "hyperkalemia", "hypokalemia", "hypernatremia",
-        "hyponatremia", "hypercalcemia", "hypocalcemia", "acidosis", "alkalosis",
-        "fever", "hypertension", "hypotension", "tachycardia", "bradycardia", "arrhythmia"
-      )
-
-      has_disease_pattern <- any(sapply(disease_patterns, function(p) grepl(p, term_lower)))
-
-      # Special case: reject if term is "receptor" or "receptors" claimed as disease
-      if (term_lower == "receptor" || term_lower == "receptors") {
-        return(FALSE)
-      }
-
-      # Special case: "malformation" should be allowed as a disease
-      if (term_lower == "malformation") {
-        return(TRUE)
-      }
-
-      # Special case: "migraine" is a disease
-      if (term_lower == "migraine") {
-        return(TRUE)
-      }
-
-      return(has_disease_pattern)
-    }
-    else if (claimed_type == "chemical") {
-      # Common chemical patterns
-      chemical_patterns <- c(
-        "acid", "oxide", "chloride", "bromide", "iodide", "fluoride", "hydroxide",
-        "carbonate", "sulfate", "nitrate", "phosphate", "acetate", "citrate", "sulfide",
-        "amine", "amide", "ester", "ether", "alcohol", "phenol", "ketone", "aldehyde",
-        "hydrocarbon", "lipid", "carbohydrate", "steroid", "alkaloid", "glycoside",
-        "amino acid", "nucleotide", "element", "compound", "metal", "ion", "isotope",
-        "molecule", "solvent", "reagent", "catalyst", "polymer", "monomer", "dimer",
-        "anhydride", "anion", "cation", "salt", "base", "gas", "solution", "suspension",
-        "emulsion", "colloid", "crystal", "precipitate", "solid", "liquid", "vapor",
-        "distillate", "extract", "benzene", "methane", "ethane", "propane", "butane",
-        "pentane", "hexane", "heptane", "octane", "nonane", "decane", "methanol",
-        "ethanol", "propanol", "butanol", "glucose", "fructose", "galactose", "mannose",
-        "sucrose", "lactose", "maltose", "cellulose", "starch", "glycogen", "protein",
-        "peptide", "amino", "glycine", "alanine", "valine", "leucine", "isoleucine",
-        "proline", "phenylalanine", "tyrosine", "tryptophan", "serine", "threonine",
-        "cysteine", "methionine", "asparagine", "glutamine", "aspartate", "glutamate",
-        "lysine", "arginine", "histidine", "cholesterol", "testosterone", "estrogen",
-        "progesterone", "cortisol", "aldosterone", "adrenaline", "noradrenaline",
-        "dopamine", "serotonin", "histamine", "acetylcholine", "adenosine", "guanosine",
-        "cytidine", "thymidine", "uridine", "atp", "adp", "amp", "gtp", "gdp", "gmp"
-      )
-
-      has_chemical_pattern <- any(sapply(chemical_patterns, function(p) grepl(p, term_lower)))
-
-      # Chemical formulas (e.g., H2O, CO2, NaCl)
-      is_chemical_formula <- grepl("[A-Z][a-z]?[0-9]*", term)
-
-      # Special case: reject terms known to be misclassified as chemicals
-      if (term_lower %in% c("optimization", "retention", "vehicle", "malformation")) {
-        return(FALSE)
-      }
-
-      # Special case: reject analytical method acronyms that are often misclassified as chemicals
-      if (is_acronym) {
-        analytical_acronyms <- c(
-          "FAERS", "BCPNN", "UPLC", "FRAP", "HPLC", "LCMS", "GCMS", "MALDI",
-          "ELISA", "FTIR", "NMR", "PCR", "SEM", "TEM", "XRD", "SAXS", "UV", "IR",
-          "MS", "LC", "GC", "CT", "MRI", "PET", "ROC", "AUC", "ANOVA", "PCA"
-        )
-
-        if (toupper(term) %in% analytical_acronyms) {
-          return(FALSE)
-        }
-      }
-
-      return(has_chemical_pattern || is_chemical_formula || is_acronym)
-    }
-    else if (claimed_type == "pathway") {
-      # Common pathway patterns
-      pathway_patterns <- c(
-        "pathway", "signaling", "cascade", "cycle", "biosynthesis", "metabolism",
-        "degradation", "synthesis", "catabolism", "anabolism", "oxidation", "reduction",
-        "phosphorylation", "glycolysis", "gluconeogenesis", "respiration", "transport",
-        "signalling", "transduction", "activation", "inhibition", "regulation",
-        "homeostasis", "feedback", "response", "mechanism", "process", "circuit",
-        "network", "cross-talk", "interplay", "interaction", "communication",
-        "transmission", "conductance", "induction", "repression", "amplification",
-        "attenuation", "potentiation", "oscillation", "cycling", "recycling",
-        "metabolism", "anabolism", "catabolism", "glycolysis", "gluconeogenesis",
-        "glycogenolysis", "glycogenesis", "proteolysis", "proteogenesis", "lipolysis",
-        "lipogenesis", "ketogenesis", "ketolysis", "thermogenesis", "hematopoiesis",
-        "erythropoiesis", "leukopoiesis", "lymphopoiesis", "myelopoiesis", "thrombopoiesis",
-        "apoptosis", "necroptosis", "autophagy", "pyroptosis", "ferroptosis", "senescence",
-        "differentiation", "proliferation", "maturation", "migration", "chemotaxis",
-        "phagocytosis", "endocytosis", "exocytosis", "transcytosis", "pinocytosis",
-        "secretion", "absorption", "diffusion", "filtration", "osmosis", "reabsorption"
-      )
-
-      has_pathway_pattern <- any(sapply(pathway_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_pathway_pattern)
-    }
-    else if (claimed_type == "biological_process") {
-      # Common biological process patterns
-      bioprocess_patterns <- c(
-        "process", "regulation", "activation", "inhibition", "induction", "suppression",
-        "proliferation", "differentiation", "apoptosis", "necrosis", "autophagy", "growth",
-        "development", "maturation", "aging", "senescence", "inflammation", "fibrosis",
-        "angiogenesis", "healing", "repair", "regeneration", "immunity", "response",
-        "secretion", "expression", "translation", "transcription", "replication", "binding",
-        "signaling", "transduction", "transmission", "recognition", "adhesion", "migration",
-        "biogenesis", "morphogenesis", "organogenesis", "embryogenesis", "hematopoiesis",
-        "neurogenesis", "vasculogenesis", "myogenesis", "osteogenesis", "chondrogenesis",
-        "adipogenesis", "lymphopoiesis", "erythropoiesis", "myelopoiesis", "granulopoiesis",
-        "monocytopoiesis", "thrombopoiesis", "spermatogenesis", "oogenesis", "fertilization",
-        "implantation", "gastrulation", "neurulation", "placentation", "parturition",
-        "lactation", "respiration", "circulation", "digestion", "absorption", "assimilation",
-        "excretion", "homeostasis", "thermoregulation", "osmoregulation", "metabolism",
-        "catabolism", "anabolism", "glycolysis", "gluconeogenesis", "glycogenolysis",
-        "glycogenesis", "lipolysis", "lipogenesis", "proteolysis", "proteogenesis",
-        "detoxification", "biotransformation", "conjugation", "elimination", "oxidation",
-        "reduction", "phosphorylation", "dephosphorylation", "methylation", "demethylation",
-        "acetylation", "deacetylation", "ubiquitination", "deubiquitination", "glycosylation"
-      )
-
-      has_bioprocess_pattern <- any(sapply(bioprocess_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_bioprocess_pattern)
-    }
-    else if (claimed_type == "molecular_function") {
-      # Common molecular function patterns
-      molfunction_patterns <- c(
-        "binding", "activity", "function", "catalysis", "hydrolysis", "synthesis",
-        "polymerization", "depolymerization", "phosphorylation", "dephosphorylation",
-        "methylation", "demethylation", "acetylation", "deacetylation", "ubiquitination",
-        "sumoylation", "glycosylation", "transport", "uptake", "release", "secretion",
-        "import", "export", "recognition", "interaction", "regulation", "activation",
-        "inhibition", "transduction", "transmission", "receptor", "ligand", "cofactor",
-        "coenzyme", "prosthetic", "modulator", "effector", "mediator", "transmitter",
-        "antagonist", "agonist", "blocker", "inhibitor", "activator", "stimulator",
-        "repressor", "inducer", "catalyst", "enzyme", "isomerase", "transferase",
-        "hydrolase", "lyase", "oxidoreductase", "ligase", "kinase", "phosphatase",
-        "protease", "nuclease", "glycosidase", "lipase", "transporter", "carrier",
-        "channel", "pump", "exchanger", "symporter", "antiporter", "uniporter",
-        "permease", "porin", "translocase", "translocator", "transferrin", "ferritin",
-        "globin", "hemoglobin", "myoglobin", "albumin", "immunoglobulin", "antibody",
-        "antigen", "complement", "cytokine", "chemokine", "interferon", "interleukin",
-        "growth factor", "hormone", "neurotransmitter", "neuromodulator", "peptide",
-        "neuropeptide", "endorphin", "enkephalin", "dynorphin", "substance"
-      )
-
-      has_molfunction_pattern <- any(sapply(molfunction_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_molfunction_pattern)
-    }
-    else if (claimed_type == "cellular_component" || claimed_type == "cell") {
-      # Common cellular component patterns
-      cell_patterns <- c(
-        "cell", "membrane", "cytoplasm", "nucleus", "organelle", "mitochondrion",
-        "mitochondria", "endoplasmic", "golgi", "lysosome", "vesicle", "vacuole",
-        "peroxisome", "ribosome", "cytoskeleton", "microtubule", "microfilament",
-        "chromosome", "chromatin", "nucleolus", "centrosome", "centriole", "cilium",
-        "flagellum", "axoneme", "spindle", "cortex", "matrix", "lumen", "junction",
-        "desmosome", "phagosome", "endosome", "exosome", "soma", "dendrite", "axon",
-        "synapse", "neuron", "fibroblast", "macrophage", "lymphocyte", "erythrocyte",
-        "platelet", "epithelial", "endothelial", "muscle", "nuclear", "nucleoplasm",
-        "nucleoid", "nucleoplasm", "nucleopore", "nuclear envelope", "nuclear matrix",
-        "nuclear lamina", "nuclear pore", "nuclear receptor", "chromatin", "chromosome",
-        "chromatid", "centromere", "telomere", "kinetochore", "cytoplasmic", "cytosol",
-        "cytoskeleton", "microfilament", "microtubule", "intermediate filament",
-        "actin", "myosin", "tubulin", "kinesin", "dynein", "spectrin", "ankyrin",
-        "integrin", "cadherin", "selectin", "immunoglobulin", "fibronectin", "laminin",
-        "collagen", "elastin", "proteoglycan", "glycoprotein", "lipoprotein", "receptor",
-        "channel", "pump", "transporter", "carrier", "anchoring", "scaffold", "matrix",
-        "basal lamina", "basement membrane", "extracellular matrix", "tight junction",
-        "gap junction", "adherens junction", "desmosome", "hemidesmosome", "focal adhesion",
-        "zonula adherens", "zonula occludens", "macula adherens", "neuromuscular junction",
-        "neuron", "neurite", "dendrite", "axon", "synapse", "presynaptic", "postsynaptic",
-        "synaptic vesicle", "synaptic cleft", "neurotransmitter", "neuroreceptor"
-      )
-
-      has_cell_pattern <- any(sapply(cell_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_cell_pattern)
-    }
-    else if (claimed_type == "symptom") {
-      # Common symptom patterns - significantly expanded
-      symptom_patterns <- c(
-        "pain", "ache", "fever", "cough", "rash", "swelling", "inflammation", "fatigue",
-        "weakness", "dizziness", "vertigo", "nausea", "vomiting", "diarrhea", "constipation",
-        "bleeding", "discharge", "lesion", "loss", "deficit", "malaise", "discomfort",
-        "distress", "dyspnea", "shortness", "tachycardia", "bradycardia", "hypertension",
-        "hypotension", "hyperglycemia", "hypoglycemia", "seizure", "paralysis", "spasm",
-        "tremor", "headache", "anorexia", "insomnia", "anxiety", "depression", "symptom",
-        "sign", "manifestation", "complaint", "condition", "syndrome", "presentation",
-        "syndrome", "disorder", "palpitation", "arrhythmia", "dysphagia", "dysphonia",
-        "dysarthria", "aphasia", "amnesia", "paresthesia", "dysesthesia", "anesthesia",
-        "hyperesthesia", "hypoesthesia", "ataxia", "apraxia", "agnosia", "alexia",
-        "agraphia", "acalculia", "hemianopia", "hemianopsia", "scotoma", "diplopia",
-        "amblyopia", "amaurosis", "photophobia", "phonophobia", "hyperacusis", "tinnitus",
-        "vertigo", "syncope", "presyncope", "diaphoresis", "hyperhidrosis", "anhidrosis",
-        "pruritus", "urticaria", "erythema", "petechiae", "purpura", "ecchymosis",
-        "jaundice", "cyanosis", "pallor", "flushing", "edema", "ascites", "pleural effusion",
-        "pericardial effusion", "hemoptysis", "hematemesis", "melena", "hematochezia",
-        "hematuria", "dysuria", "polyuria", "oliguria", "anuria", "polydipsia", "polyphagia",
-        "dyspepsia", "bloating", "flatulence", "tenesmus", "steatorrhea", "pyrosis", "heartburn",
-        "migraine", "aura", "osmophobia", "allodynia", "hypersensitivity", "paresthesia"
-      )
-
-      # Explicit checks for common symptoms that are frequently misclassified
-      if (term_lower %in% c("pain", "headache", "migraine", "nausea", "vomiting",
-                            "dizziness", "fatigue", "weakness", "photophobia")) {
-        return(TRUE)
-      }
-
-      # General check for symptom patterns
-      has_symptom_pattern <- any(sapply(symptom_patterns, function(p) grepl(paste0("\\b", p, "\\b"), term_lower)))
-
-      return(has_symptom_pattern)
-    }
-    else if (claimed_type == "organism") {
-      # Common organism patterns
-      organism_patterns <- c(
-        "bacteria", "virus", "fungus", "parasite", "microbe", "pathogen", "species", "strain",
-        "genus", "family", "order", "class", "phylum", "kingdom", "domain", "organism",
-        "animal", "plant", "vertebrate", "invertebrate", "mammal", "bird", "reptile",
-        "amphibian", "fish", "insect", "arachnid", "crustacean", "mollusk", "worm",
-        "protozoa", "algae", "archaea", "prokaryote", "eukaryote", "bacteria", "bacterium",
-        "bacillus", "cocci", "coccus", "spirochete", "spirillum", "rickettsia", "mycoplasma",
-        "chlamydia", "escherichia", "salmonella", "shigella", "klebsiella", "proteus",
-        "pseudomonas", "acinetobacter", "enterobacter", "haemophilus", "neisseria",
-        "staphylococcus", "streptococcus", "enterococcus", "pneumococcus", "mycobacterium",
-        "clostridium", "bacillus", "listeria", "corynebacterium", "actinomyces",
-        "nocardia", "legionella", "bordetella", "brucella", "campylobacter", "helicobacter",
-        "vibrio", "yersinia", "pasteurella", "francisella", "bartonella", "virus", "viral",
-        "virology", "virion", "capsid", "envelope", "glycoprotein", "adenovirus", "herpesvirus",
-        "papillomavirus", "polyomavirus", "poxvirus", "hepadnavirus", "retrovirus",
-        "lentivirus", "rhabdovirus", "filovirus", "paramyxovirus", "orthomyxovirus",
-        "bunyavirus", "arenavirus", "reovirus", "togavirus", "flavivirus", "picornavirus",
-        "coronavirus", "hepatitis", "influenza", "rhinovirus", "rotavirus", "hiv", "fungus",
-        "fungi", "yeast", "mold", "mould", "mushroom", "candida", "aspergillus", "cryptococcus",
-        "histoplasma", "blastomyces", "coccidioides", "paracoccidioides", "sporothrix",
-        "zygomycetes", "mucor", "rhizopus", "absidia", "basidiomycetes", "ascomycetes"
-      )
-
-      has_organism_pattern <- any(sapply(organism_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_organism_pattern)
-    }
-    else if (claimed_type == "tissue") {
-      # Common tissue patterns
-      tissue_patterns <- c(
-        "tissue", "epithelium", "endothelium", "mesothelium", "mesenchyme", "stroma",
-        "parenchyma", "connective", "muscle", "nerve", "neural", "vasculature", "vascular",
-        "gland", "glandular", "mucous", "mucosa", "submucosa", "serosa", "adventitia",
-        "periosteum", "perichondrium", "synovium", "bone", "cartilage", "tendon", "ligament",
-        "fascia", "adipose", "blood", "lymph", "marrow", "skin", "dermal", "epidermal",
-        "cutaneous", "subcutaneous", "mucosal", "membrane", "meninges", "dura", "arachnoid",
-        "pia", "pleura", "peritoneum", "pericardium", "endocardium", "myocardium", "epicardium",
-        "endometrium", "myometrium", "perimetrium", "glomerulus", "tubule", "nephron",
-        "hepatocyte", "bile duct", "islet", "acinus", "alveolus", "bronchus", "bronchiole",
-        "trachea", "esophagus", "stomach", "intestine", "duodenum", "jejunum", "ileum",
-        "colon", "rectum", "bladder", "urethra", "ureter", "prostate", "testis", "ovary",
-        "uterus", "fallopian", "cervix", "vagina", "breast", "thyroid", "parathyroid",
-        "adrenal", "pituitary", "thymus", "spleen", "lymph node", "tonsil", "cerebrum",
-        "cerebellum", "brain stem", "spinal cord", "ganglion", "nerve", "neuron", "retina",
-        "cornea", "sclera", "choroid", "iris", "lens", "vitreous", "aqueous", "cochlea",
-        "vestibule", "labyrinth", "muscle", "skeletal", "cardiac", "smooth", "tendon",
-        "ligament", "cartilage", "joint", "synovium", "bone", "cortical", "trabecular",
-        "marrow", "osteoid", "callus", "granulation", "scar", "fibrosis", "granuloma"
-      )
-
-      has_tissue_pattern <- any(sapply(tissue_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_tissue_pattern)
-    }
-    else if (claimed_type == "anatomy") {
-      # Common anatomy patterns
-      anatomy_patterns <- c(
-        "head", "neck", "thorax", "chest", "abdomen", "pelvis", "back", "extremity", "arm",
-        "forearm", "wrist", "hand", "finger", "thumb", "leg", "thigh", "knee", "calf", "ankle",
-        "foot", "toe", "shoulder", "elbow", "hip", "joint", "skull", "cranium", "vertebra",
-        "spine", "rib", "sternum", "clavicle", "scapula", "humerus", "radius", "ulna", "carpal",
-        "metacarpal", "phalanx", "pelvis", "femur", "patella", "tibia", "fibula", "tarsal",
-        "metatarsal", "brain", "cerebrum", "cerebellum", "brainstem", "thalamus", "hypothalamus",
-        "pituitary", "pineal", "basal ganglia", "hippocampus", "amygdala", "fornix", "corpus callosum",
-        "ventricle", "meninges", "dura", "arachnoid", "pia", "spinal cord", "nerve", "ganglion",
-        "plexus", "heart", "atrium", "ventricle", "septum", "valve", "mitral", "tricuspid",
-        "pulmonary", "aortic", "aorta", "artery", "arteriole", "capillary", "venule", "vein",
-        "vena cava", "pulmonary", "coronary", "carotid", "jugular", "subclavian", "axillary",
-        "brachial", "radial", "ulnar", "femoral", "popliteal", "tibial", "lung", "bronchus",
-        "bronchiole", "alveolus", "pleura", "diaphragm", "trachea", "larynx", "pharynx",
-        "esophagus", "stomach", "duodenum", "jejunum", "ileum", "cecum", "colon", "appendix",
-        "rectum", "anus", "liver", "gallbladder", "bile duct", "pancreas", "spleen", "kidney",
-        "ureter", "bladder", "urethra", "prostate", "testis", "epididymis", "vas deferens",
-        "seminal vesicle", "penis", "urethra", "ovary", "fallopian", "uterus", "cervix",
-        "vagina", "vulva", "mammary", "thyroid", "parathyroid", "adrenal", "thymus", "lymph node",
-        "tonsil", "eye", "orbit", "eyelid", "conjunctiva", "cornea", "sclera", "choroid",
-        "retina", "lens", "iris", "pupil", "ciliary", "ear", "pinna", "external", "middle",
-        "inner", "tympanic", "ossicle", "cochlea", "vestibule", "labyrinth", "nose", "nasal",
-        "paranasal", "sinus", "mouth", "lip", "tongue", "teeth", "gingiva", "palate", "uvula",
-        "skin", "epidermis", "dermis", "subcutaneous", "hair", "nail", "sebaceous", "sweat",
-        "ligament", "tendon", "fascia", "bursa", "synovium", "cartilage", "meniscus", "disc"
-      )
-
-      has_anatomy_pattern <- any(sapply(anatomy_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_anatomy_pattern)
-    }
-    else if (claimed_type == "diagnostic_procedure") {
-      # Common diagnostic procedure patterns
-      diagnostic_procedure_patterns <- c(
-        "test", "scan", "imaging", "radiograph", "ultrasound", "sonogram", "tomography",
-        "resonance", "endoscopy", "biopsy", "aspiration", "culture", "assay", "analysis",
-        "measurement", "examination", "evaluation", "assessment", "screening", "monitoring",
-        "probe", "detection", "quantification", "identification", "diagnosis", "diagnostic",
-        "radiography", "xray", "x-ray", "radiogram", "fluoroscopy", "angiography", "venography",
-        "lymphangiography", "myelography", "arthrography", "mammography", "tomography",
-        "ct", "cat scan", "computed tomography", "mri", "magnetic resonance", "fmri",
-        "functional mri", "pet", "positron emission", "spect", "single photon", "ultrasound",
-        "sonography", "doppler", "echocardiography", "electrocardiography", "ecg", "ekg",
-        "electroencephalography", "eeg", "electromyography", "emg", "electroneuronography",
-        "nerve conduction", "electrophysiology", "endoscopy", "colonoscopy", "sigmoidoscopy",
-        "proctoscopy", "anoscopy", "esophagogastroduodenoscopy", "egds", "bronchoscopy",
-        "laryngoscopy", "rhinoscopy", "otoscopy", "cystoscopy", "ureteroscopy", "nephroscopy",
-        "laparoscopy", "arthroscopy", "colposcopy", "hysteroscopy", "biopsy", "aspiration",
-        "culture", "gram stain", "sensitivity", "pcr", "polymerase chain reaction", "elisa",
-        "western blot", "southern blot", "northern blot", "immunoassay", "immunohistochemistry",
-        "serology", "titer", "flow cytometry", "karyotype", "cytogenetics", "genetic",
-        "sequencing", "microarray", "histopathology", "cytology", "hematology", "chemistry",
-        "metabolic", "electrolytes", "glucose", "glycemia", "lipid profile", "cholesterol",
-        "triglycerides", "liver function", "renal function", "creatinine", "bun", "urea",
-        "hemoglobin", "hematocrit", "complete blood count", "cbc", "coagulation", "urinalysis",
-        "urine", "stool", "cerebrospinal", "fluid", "synovial", "pleural", "pericardial",
-        "peritoneal", "bronchial", "lavage", "sputum", "spectrum", "spectra", "spectroscopy",
-        "spectrophotometry", "chromatography", "mass spectrometry", "electrophoresis"
-      )
-
-      # Special case for analytical techniques often misclassified
-      analytical_techniques <- c(
-        "faers", "bcpnn", "uplc", "frap", "hplc", "lc-ms", "gc-ms", "maldi",
-        "elisa", "ft-ir", "nmr", "pcr", "sem", "tem", "xrd", "saxs", "uv-vis",
-        "ms", "ms/ms", "lc", "gc", "tga", "dsc", "uv", "ir", "rna-seq", "qtof",
-        "mri", "ct", "pet", "spect", "ecg", "eeg", "emg", "fmri", "qsar", "qspr",
-        "anova", "ancova", "manova", "pca", "sem", "glm", "lda", "svm", "ann"
-      )
-
-      # Check if term is an analytical technique
-      if (term_lower %in% analytical_techniques) {
-        return(TRUE)
-      }
-
-      # Check if it's a diagnostic procedure
-      has_diagnostic_procedure_pattern <- any(sapply(diagnostic_procedure_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_diagnostic_procedure_pattern)
-    }
-    else if (claimed_type == "therapeutic_procedure") {
-      # Common therapeutic procedure patterns
-      therapeutic_procedure_patterns <- c(
-        "therapy", "treatment", "intervention", "management", "procedure", "surgery", "operation",
-        "excision", "resection", "removal", "transplantation", "implantation", "replacement",
-        "repair", "reconstruction", "restoration", "augmentation", "reduction", "extraction",
-        "amputation", "anastomosis", "bypass", "graft", "flap", "catheterization", "intubation",
-        "cannulation", "injection", "infusion", "transfusion", "dialysis", "filtration",
-        "transplant", "prosthesis", "fixation", "manipulation", "reposition", "reduction",
-        "traction", "immobilization", "stimulation", "radiation", "irradiation", "ablation",
-        "cauterization", "coagulation", "cryotherapy", "hyperthermia", "phototherapy", "laser",
-        "ultrasound", "lithotripsy", "dilatation", "dilation", "stenting", "drainage", "aspiration",
-        "lavage", "debridement", "curettage", "anesthesia", "sedation", "analgesia", "ventilation",
-        "oxygenation", "suction", "suctioning", "tracheostomy", "gastrostomy", "jejunostomy",
-        "ileostomy", "colostomy", "cystostomy", "nephrostomy", "thoracostomy", "thoracentesis",
-        "paracentesis", "arthrocentesis", "lumbar puncture", "spinal tap", "amniocentesis",
-        "chorionic villus sampling", "cordocentesis", "biopsy", "excisional", "incisional",
-        "needle", "aspiration", "incision", "excision", "dissection", "ligation", "suture",
-        "stapling", "amputation", "disarticulation", "arthrodesis", "fusion", "arthroplasty",
-        "replacement", "osteotomy", "tenorrhaphy", "tenolysis", "tenotomy", "myotomy", "myorrhaphy",
-        "neurorrhaphy", "neurolysis", "neurectomy", "sympathectomy", "vagotomy", "rhizotomy",
-        "cordotomy", "tractotomy", "lobotomy", "craniotomy", "craniectomy", "cranioplasty",
-        "ventriculostomy", "shunt", "laminectomy", "discectomy", "foraminotomy", "vertebroplasty",
-        "kyphoplasty", "thoracotomy", "thoracoplasty", "pneumonectomy", "lobectomy", "segmentectomy",
-        "wedge resection", "pleurodesis", "pleurectomy", "decortication", "pericardiectomy",
-        "pericardiostomy", "valvuloplasty", "valvulotomy", "commissurotomy", "annuloplasty",
-        "ventriculoplasty", "bypass", "endarterectomy", "thrombectomy", "embolectomy",
-        "aneurysmectomy", "aneurysmorrhaphy", "varicectomy", "sclerotherapy", "gastrectomy",
-        "vagotomy", "gastroenterostomy", "gastropexy", "fundoplication", "pyloromyotomy",
-        "pyloroplasty", "esophagectomy", "esophagostomy", "esophagoplasty", "colectomy",
-        "colostomy", "ileostomy", "appendectomy", "proctectomy", "hemorrhoidectomy", "hepatectomy",
-        "hepatorrhaphy", "cholecystectomy", "choledochostomy", "splenectomy", "pancreatectomy",
-        "nephrectomy", "nephrostomy", "nephropexy", "pyeloplasty", "ureteroplasty", "cystectomy",
-        "cystostomy", "cystoplasty", "prostatectomy", "vasectomy", "vasovasostomy", "orchidectomy",
-        "orchiectomy", "orchiopexy", "hydrocelectomy", "varicocelectomy", "hysterectomy", "oophorectomy"
-      )
-
-      has_therapeutic_procedure_pattern <- any(sapply(therapeutic_procedure_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_therapeutic_procedure_pattern)
-    }
-    else if (claimed_type == "method") {
-      # Common method patterns - especially for technical terms often misclassified as chemicals
-      method_patterns <- c(
-        "method", "technique", "assay", "analysis", "procedure", "protocol", "algorithm",
-        "approach", "workflow", "process", "measurement", "detection", "quantification",
-        "identification", "determination", "evaluation", "assessment", "test", "screen",
-        "monitor", "examine", "characterize", "validate", "verify", "qualify", "quantify",
-        "calculate", "estimate", "predict", "model", "simulate", "standardize", "optimize",
-        "chromatography", "spectroscopy", "microscopy", "spectrometry", "electrophoresis",
-        "sequencing", "immunoassay", "radiography", "tomography", "ultrasound", "imaging"
-      )
-
-      # List of specific analytical methods and their acronyms
-      analytical_methods <- c(
-        "faers", "fda adverse event reporting system", "bcpnn", "bayesian confidence propagation neural network",
-        "uplc", "ultra performance liquid chromatography", "frap", "fluorescence recovery after photobleaching",
-        "hplc", "high performance liquid chromatography", "lc-ms", "liquid chromatography-mass spectrometry",
-        "gc-ms", "gas chromatography-mass spectrometry", "maldi", "matrix-assisted laser desorption/ionization",
-        "elisa", "enzyme-linked immunosorbent assay", "ft-ir", "fourier transform infrared spectroscopy",
-        "nmr", "nuclear magnetic resonance", "pcr", "polymerase chain reaction", "sem", "scanning electron microscopy",
-        "tem", "transmission electron microscopy", "xrd", "x-ray diffraction", "saxs", "small-angle x-ray scattering",
-        "uv-vis", "ultraviolet-visible spectroscopy", "ms", "mass spectrometry", "ms/ms", "tandem mass spectrometry",
-        "lc", "liquid chromatography", "gc", "gas chromatography", "tga", "thermogravimetric analysis",
-        "dsc", "differential scanning calorimetry", "uv", "ultraviolet", "ir", "infrared", "rna-seq", "rna sequencing",
-        "qtof", "quadrupole time-of-flight", "mri", "magnetic resonance imaging", "ct", "computed tomography",
-        "pet", "positron emission tomography", "spect", "single-photon emission computed tomography",
-        "ecg", "electrocardiogram", "eeg", "electroencephalogram", "emg", "electromyography",
-        "fmri", "functional magnetic resonance imaging", "qsar", "quantitative structure-activity relationship",
-        "qspr", "quantitative structure-property relationship", "anova", "analysis of variance",
-        "ancova", "analysis of covariance", "manova", "multivariate analysis of variance",
-        "pca", "principal component analysis", "sem", "structural equation modeling",
-        "glm", "generalized linear model", "lda", "linear discriminant analysis",
-        "svm", "support vector machine", "ann", "artificial neural network",
-        "roc", "receiver operating characteristic", "auc", "area under the curve"
-      )
-
-      # If term is an analytical technique acronym, it's a method
-      if (term_lower %in% analytical_methods || is_acronym) {
-        return(TRUE)
-      }
-
-      # Check for method patterns
-      has_method_pattern <- any(sapply(method_patterns, function(p) grepl(p, term_lower)))
-
-      return(has_method_pattern)
-    }
-
-    # If no specific rules for this type, allow it to pass
-    return(TRUE)
+    return(validate_term_by_type(term, claimed_type))
   }
 
   # STAGE 3: Check for general biomedical term characteristics
+  return(has_general_biomedical_characteristics(term))
+}
 
-  # Check common biomedical characteristics that span multiple types
-  # If a term has any of these characteristics, it's likely a biomedical entity
+#' Validate term based on its claimed type
+#' @keywords internal
+validate_term_by_type <- function(term, claimed_type) {
+  term_lower <- tolower(term)
 
-  # Is a recognized acronym pattern common in biomedicine (2-6 uppercase letters, maybe with numbers)
+  # Is an acronym (common for genes, proteins, etc.)
+  is_acronym <- grepl("^[A-Z0-9]{2,}$", term)
+
+  # Check for commonly misclassified acronyms (analytical methods, etc.)
+  if (is_acronym && claimed_type == "chemical") {
+    analytical_acronyms <- c(
+      "FAERS", "BCPNN", "UPLC", "FRAP", "HPLC", "LCMS", "GCMS", "MALDI",
+      "ELISA", "FTIR", "NMR", "PCR", "SEM", "TEM", "XRD", "SAXS", "UVVIS",
+      "MS", "MSMS", "LC", "GC", "TGA", "DSC", "UV", "IR", "RNASEQ", "QTOF",
+      "MRI", "CT", "PET", "SPECT", "ECG", "EEG", "EMG", "FMRI", "QSAR", "QSPR",
+      "ANOVA", "ANCOVA", "MANOVA", "PCA", "GLM", "LDA", "SVM", "ANN"
+    )
+
+    # Check if the acronym is in our list of analytical methods
+    if (toupper(term) %in% analytical_acronyms) {
+      return(FALSE)  # This is not a chemical, but an analytical method
+    }
+  }
+
+  # Type-specific checks with patterns from static_data
+  if (claimed_type %in% names(static_data$biomedical_patterns)) {
+    pattern <- static_data$biomedical_patterns[[claimed_type]]
+    has_pattern <- grepl(pattern, term_lower)
+
+    # Additional specific checks
+    if (claimed_type == "protein" && (term_lower == "receptor" || term_lower == "receptors")) {
+      return(TRUE)
+    }
+
+    return(is_acronym || has_pattern)
+  }
+
+  # If no specific rules for this type, allow it to pass
+  return(TRUE)
+}
+
+#' Check for general biomedical characteristics
+#' @keywords internal
+has_general_biomedical_characteristics <- function(term) {
+  term_lower <- tolower(term)
+
+  # Is a recognized acronym pattern common in biomedicine
   is_biomedical_acronym <- grepl("^[A-Z]{2,6}[0-9]*$", term)
 
   # Has Latin or Greek roots common in medical terminology
-  has_latin_greek_roots <- grepl("(itis|osis|emia|pathy|trophy|plasia|poiesis|genesis|lysis|ectomy|otomy|ostomy|plasty|pexy|rhaphy|graphy|scopy|metry)", term_lower)
+  has_latin_greek_roots <- any(sapply(static_data$biomedical_suffixes, function(suffix) grepl(suffix, term_lower)))
 
   # Contains numbers and chemical elements (common in chemical formulas)
   is_chemical_formula <- grepl("[A-Z][a-z]?[0-9]+", term)
 
-  # Common biomedical term endings
-  biomedical_suffixes <- c("in$", "ase$", "gen$", "one$", "ide$", "ate$", "ene$", "ane$", "ole$",
-                           "itis$", "osis$", "emia$", "pathy$", "trophy$", "plasia$", "poiesis$",
-                           "genesis$", "lysis$", "ectomy$", "otomy$", "ostomy$", "plasty$", "pexy$",
-                           "rhaphy$", "graphy$", "scopy$", "metry$", "algia$", "dynia$", "oma$",
-                           "iasis$", "ismus$", "uria$", "pnea$", "emesis$", "pepsia$", "phagia$",
-                           "rrhea$", "rrhage$", "sthenia$", "phobia$", "lexia$", "praxia$", "gnosis$",
-                           "penia$", "cytosis$", "esthesia$", "kinesia$", "phasia$", "plegia$", "paresis$")
-
-  has_biomedical_suffix <- any(sapply(biomedical_suffixes, function(s) grepl(s, term_lower)))
-
   # Check for compound terms that contain recognizable biomedical components
-  biomedical_components <- c("neuro", "cardio", "gastro", "hepato", "nephro", "dermato",
-                             "hemato", "immuno", "onco", "osteo", "arthro", "myelo", "cyto",
-                             "histo", "patho", "pharmaco", "psycho", "toxo", "vas", "angio")
-
-  has_biomedical_component <- any(sapply(biomedical_components, function(c) grepl(c, term_lower)))
-
-  # Additional check for terms that should NEVER be considered biomedical entities
-  never_biomedical <- c(
-    # Geographic regions and locations
-    "europe", "asia", "africa", "america", "australia", "us", "uk", "usa",
-    # General abstract concepts
-    "vehicle", "optimization", "retention",
-    # Problematic general terms from example
-    "malformation", "receptor", "receptors"
-  )
-
-  # Special case handling exceptions - these are only valid with specific type claims
-  special_exceptions <- list(
-    "malformation" = "disease",   # Malformation is valid as a disease
-    "receptor" = "protein",       # Receptor is valid as a protein
-    "receptors" = "protein"       # Receptors is valid as a protein
-  )
+  has_biomedical_component <- any(sapply(static_data$biomedical_components, function(comp) grepl(comp, term_lower)))
 
   # Check if the term is in our never_biomedical list
-  if (term_lower %in% never_biomedical) {
+  if (term_lower %in% static_data$never_biomedical) {
     # If it's in special_exceptions, check claimed type
-    if (term_lower %in% names(special_exceptions)) {
-      # Only allow if claimed type matches the exception type
-      if (!is.null(claimed_type) && claimed_type == special_exceptions[[term_lower]]) {
-        return(TRUE)
-      } else {
-        return(FALSE)
-      }
+    if (term_lower %in% names(static_data$special_exceptions)) {
+      # Only allow if no claimed type or if claimed type matches the exception type
+      return(TRUE)  # Let the caller handle type validation
     } else {
       # Not in exceptions, so reject
       return(FALSE)
     }
   }
 
-  # Special check for analytical method acronyms that are often misclassified as chemicals
-  if (is_biomedical_acronym) {
-    analytical_acronyms <- c(
-      "FAERS", "BCPNN", "UPLC", "FRAP", "HPLC", "LCMS", "GCMS", "MALDI",
-      "ELISA", "FTIR", "NMR", "PCR", "SEM", "TEM", "XRD", "SAXS", "UV", "IR",
-      "MS", "LC", "GC", "CT", "MRI", "PET", "ROC", "AUC", "ANOVA", "PCA"
-    )
-
-    if (toupper(term) %in% analytical_acronyms) {
-      # If claimed as chemical, it's invalid
-      if (!is.null(claimed_type) && claimed_type == "chemical") {
-        return(FALSE)
-      }
-      # But it's valid as a method or diagnostic_procedure
-      else if (!is.null(claimed_type) &&
-               (claimed_type == "method" ||
-                claimed_type == "diagnostic_procedure" ||
-                claimed_type == "therapeutic_procedure")) {
-        return(TRUE)
-      }
-      # If no claimed type, return TRUE as it's a valid biomedical term
-      else if (is.null(claimed_type)) {
-        return(TRUE)
-      }
-    }
-  }
-
-  # Return TRUE if term shows any of these biomedical characteristics
-  if (is_biomedical_acronym || has_latin_greek_roots || is_chemical_formula ||
-      has_biomedical_suffix || has_biomedical_component) {
-    return(TRUE)
-  }
-
-  # Special check for "sociodemographic" and similar terms that are incorrectly labeled
-  problematic_terms <- c("sociodemographic", "demographic", "social", "economic", "education",
-                         "income", "status", "cultural", "ethical", "society", "community",
-                         "population", "questionnaire", "survey", "interview", "assessment")
-
-  if (term_lower %in% problematic_terms) {
-    return(FALSE)
-  }
-
-  # If no positive identification was made and the term passed all filters, let it through
-  # A future version could implement a machine learning classifier for more accuracy
-  return(FALSE)  # Default to FALSE for terms that don't match any biomedical patterns
+  # Return TRUE if term shows any biomedical characteristics
+  return(is_biomedical_acronym || has_latin_greek_roots || is_chemical_formula || has_biomedical_component)
 }
-
 
 # Filter function for use in the ABC model
 filter_terms_for_abc_model <- function(terms, entity_types = NULL) {
@@ -1104,6 +367,23 @@ filter_terms_for_abc_model <- function(terms, entity_types = NULL) {
 #'
 #' @return A data frame with ranked discovery results.
 #' @export
+#' @examples
+#' # Create a simple example co-occurrence matrix
+#' set.seed(123)
+#' terms <- c("migraine", "headache", "pain", "serotonin", "sumatriptan", "CGRP")
+#' n_terms <- length(terms)
+#' co_matrix <- matrix(runif(n_terms^2, 0, 1), nrow = n_terms, ncol = n_terms)
+#' rownames(co_matrix) <- colnames(co_matrix) <- terms
+#' diag(co_matrix) <- 1  # Perfect self-similarity
+#'
+#' # Add entity types
+#' entity_types <- c("disease", "symptom", "symptom", "chemical", "drug", "protein")
+#' names(entity_types) <- terms
+#' attr(co_matrix, "entity_types") <- entity_types
+#'
+#' # Apply ABC model
+#' results <- abc_model(co_matrix, a_term = "migraine", min_score = 0.1, n_results = 5)
+#' print(results)
 abc_model <- function(co_matrix, a_term, c_term = NULL,
                       min_score = 0.1, n_results = 100,
                       scoring_method = c("multiplication", "average", "combined", "jaccard"),
@@ -1167,119 +447,6 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
     stop("C-term '", c_term, "' not found in the co-occurrence matrix")
   }
 
-  # Define explicit blacklist of problematic terms
-  blacklisted_terms <- c(
-    # Geographic locations
-    "africa", "america", "asia", "australia", "europe", "north america", "south america",
-    "central america", "western europe", "eastern europe", "northern europe", "southern europe",
-    "usa", "uk", "us", "china", "japan", "germany", "france", "italy", "spain", "russia",
-
-    # General terms that should never be B terms
-    "method", "approach", "analysis", "assessment", "evaluation", "procedure", "technique",
-    "protocol", "intervention", "treatment", "outcome", "result", "effect", "impact",
-    "value", "study", "trial", "research", "experiment", "observation", "publication",
-    "test", "measure", "detection", "identification", "classification", "characterization",
-    "determination", "calculation", "examination", "investigation", "exploration",
-    "screening", "monitoring", "surveillance", "survey", "review", "overview", "summary",
-    "score", "grade", "rating", "ranking", "stratification", "categorization", "grouping",
-    "vehicle", "optimization", "retention"
-  )
-
-  # Enhanced term-type mapping for common terms that are frequently misclassified
-  term_type_mappings <- list(
-    # Analytical techniques/methods that are often misclassified as chemicals
-    "faers" = "method",              # FDA Adverse Event Reporting System
-    "bcpnn" = "method",              # Bayesian Confidence Propagation Neural Network
-    "uplc" = "method",               # Ultra Performance Liquid Chromatography
-    "frap" = "method",               # Fluorescence Recovery After Photobleaching
-    "hplc" = "method",               # High Performance Liquid Chromatography
-    "lc-ms" = "method",              # Liquid Chromatography-Mass Spectrometry
-    "gc-ms" = "method",              # Gas Chromatography-Mass Spectrometry
-    "maldi" = "method",              # Matrix-Assisted Laser Desorption/Ionization
-    "elisa" = "method",              # Enzyme-Linked Immunosorbent Assay
-    "ft-ir" = "method",              # Fourier Transform Infrared Spectroscopy
-    "nmr" = "method",                # Nuclear Magnetic Resonance
-    "pcr" = "method",                # Polymerase Chain Reaction
-    "sem" = "method",                # Scanning Electron Microscopy
-    "tem" = "method",                # Transmission Electron Microscopy
-    "xrd" = "method",                # X-Ray Diffraction
-    "saxs" = "method",               # Small-Angle X-ray Scattering
-    "uv-vis" = "method",             # Ultraviolet-Visible Spectroscopy
-    "ms" = "method",                 # Mass Spectrometry
-    "ms/ms" = "method",              # Tandem Mass Spectrometry
-    "lc" = "method",                 # Liquid Chromatography
-    "gc" = "method",                 # Gas Chromatography
-    "tga" = "method",                # Thermogravimetric Analysis
-    "dsc" = "method",                # Differential Scanning Calorimetry
-    "uv" = "method",                 # Ultraviolet
-    "ir" = "method",                 # Infrared
-    "rna-seq" = "method",            # RNA Sequencing
-    "qtof" = "method",               # Quadrupole Time-of-Flight
-    "mri" = "method",                # Magnetic Resonance Imaging
-    "ct" = "method",                 # Computed Tomography
-    "pet" = "method",                # Positron Emission Tomography
-    "spect" = "method",              # Single-Photon Emission Computed Tomography
-    "ecg" = "method",                # Electrocardiogram
-    "eeg" = "method",                # Electroencephalogram
-    "emg" = "method",                # Electromyography
-    "fmri" = "method",               # Functional Magnetic Resonance Imaging
-    "qsar" = "method",               # Quantitative Structure-Activity Relationship
-    "qspr" = "method",               # Quantitative Structure-Property Relationship
-
-    # Common biostatistical methods incorrectly classified as chemicals
-    "anova" = "method",              # Analysis of Variance
-    "ancova" = "method",             # Analysis of Covariance
-    "manova" = "method",             # Multivariate Analysis of Variance
-    "pca" = "method",                # Principal Component Analysis
-    "sem" = "method",                # Structural Equation Modeling
-    "glm" = "method",                # Generalized Linear Model
-    "lda" = "method",                # Linear Discriminant Analysis
-    "svm" = "method",                # Support Vector Machine
-    "ann" = "method",                # Artificial Neural Network
-    "kmeans" = "method",             # K-means clustering
-    "roc" = "method",                # Receiver Operating Characteristic
-    "auc" = "method",                # Area Under the Curve
-
-    # Database and algorithm acronyms
-    "kegg" = "database",             # Kyoto Encyclopedia of Genes and Genomes
-    "smiles" = "method",             # Simplified Molecular-Input Line-Entry System
-    "blast" = "method",              # Basic Local Alignment Search Tool
-    "mace" = "method",               # Major Adverse Cardiac Events
-
-    # Proteins and receptors
-    "receptor" = "protein",
-    "receptors" = "protein",
-    "channel" = "protein",
-    "channels" = "protein",
-    "transporter" = "protein",
-    "transporters" = "protein",
-
-    # Symptoms and clinical manifestations
-    "pain" = "symptom",
-    "headache" = "symptom",
-    "migraine" = "disease",
-    "nausea" = "symptom",
-    "vomiting" = "symptom",
-    "dizziness" = "symptom",
-    "aura" = "symptom",
-    "photophobia" = "symptom",
-    "phonophobia" = "symptom",
-
-    # Biological processes
-    "inflammation" = "biological_process",
-    "signaling" = "biological_process",
-    "activation" = "biological_process",
-    "inhibition" = "biological_process",
-    "regulation" = "biological_process",
-    "phosphorylation" = "biological_process",
-    "oxidation" = "biological_process",
-
-    # Diseases and disorders
-    "malformation" = "disease",
-    "disorder" = "disease",
-    "syndrome" = "disease"
-  )
-
   # Extract A-B associations
   a_associations <- co_matrix[a_term, ]
 
@@ -1294,19 +461,19 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
     b_terms <- b_terms[b_terms != c_term]
   }
 
-  # Remove blacklisted terms from potential B terms
-  b_terms <- b_terms[!tolower(b_terms) %in% blacklisted_terms]
+  # Remove blacklisted terms from potential B terms (using static_data)
+  b_terms <- b_terms[!tolower(b_terms) %in% static_data$blacklisted_terms]
 
-  # Enforce term-type mappings
+  # Enforce term-type mappings (using static_data)
   if (has_entity_types) {
     # Apply corrections to entity types dictionary
-    for (term_lower in names(term_type_mappings)) {
+    for (term_lower in names(static_data$term_type_mappings)) {
       # Find matches in the co-occurrence matrix (case-insensitive)
       term_matches <- grep(paste0("^", term_lower, "$"), rownames(co_matrix), ignore.case = TRUE)
       if (length(term_matches) > 0) {
         matched_terms <- rownames(co_matrix)[term_matches]
         for (matched_term in matched_terms) {
-          entity_types_dict[matched_term] <- term_type_mappings[[term_lower]]
+          entity_types_dict[matched_term] <- static_data$term_type_mappings[[term_lower]]
         }
       }
     }
@@ -1327,8 +494,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
       b_type <- NULL
       term_lower <- tolower(b_term)
 
-      if (term_lower %in% names(term_type_mappings)) {
-        b_type <- term_type_mappings[[term_lower]]
+      if (term_lower %in% names(static_data$term_type_mappings)) {
+        b_type <- static_data$term_type_mappings[[term_lower]]
       } else if (has_entity_types && b_term %in% names(entity_types_dict)) {
         b_type <- entity_types_dict[b_term]
       }
@@ -1370,8 +537,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
       term_lower <- tolower(b_term)
 
       # Check if term is in our mapping first
-      if (term_lower %in% names(term_type_mappings)) {
-        b_type <- term_type_mappings[[term_lower]]
+      if (term_lower %in% names(static_data$term_type_mappings)) {
+        b_type <- static_data$term_type_mappings[[term_lower]]
       }
       # Otherwise check in entity_types_dict if available
       else if (has_entity_types && b_term %in% names(entity_types_dict)) {
@@ -1492,8 +659,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
       term_lower <- tolower(c_term)
 
       # Check if c_term is in our mapping
-      if (term_lower %in% names(term_type_mappings)) {
-        c_type <- term_type_mappings[[term_lower]]
+      if (term_lower %in% names(static_data$term_type_mappings)) {
+        c_type <- static_data$term_type_mappings[[term_lower]]
       }
       # Otherwise check in entity_types_dict if available
       else if (c_term %in% names(entity_types_dict)) {
@@ -1542,8 +709,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
     all_terms <- rownames(co_matrix)
     potential_c_terms <- setdiff(all_terms, c(a_term, b_terms))
 
-    # Remove blacklisted terms from potential C terms
-    potential_c_terms <- potential_c_terms[!tolower(potential_c_terms) %in% blacklisted_terms]
+    # Remove blacklisted terms from potential C terms (using static_data)
+    potential_c_terms <- potential_c_terms[!tolower(potential_c_terms) %in% static_data$blacklisted_terms]
 
     # Apply filtering to potential C terms if requested
     if (exclude_general_terms) {
@@ -1557,8 +724,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
         term_lower <- tolower(c_term_candidate)
 
         # Check if term is in our mapping
-        if (term_lower %in% names(term_type_mappings)) {
-          c_type <- term_type_mappings[[term_lower]]
+        if (term_lower %in% names(static_data$term_type_mappings)) {
+          c_type <- static_data$term_type_mappings[[term_lower]]
         }
         # Otherwise check in entity_types_dict if available
         else if (has_entity_types && c_term_candidate %in% names(entity_types_dict)) {
@@ -1590,8 +757,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
         term_lower <- tolower(c_term_candidate)
 
         # Check if term is in our mapping
-        if (term_lower %in% names(term_type_mappings)) {
-          c_type <- term_type_mappings[[term_lower]]
+        if (term_lower %in% names(static_data$term_type_mappings)) {
+          c_type <- static_data$term_type_mappings[[term_lower]]
         }
         # Otherwise check in entity_types_dict if available
         else if (c_term_candidate %in% names(entity_types_dict)) {
@@ -1643,6 +810,22 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
       # Also filter out C terms that are too similar to A term if requested
       if (filter_similar_terms && length(potential_c_for_b) > 0) {
         # Calculate similarity for each potential C term
+        string_similarity <- function(a, b) {
+          a_lower <- tolower(a)
+          b_lower <- tolower(b)
+          a_singular <- sub("s$", "", a_lower)
+          b_singular <- sub("s$", "", b_lower)
+          stem_sim <- a_singular == b_singular
+          if (nchar(a_lower) == 0 || nchar(b_lower) == 0) {
+            basic_sim <- 0
+          } else {
+            lev_dist <- adist(a_lower, b_lower)[1,1]
+            max_len <- max(nchar(a_lower), nchar(b_lower))
+            basic_sim <- 1 - (lev_dist / max_len)
+          }
+          return(max(basic_sim, as.numeric(stem_sim)))
+        }
+
         c_similarities <- sapply(potential_c_for_b, function(c) string_similarity(a_term, c))
 
         # Filter out terms that are too similar to A term
@@ -1692,17 +875,17 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
   # Add entity type information if available
   if (has_entity_types) {
     # Process special type mappings
-    for (term in names(term_type_mappings)) {
+    for (term in names(static_data$term_type_mappings)) {
       if (term %in% names(entity_types_dict)) {
-        entity_types_dict[term] <- term_type_mappings[[term]]
+        entity_types_dict[term] <- static_data$term_type_mappings[[term]]
       }
     }
 
     results$a_type <- sapply(results$a_term, function(term) {
       term_lower <- tolower(term)
       # Check if term is in our mapping
-      if (term_lower %in% names(term_type_mappings)) {
-        return(term_type_mappings[[term_lower]])
+      if (term_lower %in% names(static_data$term_type_mappings)) {
+        return(static_data$term_type_mappings[[term_lower]])
       }
       # Otherwise check in entity_types_dict if available
       else if (term %in% names(entity_types_dict)) {
@@ -1715,8 +898,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
     results$b_type <- sapply(results$b_term, function(term) {
       term_lower <- tolower(term)
       # Check if term is in our mapping
-      if (term_lower %in% names(term_type_mappings)) {
-        return(term_type_mappings[[term_lower]])
+      if (term_lower %in% names(static_data$term_type_mappings)) {
+        return(static_data$term_type_mappings[[term_lower]])
       }
       # Otherwise check in entity_types_dict if available
       else if (term %in% names(entity_types_dict)) {
@@ -1729,8 +912,8 @@ abc_model <- function(co_matrix, a_term, c_term = NULL,
     results$c_type <- sapply(results$c_term, function(term) {
       term_lower <- tolower(term)
       # Check if term is in our mapping
-      if (term_lower %in% names(term_type_mappings)) {
-        return(term_type_mappings[[term_lower]])
+      if (term_lower %in% names(static_data$term_type_mappings)) {
+        return(static_data$term_type_mappings[[term_lower]])
       }
       # Otherwise check in entity_types_dict if available
       else if (term %in% names(entity_types_dict)) {

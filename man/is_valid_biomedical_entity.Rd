@@ -17,3 +17,10 @@ Logical, TRUE if the term is likely a valid biomedical entity, FALSE otherwise
 \description{
 Determine if a term is likely a specific biomedical entity with improved accuracy
 }
+\examples{
+# Test biomedical entity validation
+is_valid_biomedical_entity("migraine", "disease")  # Should return TRUE
+is_valid_biomedical_entity("receptor", "protein")  # Should return TRUE
+is_valid_biomedical_entity("optimization", "chemical")  # Should return FALSE
+is_valid_biomedical_entity("europe", "disease")  # Should return FALSE
+}

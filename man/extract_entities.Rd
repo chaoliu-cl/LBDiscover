@@ -33,3 +33,24 @@ A data frame with extracted entities, their types, and positions.
 This function extracts entities from text and optionally assigns them to specific
 semantic categories based on dictionaries.
 }
+\examples{
+# Create example text data
+text_data <- data.frame(
+  doc_id = 1:3,
+  abstract = c(
+    "Migraine is a neurological disorder causing severe headache and photophobia.",
+    "Serotonin receptors play a role in migraine pathophysiology.",
+    "Sumatriptan is an effective treatment for migraine attacks."
+  )
+)
+
+# Create example dictionary
+dictionary <- data.frame(
+  term = c("migraine", "headache", "photophobia", "serotonin", "sumatriptan"),
+  type = c("disease", "symptom", "symptom", "chemical", "drug")
+)
+
+# Extract entities
+entities <- extract_entities(text_data, dictionary = dictionary)
+print(entities)
+}
