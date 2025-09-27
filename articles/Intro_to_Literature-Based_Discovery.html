@@ -161,7 +161,7 @@ treatment.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Found"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">primary_term_variations</span><span class="op">)</span>, <span class="st">"variations of"</span>, <span class="va">primary_term</span>, <span class="st">"in the corpus:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Found 15 variations of migraine in the corpus:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">primary_term_variations</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "Migraine"    "migraine"    "MigrainE"    "MIGRAINE"    "Migraines"  </span></span>
+<span><span class="co">#&gt;  [1] "migraine"    "Migraine"    "MigrainE"    "MIGRAINE"    "Migraines"  </span></span>
 <span><span class="co">#&gt;  [6] "migraines"   "migraineur"  "ofmigraine"  "migraineurs" "Migraineurs"</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -268,7 +268,7 @@ treatment.</p>
 <span>  <span class="va">standard_entities</span>,</span>
 <span>  <span class="va">primary_term</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Combined 6277 custom entities with 6948 standard entities.</span></span>
+<span><span class="co">#&gt; Combined 6280 custom entities with 6952 standard entities.</span></span>
 <span></span>
 <span><span class="co"># Filter entities to ensure only relevant biomedical terms are included</span></span>
 <span><span class="va">filtered_entities</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/valid_entities.html">valid_entities</a></span><span class="op">(</span></span>
@@ -277,24 +277,24 @@ treatment.</p>
 <span>  <span class="va">primary_term_variations</span>,</span>
 <span>  validation_function <span class="op">=</span> <span class="va">is_valid_biomedical_entity</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Filtered from 7339 to 7339 validated entities</span></span>
+<span><span class="co">#&gt; Filtered from 7343 to 7343 validated entities</span></span>
 <span></span>
 <span><span class="co"># View the first few extracted entities</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">filtered_entities</span><span class="op">)</span></span>
 <span><span class="co">#&gt;         entity entity_type doc_id start_pos end_pos</span></span>
-<span><span class="co">#&gt; 1 antimigraine     disease    132      1488    1499</span></span>
-<span><span class="co">#&gt; 2 antimigraine     disease    139      1671    1682</span></span>
-<span><span class="co">#&gt; 3 antimigraine     disease    435       667     678</span></span>
-<span><span class="co">#&gt; 4 antimigraine     disease    435       368     379</span></span>
-<span><span class="co">#&gt; 5 antimigraine     disease    477       876     887</span></span>
-<span><span class="co">#&gt; 6 antimigraine     disease    477      1188    1199</span></span>
+<span><span class="co">#&gt; 1 antimigraine     disease    133      1488    1499</span></span>
+<span><span class="co">#&gt; 2 antimigraine     disease    140      1671    1682</span></span>
+<span><span class="co">#&gt; 3 antimigraine     disease    436       667     678</span></span>
+<span><span class="co">#&gt; 4 antimigraine     disease    436       368     379</span></span>
+<span><span class="co">#&gt; 5 antimigraine     disease    478      1188    1199</span></span>
+<span><span class="co">#&gt; 6 antimigraine     disease    478       876     887</span></span>
 <span><span class="co">#&gt;                                                                                                                                                                                                                                                                                                    sentence</span></span>
 <span><span class="co">#&gt; 1                                                                                         CONCLUSION AND IMPLICATIONS: DOP-mediated antimigraine effect is stronger in female than male rats and appears to be mediated in chronic conditions through peripheral DOPs in females and central DOPs in males.</span></span>
 <span><span class="co">#&gt; 2                                                                                                                                    Our results suggest that the antagonism on the alpha-CGRP isoform plays a relevant role in the antimigraine action of mABs but not in the development of constipation.</span></span>
 <span><span class="co">#&gt; 3                                                                                                                                                                                                         Efforts have been made to find alternative delivery systems and/or routes for antimigraine drugs.</span></span>
 <span><span class="co">#&gt; 4                                               However, the administration of antimigraine drugs in conventional oral pharmaceutical dosage forms is a challenge, since many molecules have difficulty crossing the blood-brain barrier (BBB) to reach the brain, which leads to bioavailability problems.</span></span>
-<span><span class="co">#&gt; 5                                                                                                                                        EXPERT OPINION: Current anti-CGRPergic medications, although effective, have limitations, such as side effects and lack of antimigraine efficacy in some patients.</span></span>
-<span><span class="co">#&gt; 6 The existence of patients with medication-resistant migraine may be due to the: (i) complex migraine pathophysiology, in which several systems appear to be deregulated before, during, and after a migraine attack; and (ii) pharmacodynamic and pharmacokinetic properties of antimigraine medications.</span></span>
+<span><span class="co">#&gt; 5 The existence of patients with medication-resistant migraine may be due to the: (i) complex migraine pathophysiology, in which several systems appear to be deregulated before, during, and after a migraine attack; and (ii) pharmacodynamic and pharmacokinetic properties of antimigraine medications.</span></span>
+<span><span class="co">#&gt; 6                                                                                                                                        EXPERT OPINION: Current anti-CGRPergic medications, although effective, have limitations, such as side effects and lack of antimigraine efficacy in some patients.</span></span>
 <span><span class="co">#&gt;   frequency</span></span>
 <span><span class="co">#&gt; 1        22</span></span>
 <span><span class="co">#&gt; 2        22</span></span>
