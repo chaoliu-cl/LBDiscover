@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Working with Discovery Models</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-09-27</h4>
+            <h4 data-toc-skip class="date">2025-09-30</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Work_with_Discovery_Models.Rmd" class="external-link"><code>vignettes/Work_with_Discovery_Models.Rmd</code></a></small>
       <div class="d-none name"><code>Work_with_Discovery_Models.Rmd</code></div>
@@ -123,7 +123,7 @@ data:</p>
 <span><span class="co"># Combine and remove duplicates</span></span>
 <span><span class="va">all_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_results.html">merge_results</a></span><span class="op">(</span><span class="va">alzheimer_articles</span>, <span class="va">drug_articles</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Retrieved"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span>, <span class="st">"unique articles"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Retrieved 1957 unique articles"</span></span>
+<span><span class="co">#&gt; [1] "Retrieved 1948 unique articles"</span></span>
 <span></span>
 <span><span class="co"># Preprocess text</span></span>
 <span><span class="va">preprocessed_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocess_text.html">preprocess_text</a></span><span class="op">(</span></span>
@@ -158,11 +158,10 @@ data:</p>
 <span><span class="va">available_terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"First 30 terms in the co-occurrence matrix:"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">available_terms</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "disorder"       "gene"           "syndrome"       "Receptors"     </span></span>
-<span><span class="co">#&gt;  [5] "Acid"           "Databases"      "Phytochemicals" "migraine"      </span></span>
+<span><span class="co">#&gt;  [1] "gene"           "disorder"       "syndrome"       "Acid"          </span></span>
+<span><span class="co">#&gt;  [5] "Receptors"      "Databases"      "Phytochemicals" "migraine"      </span></span>
 <span><span class="co">#&gt;  [9] "Nitric"         "Menopause"      "Hemolysis"      "Estrogens"     </span></span>
-<span><span class="co">#&gt; [13] "Toxins"         "Aromatherapy"   "Pesticides"     "Nicotiana"     </span></span>
-<span><span class="co">#&gt; [17] "Anesthetics"</span></span>
+<span><span class="co">#&gt; [13] "Toxins"         "Aromatherapy"   "Taste"          "Pesticides"</span></span>
 <span></span>
 <span><span class="co"># Check if the term is misspelled or slightly different</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"\nChecking for variations of 'alzheimer' and related terms:"</span><span class="op">)</span></span>
@@ -212,7 +211,7 @@ data:</p>
 <span></span>
 <span><span class="co"># Check matrix dimensions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 17 17</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 16 16</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="classic-abc-model">1. Classic ABC Model<a class="anchor" aria-label="anchor" href="#classic-abc-model"></a>
@@ -230,7 +229,7 @@ terms.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Filtered 4 B terms (50%) that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.8)</span></span>
-<span><span class="co">#&gt; Filtered 11 potential C terms that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; Filtered 10 potential C terms that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Identifying potential C terms via 4 B terms...</span></span>
 <span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |==================                                                    |  25%  |                                                                              |===================================                                   |  50%  |                                                                              |====================================================                  |  75%  |                                                                              |======================================================================| 100%</span></span>
 <span></span>
@@ -241,10 +240,10 @@ terms.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from ABC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;             a_term    b_term   c_term    abc_score</span></span>
-<span><span class="co">#&gt; syndrome  disorder  syndrome migraine 0.0014350634</span></span>
-<span><span class="co">#&gt; Receptors disorder Receptors migraine 0.0012920314</span></span>
-<span><span class="co">#&gt; gene      disorder      gene migraine 0.0007303935</span></span>
-<span><span class="co">#&gt; Acid      disorder      Acid migraine 0.0004850792</span></span></code></pre></div>
+<span><span class="co">#&gt; Receptors disorder Receptors migraine 0.0012957564</span></span>
+<span><span class="co">#&gt; syndrome  disorder  syndrome migraine 0.0011231472</span></span>
+<span><span class="co">#&gt; gene      disorder      gene migraine 0.0007421969</span></span>
+<span><span class="co">#&gt; Acid      disorder      Acid migraine 0.0004673065</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="statistical-validation-of-abc-results">Statistical Validation of ABC Results<a class="anchor" aria-label="anchor" href="#statistical-validation-of-abc-results"></a>
 </h4>
@@ -258,7 +257,7 @@ the discovered connections:</p>
 <span>  correction <span class="op">=</span> <span class="st">"BH"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimized approach for large matrix validation...</span></span>
-<span><span class="co">#&gt; Using metadata for document count: 679</span></span>
+<span><span class="co">#&gt; Using metadata for document count: 687</span></span>
 <span><span class="co">#&gt; Calculating statistical significance using hypergeometric test...</span></span>
 <span><span class="co">#&gt; 0.0% of connections are statistically significant (p &lt; 0.05, BH correction)</span></span>
 <span></span>
@@ -300,8 +299,8 @@ intermediate B terms:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from AnC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt;     a_term                         b_terms   c_term anc_score</span></span>
-<span><span class="co">#&gt; 1 disorder gene, syndrome, Receptors, Acid migraine 0.0128084</span></span></code></pre></div>
+<span><span class="co">#&gt;     a_term                         b_terms   c_term  anc_score</span></span>
+<span><span class="co">#&gt; 1 disorder gene, syndrome, Receptors, Acid migraine 0.01238087</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitola-model">3. BITOLA Model<a class="anchor" aria-label="anchor" href="#bitola-model"></a>
@@ -353,13 +352,13 @@ related terms:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from LSI model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt;     a_term     c_term lsi_similarity</span></span>
-<span><span class="co">#&gt; 1 disorder    disease      0.6264930</span></span>
-<span><span class="co">#&gt; 2 disorder   chloride      0.5597755</span></span>
-<span><span class="co">#&gt; 3 disorder regulation      0.4407862</span></span>
-<span><span class="co">#&gt; 4 disorder  signaling      0.4292837</span></span>
-<span><span class="co">#&gt; 5 disorder   receptor      0.4118216</span></span>
-<span><span class="co">#&gt; 6 disorder       gene      0.3886896</span></span></code></pre></div>
+<span><span class="co">#&gt;     a_term      c_term lsi_similarity</span></span>
+<span><span class="co">#&gt; 1 disorder     disease      0.6246493</span></span>
+<span><span class="co">#&gt; 2 disorder  regulation      0.5685152</span></span>
+<span><span class="co">#&gt; 3 disorder    chloride      0.5367096</span></span>
+<span><span class="co">#&gt; 4 disorder transporter      0.5263496</span></span>
+<span><span class="co">#&gt; 5 disorder    receptor      0.4567891</span></span>
+<span><span class="co">#&gt; 6 disorder     hormone      0.4556487</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparing-results-from-different-models">Comparing Results from Different Models<a class="anchor" aria-label="anchor" href="#comparing-results-from-different-models"></a>
@@ -389,7 +388,7 @@ models:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  BITOLA model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bitola_c_terms</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   BITOLA model: 0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  LSI model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">lsi_c_terms</span><span class="op">)</span>, <span class="st">"\n\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   LSI model: 46</span></span>
+<span><span class="co">#&gt;   LSI model: 44</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Number of C terms found by multiple models:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of C terms found by multiple models:</span></span>
