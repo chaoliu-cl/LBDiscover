@@ -29,12 +29,19 @@ jobs:
           covr::codecov(
             type = "tests",
             line_exclusions = list(
-              "tests/testthat/test-slow.R",
-              "tests/testthat/test-integration.R"
+              "tests/testthat/test-abc_model_test.R",
+              "tests/testthat/queries_tests.r",
+              "tests/testthat/test-comprehensive_summary_test.R",
+              "tests/testthat/test-comprehensive_summary.R",
+              "tests/testthat/test-test_queries.R",
+              "tests/testthat/test-text_preprocessing.R",
+              "tests/testthat/test-pubmed_search.R",
+              "tests/testthat/test-utilities.R",
+              "tests/testthat/test-visualization.R"
             ),
             quiet = FALSE,
             clean = FALSE,
             install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package"),
-            token = "${{ secrets.90c513b5-cbe7-4c8c-92f2-8aeb785b8b0b }}"
+            token = "${{ secrets.CODECOV_TOKEN }}"
           )
         shell: Rscript {0}
