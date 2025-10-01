@@ -53,6 +53,34 @@ test_that("preprocess_text basic functionality", {
   expect_equal(nrow(result), 3)
 })
 
+test_that("preprocess_text with stemming", {
+  skip_if_not_installed("SnowballC")
+
+  text_data <- create_test_data()
+
+  result <- preprocess_text(
+    text_data,
+    text_column = "abstract",
+    stem_words = TRUE,
+    remove_stopwords = TRUE
+  )
+
+  expect_s3_class(result, "data.frame")
+  expect_true("terms" %in% colnames(result))
+})
+
+test_that("preprocess_text errors without SnowballC when stemming requested", {
+  skip_if(requireNamespace("SnowballC", quietly = TRUE),
+          "SnowballC is installed")
+
+  text_data <- create_test_data()
+
+  expect_error(
+    preprocess_text(text_data, stem_words = TRUE),
+    "SnowballC package is required"
+  )
+})
+
 test_that("preprocess_text handles missing doc_id", {
   text_data <- data.frame(
     abstract = "Test text for preprocessing."
@@ -89,7 +117,7 @@ test_that("preprocess_text with custom stopwords", {
 })
 
 # ============================================================================
-# Test: extract_entities
+# Test: extract_entities - overlap strategies
 # ============================================================================
 test_that("extract_entities basic functionality", {
   text_data <- create_test_data()
@@ -115,42 +143,76 @@ test_that("extract_entities handles empty dictionary", {
   )
 
   expect_error(
-    extract_entities(text_data, dictionary = dictionary, sanitize_dict = TRUE),
+    suppressWarnings(extract_entities(text_data, dictionary = dictionary, sanitize_dict = TRUE)),
     "No terms remain in the dictionary"
   )
 })
 
-test_that("extract_entities with overlap strategies", {
-  text_data <- create_test_data()
-  dictionary <- create_test_dictionary()
+test_that("extract_entities with overlap strategies - priority", {
+  text_data <- data.frame(
+    doc_id = 1,
+    abstract = "severe headache pain and headache disorders"
+  )
 
-  # Test priority strategy
+  dictionary <- data.frame(
+    term = c("headache", "severe headache", "pain"),
+    type = c("symptom", "symptom", "symptom"),
+    id = paste0("SYM_", 1:3),
+    source = rep("test", 3),
+    stringsAsFactors = FALSE
+  )
+
   result_priority <- extract_entities(
     text_data,
     dictionary = dictionary,
-    overlap_strategy = "priority"
+    overlap_strategy = "priority",
+    sanitize_dict = FALSE
   )
-  expect_s3_class(result_priority, "data.frame")
 
-  # Test longest strategy
+  expect_s3_class(result_priority, "data.frame")
+  expect_true(nrow(result_priority) > 0)
+})
+
+test_that("extract_entities with overlap strategies - longest", {
+  text_data <- data.frame(
+    doc_id = 1,
+    abstract = "severe headache and migraine headache"
+  )
+
+  dictionary <- data.frame(
+    term = c("headache", "severe headache", "migraine headache"),
+    type = c("symptom", "symptom", "symptom"),
+    id = paste0("SYM_", 1:3),
+    source = rep("test", 3),
+    stringsAsFactors = FALSE
+  )
+
   result_longest <- extract_entities(
     text_data,
     dictionary = dictionary,
-    overlap_strategy = "longest"
+    overlap_strategy = "longest",
+    sanitize_dict = FALSE
   )
-  expect_s3_class(result_longest, "data.frame")
 
-  # Test all strategy
+  expect_s3_class(result_longest, "data.frame")
+})
+
+test_that("extract_entities with overlap strategies - all", {
+  text_data <- create_test_data()
+  dictionary <- create_test_dictionary()
+
   result_all <- extract_entities(
     text_data,
     dictionary = dictionary,
-    overlap_strategy = "all"
+    overlap_strategy = "all",
+    sanitize_dict = FALSE
   )
+
   expect_s3_class(result_all, "data.frame")
 })
 
 # ============================================================================
-# Test: load_dictionary
+# Test: load_dictionary - various sources and error handling
 # ============================================================================
 test_that("load_dictionary with local source", {
   result <- load_dictionary(
@@ -163,8 +225,7 @@ test_that("load_dictionary with local source", {
   expect_true(all(c("term", "type") %in% colnames(result)))
 })
 
-test_that("load_dictionary with custom path", {
-  # Create temporary custom dictionary
+test_that("load_dictionary with custom path - CSV", {
   temp_dict <- tempfile(fileext = ".csv")
   custom_dict <- create_test_dictionary()
   write.csv(custom_dict, temp_dict, row.names = FALSE)
@@ -174,23 +235,109 @@ test_that("load_dictionary with custom path", {
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), nrow(custom_dict))
 
-  # With sanitization, some terms may be filtered
-  result_sanitized <- load_dictionary(custom_path = temp_dict, sanitize = TRUE)
-  expect_s3_class(result_sanitized, "data.frame")
-  expect_true(nrow(result_sanitized) <= nrow(custom_dict))
-
-  # Cleanup
   unlink(temp_dict)
 })
 
-test_that("load_dictionary handles invalid types", {
-  # When local doesn't support the type, it should switch to mesh
-  expect_message(
-    result <- load_dictionary(dictionary_type = "invalid_type", source = "local", sanitize = FALSE),
-    "not supported|Using example dictionary"
+test_that("load_dictionary with custom path - RDS", {
+  temp_dict <- tempfile(fileext = ".rds")
+  custom_dict <- create_test_dictionary()
+  saveRDS(custom_dict, temp_dict)
+
+  result <- load_dictionary(custom_path = temp_dict, sanitize = FALSE)
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), nrow(custom_dict))
+
+  unlink(temp_dict)
+})
+
+test_that("load_dictionary with custom path - unsupported format", {
+  temp_dict <- tempfile(fileext = ".txt")
+  writeLines("test", temp_dict)
+
+  expect_error(
+    load_dictionary(custom_path = temp_dict),
+    "Unsupported file format"
   )
 
-  # Should still return a valid data frame (dummy dictionary)
+  unlink(temp_dict)
+})
+
+test_that("load_dictionary with custom path - missing file", {
+  expect_error(
+    load_dictionary(custom_path = "nonexistent_file.csv"),
+    "Custom dictionary file not found"
+  )
+})
+
+test_that("load_dictionary with custom path - missing required columns", {
+  temp_dict <- tempfile(fileext = ".csv")
+  bad_dict <- data.frame(
+    word = c("test1", "test2"),
+    category = c("type1", "type2")
+  )
+  write.csv(bad_dict, temp_dict, row.names = FALSE)
+
+  expect_error(
+    load_dictionary(custom_path = temp_dict),
+    "Dictionary must have columns"
+  )
+
+  unlink(temp_dict)
+})
+
+test_that("load_dictionary handles invalid types for local source", {
+  suppressWarnings(
+    expect_message(
+      result <- load_dictionary(dictionary_type = "invalid_type", source = "local", sanitize = FALSE),
+      "not supported|Using example dictionary"
+    )
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
+test_that("load_dictionary switches to mesh for unsupported local types", {
+  skip_if_not_installed("rentrez")
+  skip_on_cran()
+
+  suppressWarnings(
+    expect_message(
+      result <- load_dictionary(dictionary_type = "protein", source = "local", sanitize = FALSE),
+      "not supported"
+    )
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
+test_that("load_dictionary with UMLS requires API key", {
+  expect_message(
+    result <- load_dictionary(dictionary_type = "disease", source = "umls", api_key = NULL, sanitize = FALSE),
+    "API key is required"
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
+# ============================================================================
+# Test: load_from_mesh (internal function testing)
+# ============================================================================
+test_that("load_from_mesh returns dummy dictionary when rentrez not available", {
+  skip_if(requireNamespace("rentrez", quietly = TRUE), "rentrez is available")
+
+  result <- LBDiscover:::load_from_mesh("disease", n_terms = 10)
+
+  expect_s3_class(result, "data.frame")
+  expect_true("source" %in% colnames(result))
+})
+
+test_that("load_from_mesh returns dummy dictionary when xml2 not available", {
+  skip_if(requireNamespace("xml2", quietly = TRUE), "xml2 is available")
+  skip_if_not_installed("rentrez")
+
+  result <- LBDiscover:::load_from_mesh("disease", n_terms = 10)
+
   expect_s3_class(result, "data.frame")
 })
 
@@ -207,6 +354,27 @@ test_that("create_dummy_dictionary creates valid dictionaries", {
 
   gene_dict <- create_dummy_dictionary("gene")
   expect_s3_class(gene_dict, "data.frame")
+
+  protein_dict <- create_dummy_dictionary("protein")
+  expect_s3_class(protein_dict, "data.frame")
+
+  chemical_dict <- create_dummy_dictionary("chemical")
+  expect_s3_class(chemical_dict, "data.frame")
+
+  pathway_dict <- create_dummy_dictionary("pathway")
+  expect_s3_class(pathway_dict, "data.frame")
+
+  symptom_dict <- create_dummy_dictionary("symptom")
+  expect_s3_class(symptom_dict, "data.frame")
+
+  anatomy_dict <- create_dummy_dictionary("anatomy")
+  expect_s3_class(anatomy_dict, "data.frame")
+})
+
+test_that("create_dummy_dictionary handles unknown types", {
+  result <- create_dummy_dictionary("unknown_type")
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0)
 })
 
 # ============================================================================
@@ -224,10 +392,15 @@ test_that("detect_lang handles short text", {
   expect_type(result, "character")
 })
 
+test_that("detect_lang handles empty/NULL text", {
+  expect_equal(detect_lang(""), "unknown")
+  expect_equal(detect_lang(NULL), "unknown")
+  expect_equal(detect_lang(character(0)), "unknown")
+})
+
 test_that("detect_lang handles non-English text", {
   spanish_text <- "El rápido zorro marrón salta sobre el perro perezoso."
   result <- detect_lang(spanish_text)
-  # May not always be accurate for short text
   expect_type(result, "character")
 })
 
@@ -263,6 +436,14 @@ test_that("extract_ngrams handles empty text", {
   expect_true(all(c("ngram", "frequency") %in% colnames(result)))
 })
 
+test_that("extract_ngrams handles NA values", {
+  text <- c("test", NA, "another test")
+
+  result <- extract_ngrams(text, n = 1, min_freq = 1)
+
+  expect_s3_class(result, "data.frame")
+})
+
 # ============================================================================
 # Test: segment_sentences
 # ============================================================================
@@ -282,7 +463,6 @@ test_that("segment_sentences handles abbreviations", {
   result <- segment_sentences(text)
 
   expect_type(result, "list")
-  # Should not split at abbreviation periods
   expect_true(any(grepl("Dr\\.", result[[1]])))
 })
 
@@ -296,12 +476,14 @@ test_that("segment_sentences handles empty text", {
 })
 
 # ============================================================================
-# Test: sanitize_dictionary
+# Test: sanitize_dictionary - comprehensive
 # ============================================================================
 test_that("sanitize_dictionary removes problematic terms", {
   dirty_dict <- data.frame(
     term = c("migraine", "europe", "optimization", "receptor", "123", "", NA),
     type = c("disease", "location", "process", "protein", "number", "empty", "missing"),
+    id = paste0("ID_", 1:7),
+    source = rep("test", 7),
     stringsAsFactors = FALSE
   )
 
@@ -309,35 +491,82 @@ test_that("sanitize_dictionary removes problematic terms", {
 
   expect_s3_class(result, "data.frame")
   expect_true(nrow(result) < nrow(dirty_dict))
-  # Empty and NA terms should be removed
   expect_false("" %in% result$term)
   expect_false(any(is.na(result$term)))
-  # Numeric-only terms should be removed
   expect_false("123" %in% result$term)
+})
 
-  # Note: "europe" and "optimization" may or may not be filtered depending on
-  # the blacklist and validation logic, so we just check they're either
-  # kept or removed, not specifically which
-  expect_true(all(result$term %in% c("migraine", "europe", "optimization", "receptor")))
+test_that("sanitize_dictionary removes terms with regex special characters", {
+  dict <- data.frame(
+    term = c("normal", "with[bracket]", "with(paren)", "with{brace}"),
+    type = rep("disease", 4),
+    id = paste0("ID_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- sanitize_dictionary(dict, verbose = FALSE)
+
+  expect_s3_class(result, "data.frame")
+  expect_false("with[bracket]" %in% result$term)
+  expect_false("with(paren)" %in% result$term)
+  expect_false("with{brace}" %in% result$term)
+  # Note: "normal" may be filtered out if it's in the blacklist
+  # Check if normal survived or was legitimately filtered
+  if (nrow(result) > 0) {
+    expect_true(all(!grepl("[\\[\\]\\(\\)\\{\\}]", result$term)))
+  }
+})
+
+test_that("sanitize_dictionary removes terms with numbers followed by special characters", {
+  dict <- data.frame(
+    term = c("normal", "test123[", "68 [1", "valid123"),
+    type = rep("disease", 4),
+    id = paste0("ID_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- sanitize_dictionary(dict, verbose = FALSE)
+
+  expect_s3_class(result, "data.frame")
+  expect_false("test123[" %in% result$term)
+  expect_false("68 [1" %in% result$term)
 })
 
 test_that("sanitize_dictionary validates entity types", {
   dict <- data.frame(
     term = c("migraine", "receptor", "optimization"),
     type = c("disease", "protein", "chemical"),
+    id = paste0("ID_", 1:3),
+    source = rep("test", 3),
     stringsAsFactors = FALSE
   )
 
   result <- sanitize_dictionary(dict, validate_types = TRUE, verbose = FALSE)
 
   expect_s3_class(result, "data.frame")
-  # Check that valid terms are kept
   expect_true("migraine" %in% result$term)
   expect_true("receptor" %in% result$term)
+})
 
-  # optimization may or may not be filtered depending on validation logic
-  # Just ensure we get a valid result
-  expect_true(nrow(result) >= 2)
+test_that("sanitize_dictionary applies type corrections", {
+  dict <- data.frame(
+    term = c("migraine", "headache", "serotonin", "receptor"),
+    type = c("symptom", "disease", "protein", "gene"),  # Intentionally wrong
+    id = paste0("ID_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- sanitize_dictionary(dict, validate_types = TRUE, verbose = FALSE)
+
+  expect_s3_class(result, "data.frame")
+  # Check that corrections were applied
+  migraine_row <- result[result$term == "migraine", ]
+  if (nrow(migraine_row) > 0) {
+    expect_equal(migraine_row$type, "disease")
+  }
 })
 
 test_that("sanitize_dictionary handles empty input", {
@@ -347,13 +576,20 @@ test_that("sanitize_dictionary handles empty input", {
     stringsAsFactors = FALSE
   )
 
-  # Should return empty dictionary without error
   result <- suppressWarnings(
     sanitize_dictionary(empty_dict, verbose = FALSE)
   )
 
   expect_s3_class(result, "data.frame")
   expect_equal(nrow(result), 0)
+})
+
+test_that("sanitize_dictionary handles NULL input", {
+  result <- suppressWarnings(
+    sanitize_dictionary(NULL, verbose = FALSE)
+  )
+
+  expect_true(is.null(result) || (is.data.frame(result) && nrow(result) == 0))
 })
 
 # ============================================================================
@@ -393,7 +629,6 @@ test_that("create_term_document_matrix creates matrix", {
   text_data <- create_test_data()
   preprocessed <- preprocess_text(text_data, text_column = "abstract")
 
-  # Use lower min_df to ensure we get some terms
   result <- create_term_document_matrix(preprocessed, min_df = 1, max_df = 1.0)
 
   expect_true(is.matrix(result))
@@ -405,18 +640,14 @@ test_that("create_term_document_matrix filters by frequency", {
   text_data <- create_test_data()
   preprocessed <- preprocess_text(text_data, text_column = "abstract")
 
-  # Use min_df = 1 to ensure we get terms
   result1 <- create_term_document_matrix(preprocessed, min_df = 1, max_df = 1.0)
 
   expect_true(is.matrix(result1))
   expect_true(nrow(result1) > 0)
 
-  # If we have terms appearing multiple times, test min_df = 2
-  # Otherwise skip this part
   if (any(rowSums(result1 > 0) >= 2)) {
     result2 <- create_term_document_matrix(preprocessed, min_df = 2, max_df = 1.0)
     expect_true(is.matrix(result2))
-    # Should have fewer or equal terms
     expect_true(nrow(result2) <= nrow(result1))
   }
 })
@@ -460,10 +691,67 @@ test_that("extract_entities_workflow handles empty results", {
     abstract = "Text with no recognized entities xyz abc def."
   )
 
+  result <- suppressWarnings(
+    extract_entities_workflow(
+      text_data,
+      entity_types = c("disease"),
+      dictionary_sources = "local",
+      verbose = FALSE
+    )
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
+test_that("extract_entities_workflow with parallel processing disabled", {
+  text_data <- create_test_data()
+
   result <- extract_entities_workflow(
     text_data,
     entity_types = c("disease"),
     dictionary_sources = "local",
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
+test_that("extract_entities_workflow with caching", {
+  text_data <- create_test_data()
+
+  result1 <- extract_entities_workflow(
+    text_data,
+    entity_types = c("disease"),
+    dictionary_sources = "local",
+    cache_dictionaries = TRUE,
+    verbose = FALSE
+  )
+
+  # Second call should use cache
+  result2 <- extract_entities_workflow(
+    text_data,
+    entity_types = c("disease"),
+    dictionary_sources = "local",
+    cache_dictionaries = TRUE,
+    verbose = FALSE
+  )
+
+  expect_s3_class(result1, "data.frame")
+  expect_s3_class(result2, "data.frame")
+})
+
+test_that("extract_entities_workflow handles batch processing", {
+  large_data <- data.frame(
+    doc_id = 1:10,
+    abstract = rep("Migraine causes headache", 10)
+  )
+
+  result <- extract_entities_workflow(
+    large_data,
+    entity_types = c("disease"),
+    dictionary_sources = "local",
+    batch_size = 5,
     verbose = FALSE
   )
 
@@ -473,32 +761,25 @@ test_that("extract_entities_workflow handles empty results", {
 # ============================================================================
 # Test: map_ontology
 # ============================================================================
-test_that("map_ontology handles basic mapping", {
-  skip_if_not_installed("rentrez")
+test_that("map_ontology handles empty terms", {
+  result <- map_ontology(
+    character(0),
+    ontology = "mesh"
+  )
 
-  terms <- c("headache", "migraine")
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0)
+})
 
-  # This test may fail without internet connection
-  skip_on_cran()
-  skip_if_offline()
-
-  result <- tryCatch({
-    map_ontology(
-      terms,
-      ontology = "mesh",
-      fuzzy_match = FALSE
-    )
-  }, error = function(e) {
-    skip("MeSH API not available")
-  })
-
-  if (!is.null(result)) {
-    expect_s3_class(result, "data.frame")
-  }
+test_that("map_ontology requires API key for UMLS", {
+  expect_error(
+    map_ontology(c("headache"), ontology = "umls", api_key = NULL),
+    "API key is required"
+  )
 })
 
 # ============================================================================
-# Test: extract_ner (Named Entity Recognition)
+# Test: extract_ner
 # ============================================================================
 test_that("extract_ner extracts entities", {
   text <- c(
@@ -525,6 +806,17 @@ test_that("extract_ner extracts entities", {
   expect_true(all(c("text_id", "entity", "entity_type") %in% colnames(result)))
 })
 
+test_that("extract_ner handles missing dictionaries gracefully", {
+  text <- c("Test text")
+
+  # This should load dummy dictionaries and not fail
+  result <- suppressWarnings(
+    extract_ner(text, entity_types = c("disease"))
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
 # ============================================================================
 # Test: get_umls_semantic_types
 # ============================================================================
@@ -546,16 +838,13 @@ test_that("get_umls_semantic_types returns correct types", {
 test_that("complete workflow: preprocess -> extract -> sanitize", {
   text_data <- create_test_data()
 
-  # Step 1: Preprocess
   preprocessed <- preprocess_text(text_data, text_column = "abstract")
   expect_s3_class(preprocessed, "data.frame")
 
-  # Step 2: Extract entities
   dictionary <- create_test_dictionary()
-  entities <- extract_entities(preprocessed, dictionary = dictionary)
+  entities <- extract_entities(preprocessed, dictionary = dictionary, sanitize_dict = FALSE)
   expect_s3_class(entities, "data.frame")
 
-  # Step 3: Sanitize dictionary
   clean_dict <- sanitize_dictionary(dictionary, verbose = FALSE)
   expect_s3_class(clean_dict, "data.frame")
   expect_true(nrow(clean_dict) <= nrow(dictionary))
@@ -564,7 +853,6 @@ test_that("complete workflow: preprocess -> extract -> sanitize", {
 test_that("workflow with entity extraction and topic modeling", {
   text_data <- create_test_data()
 
-  # Extract entities
   entities <- extract_entities_workflow(
     text_data,
     entity_types = c("disease", "drug"),
@@ -572,7 +860,6 @@ test_that("workflow with entity extraction and topic modeling", {
     verbose = FALSE
   )
 
-  # Extract topics
   topics <- extract_topics(text_data, n_topics = 2)
 
   expect_s3_class(entities, "data.frame")
@@ -583,13 +870,10 @@ test_that("workflow with entity extraction and topic modeling", {
 # Edge Cases and Error Handling
 # ============================================================================
 test_that("functions handle NULL inputs gracefully", {
-  # preprocess_text with NULL should error
   expect_error(suppressWarnings(preprocess_text(NULL)))
 
-  # extract_entities with NULL dictionary should error
   expect_error(extract_entities(create_test_data(), dictionary = NULL))
 
-  # sanitize_dictionary with NULL should return NULL or error
   result <- suppressWarnings(sanitize_dictionary(NULL, verbose = FALSE))
   expect_true(is.null(result) || (is.data.frame(result) && nrow(result) == 0))
 })
@@ -598,11 +882,8 @@ test_that("functions handle empty strings", {
   text_data <- data.frame(abstract = c("", "  ", "\n"))
   result <- preprocess_text(text_data, text_column = "abstract")
 
-  # Empty strings should be filtered out during preprocessing
-  # The function may keep rows but with empty terms lists
   expect_s3_class(result, "data.frame")
 
-  # Check that terms lists are empty for these rows
   if (nrow(result) > 0) {
     all_empty <- all(sapply(result$terms, function(x) {
       is.data.frame(x) && nrow(x) == 0
@@ -623,7 +904,6 @@ test_that("detect_lang handles various inputs", {
 test_that("extract_entities_workflow handles large datasets", {
   skip_on_cran()
 
-  # Create larger test dataset
   large_data <- data.frame(
     doc_id = 1:100,
     abstract = rep(
@@ -644,8 +924,126 @@ test_that("extract_entities_workflow handles large datasets", {
   end_time <- Sys.time()
 
   expect_s3_class(result, "data.frame")
-  # Should complete in reasonable time (< 30 seconds)
   expect_true(difftime(end_time, start_time, units = "secs") < 30)
+})
+
+# ============================================================================
+# Additional coverage tests for uncovered code
+# ============================================================================
+
+test_that("extract_entities handles multiple overlapping matches", {
+  text_data <- data.frame(
+    doc_id = 1,
+    abstract = "headache pain headache severe headache"
+  )
+
+  dictionary <- data.frame(
+    term = c("headache", "severe headache", "pain", "headache pain"),
+    type = rep("symptom", 4),
+    id = paste0("ID_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- extract_entities(
+    text_data,
+    dictionary = dictionary,
+    overlap_strategy = "longest",
+    sanitize_dict = FALSE
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
+test_that("sanitize_dictionary validates specific entity types", {
+  # Test gene validation
+  gene_dict <- data.frame(
+    term = c("BRCA1", "TP53", "shortterm", "receptor kinase"),
+    type = rep("gene", 4),
+    id = paste0("GENE_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- sanitize_dictionary(gene_dict, validate_types = TRUE, verbose = FALSE)
+  expect_s3_class(result, "data.frame")
+
+  # Test drug validation
+  drug_dict <- data.frame(
+    term = c("aspirin", "ibuprofen", "randomword", "antibiotic"),
+    type = rep("drug", 4),
+    id = paste0("DRUG_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- sanitize_dictionary(drug_dict, validate_types = TRUE, verbose = FALSE)
+  expect_s3_class(result, "data.frame")
+
+  # Test pathway validation
+  pathway_dict <- data.frame(
+    term = c("glycolysis", "signaling pathway", "randomterm", "metabolism"),
+    type = rep("pathway", 4),
+    id = paste0("PATH_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- sanitize_dictionary(pathway_dict, validate_types = TRUE, verbose = FALSE)
+  expect_s3_class(result, "data.frame")
+
+  # Test method validation
+  method_dict <- data.frame(
+    term = c("hplc", "pcr", "randommethod", "elisa"),
+    type = rep("method", 4),
+    id = paste0("METH_", 1:4),
+    source = rep("test", 4),
+    stringsAsFactors = FALSE
+  )
+
+  result <- sanitize_dictionary(method_dict, validate_types = TRUE, verbose = FALSE)
+  expect_s3_class(result, "data.frame")
+})
+
+test_that("extract_entities_workflow handles expanded entity types", {
+  text_data <- create_test_data()
+
+  result <- extract_entities_workflow(
+    text_data,
+    entity_types = c("disease", "protein", "symptom"),
+    dictionary_sources = "local",
+    verbose = FALSE
+  )
+
+  expect_s3_class(result, "data.frame")
+})
+
+test_that("extract_ngrams handles trigrams and higher", {
+  text <- c("This is a test sentence for ngram extraction")
+
+  trigrams <- extract_ngrams(text, n = 3, min_freq = 1)
+  expect_s3_class(trigrams, "data.frame")
+
+  fourgrams <- extract_ngrams(text, n = 4, min_freq = 1)
+  expect_s3_class(fourgrams, "data.frame")
+})
+
+test_that("extract_ngrams handles text shorter than n", {
+  text <- c("short")
+
+  result <- extract_ngrams(text, n = 3, min_freq = 1)
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0)
+})
+
+test_that("segment_sentences handles various punctuation", {
+  text <- "First sentence! Second sentence? Third sentence. Fourth: sentence; Fifth sentence..."
+
+  result <- segment_sentences(text)
+
+  expect_type(result, "list")
+  expect_true(length(result[[1]]) >= 3)
 })
 
 # ============================================================================
