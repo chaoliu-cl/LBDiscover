@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Getting Started with Literature-Based Discovery</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-09-30</h4>
+            <h4 data-toc-skip class="date">2025-10-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Intro_to_Literature-Based_Discovery.Rmd" class="external-link"><code>vignettes/Intro_to_Literature-Based_Discovery.Rmd</code></a></small>
       <div class="d-none name"><code>Intro_to_Literature-Based_Discovery.Rmd</code></div>
@@ -268,7 +268,7 @@ treatment.</p>
 <span>  <span class="va">standard_entities</span>,</span>
 <span>  <span class="va">primary_term</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Combined 6303 custom entities with 6993 standard entities.</span></span>
+<span><span class="co">#&gt; Combined 6303 custom entities with 6001 standard entities.</span></span>
 <span></span>
 <span><span class="co"># Filter entities to ensure only relevant biomedical terms are included</span></span>
 <span><span class="va">filtered_entities</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/valid_entities.html">valid_entities</a></span><span class="op">(</span></span>
@@ -277,7 +277,7 @@ treatment.</p>
 <span>  <span class="va">primary_term_variations</span>,</span>
 <span>  validation_function <span class="op">=</span> <span class="va">is_valid_biomedical_entity</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Filtered from 7376 to 7376 validated entities</span></span>
+<span><span class="co">#&gt; Filtered from 6384 to 6384 validated entities</span></span>
 <span></span>
 <span><span class="co"># View the first few extracted entities</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">filtered_entities</span><span class="op">)</span></span>
@@ -326,7 +326,7 @@ treatment.</p>
 <span></span>
 <span><span class="co"># Check matrix dimensions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 13 13</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 11 11</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="apply-the-improved-abc-model">9. Apply the improved ABC model<a class="anchor" aria-label="anchor" href="#apply-the-improved-abc-model"></a>
@@ -348,11 +348,8 @@ treatment.</p>
 <span>  similarity_threshold <span class="op">=</span> <span class="fl">0.7</span>,    <span class="co"># Relatively strict similarity threshold</span></span>
 <span>  enforce_strict_typing <span class="op">=</span> <span class="cn">TRUE</span>   <span class="co"># Enable strict entity type validation</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Filtered 8 B terms (72.7%) that weren't valid biomedical entities</span></span>
-<span><span class="co">#&gt; Filtered 2 B terms that didn't match specified entity types: protein, gene, pathway, chemical</span></span>
-<span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.7)</span></span>
-<span><span class="co">#&gt; Filtered 9 potential C terms that weren't valid biomedical entities</span></span>
-<span><span class="co">#&gt; No potential C terms found matching the specified entity types: drug, chemical, protein, gene</span></span>
+<span><span class="co">#&gt; Filtered 8 B terms (100%) that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; No suitable B terms found with association score &gt; 0.001 after filtering</span></span>
 <span></span>
 <span><span class="co"># If we don't have enough results, try with less stringent criteria</span></span>
 <span><span class="va">min_desired_results</span> <span class="op">&lt;-</span> <span class="fl">10</span></span>
@@ -374,11 +371,11 @@ treatment.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Not enough results with strict filtering. Trying with less stringent criteria...</span></span>
-<span><span class="co">#&gt; Filtered 8 B terms (72.7%) that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; Filtered 8 B terms (88.9%) that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.8)</span></span>
 <span><span class="co">#&gt; Filtered 9 potential C terms that weren't valid biomedical entities</span></span>
-<span><span class="co">#&gt; Identifying potential C terms via 3 B terms...</span></span>
-<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======================                                               |  33%  |                                                                              |===============================================                       |  67%  |                                                                              |======================================================================| 100%</span></span>
+<span><span class="co">#&gt; Identifying potential C terms via 1 B terms...</span></span>
+<span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%</span></span>
 <span><span class="co">#&gt; No ABC connections found</span></span>
 <span></span>
 <span><span class="co"># Check if we have results and what columns are available</span></span>
