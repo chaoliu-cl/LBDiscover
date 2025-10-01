@@ -109,12 +109,12 @@ create_comat <- function(entity_data,
   # Set diagonal to zero (entities don't co-occur with themselves)
   diag(co_matrix) <- 0
 
+  # Get the frequency of each entity (MOVED OUTSIDE normalization block)
+  entity_freq <- Matrix::diag(Matrix::t(dtm) %*% dtm)
+
   # Normalize if requested
   if (normalize) {
     message("Normalizing co-occurrence matrix using ", normalization_method, " method...")
-
-    # Get the frequency of each entity
-    entity_freq <- Matrix::diag(Matrix::t(dtm) %*% dtm)
 
     if (normalization_method == "cosine") {
       # Cosine normalization: co_ij / sqrt(freq_i * freq_j)

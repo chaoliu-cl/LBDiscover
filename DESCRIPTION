@@ -47,6 +47,7 @@ Suggests:
     testthat (>= 3.0.0),
     mockery,
     covr,
+    withr,
     htmltools
 VignetteBuilder: knitr
 Config/testthat/edition: 3

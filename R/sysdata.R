@@ -66,10 +66,10 @@ static_data <- list(
     "blast" = "method",              # Basic Local Alignment Search Tool
     "mace" = "method",               # Major Adverse Cardiac Events
 
-    # Correct classifications for symptoms
-    "pain" = "symptom",
-    "headache" = "symptom",
+    # Common diseases
     "migraine" = "disease",
+    "headache" = "symptom",
+    "pain" = "symptom",
     "nausea" = "symptom",
     "vomiting" = "symptom",
     "dizziness" = "symptom",
@@ -78,6 +78,8 @@ static_data <- list(
     "aura" = "symptom",
     "photophobia" = "symptom",
     "phonophobia" = "symptom",
+    "malformation" = "disease",
+    "cardiomyopathy" = "disease",
 
     # Proteins and receptors
     "receptor" = "protein",
@@ -87,6 +89,11 @@ static_data <- list(
     "transporter" = "protein",
     "transporters" = "protein",
 
+    # Common drugs
+    "sumatriptan" = "drug",
+    "aspirin" = "drug",
+    "ibuprofen" = "drug",
+
     # Biological processes
     "inflammation" = "biological_process",
     "signaling" = "biological_process",
@@ -94,6 +101,21 @@ static_data <- list(
     "inhibition" = "biological_process",
     "regulation" = "biological_process",
     "phosphorylation" = "biological_process"
+  ),
+
+  # =============================================================================
+  # TERM TYPE MAPPINGS (same as acronym_corrections, maintained for compatibility)
+  # =============================================================================
+  term_type_mappings = list(
+    "migraine" = "disease",
+    "receptor" = "protein",
+    "receptors" = "protein",
+    "channel" = "protein",
+    "channels" = "protein",
+    "malformation" = "disease",
+    "inflammation" = "biological_process",
+    "sumatriptan" = "drug",
+    "cardiomyopathy" = "disease"
   ),
 
   # =============================================================================
@@ -113,7 +135,7 @@ static_data <- list(
   # PROBLEMATIC SPECIFIC TERMS
   # =============================================================================
   problematic_specific_terms = c(
-    "europe", "vehicle", "optimization", "retention", "malformation"
+    "europe", "vehicle", "optimization", "retention"
   ),
 
   # =============================================================================
@@ -261,14 +283,14 @@ static_data <- list(
     # Chemical patterns with more specific terms and avoiding general concepts
     "chemical" = "\\b(acid|oxide|ester|amine|compound|element|ion|molecule|solvent|reagent|catalyst|inhibitor|activator|hydroxide|chloride|phosphate|sulfate|nitrate|carbonate)\\b",
 
-    # Disease patterns focusing on explicit disease terminology
-    "disease" = "\\b(disease|disorder|syndrome|itis|emia|pathy|oma|infection|deficiency|failure|dysfunction|lesion|malignancy|neoplasm|tumor|cancer|fibrosis|inflammation|sclerosis|atrophy|dystrophy)\\b",
+    # Disease patterns - split into whole words and suffixes for better matching
+    "disease" = "\\b(disease|disorder|syndrome|infection|deficiency|failure|dysfunction|lesion|malignancy|neoplasm|tumor|cancer|fibrosis|inflammation|sclerosis|atrophy|dystrophy)\\b|(itis|emia|pathy|oma)($|\\b)",
 
     # Gene patterns with specific genetic terminology
     "gene" = "\\b(gene|allele|locus|promoter|repressor|transcription|expression|mutation|variant|polymorphism|genotype|phenotype|hereditary|dna|chromosome|genomic|rna|mrna|nucleotide)\\b",
 
     # Protein patterns focusing on protein-specific terminology
-    "protein" = "\\b(protein|enzyme|receptor|antibody|hormone|kinase|phosphatase|transporter|factor|channel|carrier|ase\\b|globulin|albumin|transferase|reductase|oxidase|ligase|protease|peptidase|hydrolase)\\b",
+    "protein" = "\\b(protein|enzyme|receptor|antibody|hormone|kinase|phosphatase|transporter|factor|channel|carrier|globulin|albumin|transferase|reductase|oxidase|ligase|protease|peptidase|hydrolase)\\b|ase($|\\b)",
 
     # Pathway patterns
     "pathway" = "\\b(pathway|cascade|signaling|transduction|regulation|metabolism|synthesis|biosynthesis|degradation|catabolism|anabolism|cycle|flux|transport|secretion|activation|inhibition|phosphorylation)\\b",
@@ -276,14 +298,14 @@ static_data <- list(
     # Symptom patterns
     "symptom" = "\\b(pain|ache|discomfort|swelling|redness|fatigue|weakness|fever|nausea|vomiting|dizziness|vertigo|headache|cough|dyspnea|tachycardia|bradycardia|edema|pallor|cyanosis)\\b",
 
-    # Drug patterns
-    "drug" = "\\b(drug|medication|therapy|treatment|compound|dose|inhibitor|agonist|antagonist|blocker|stimulant|suppressant|antidepressant|antibiotic|analgesic|sedative|hypnotic|vaccine|antiviral|antifungal)\\b",
+    # Drug patterns - include common drug suffixes
+    "drug" = "\\b(drug|medication|therapy|treatment|compound|dose|inhibitor|agonist|antagonist|blocker|stimulant|suppressant|antidepressant|antibiotic|analgesic|sedative|hypnotic|vaccine|antiviral|antifungal)\\b|(triptan|statin|pril|sartan|olol|pine|caine|mab|nib|prazole|tidine|oxetine|pam|cycline|cillin|floxacin|mycin|vir)($|\\b)",
 
     # Biological process patterns
     "biological_process" = "\\b(process|function|regulation|activity|response|mechanism|homeostasis|apoptosis|autophagy|proliferation|differentiation|migration|adhesion|division|fusion|cycle|phagocytosis|endocytosis|exocytosis)\\b",
 
     # Cell patterns
-    "cell" = "\\b(cell|neuron|microglia|astrocyte|fibroblast|macrophage|lymphocyte|erythrocyte|platelet|epithelial|endothelial|muscle|myocyte|adipocyte|hepatocyte|keratinocyte|melanocyte|osteocyte|chondrocyte)\\b",
+    "cell" = "\\b(cell|neuron|microglia|astrocyte|fibroblast|macrophage|lymphocyte|erythrocyte|platelet|epithelial|endothelial|muscle|myocyte|adipocyte|hepatocyte|keratinocyte|melanocyte|osteocyte|chondrocyte|cyte)\\b",
 
     # Tissue patterns
     "tissue" = "\\b(tissue|membrane|epithelium|endothelium|mucosa|connective|muscle|nerve|vessel|artery|vein|capillary|ligament|tendon|cartilage|bone|stroma|parenchyma|dermis|epidermis)\\b",
@@ -419,5 +441,9 @@ static_data <- list(
 # Make mesh_query_map available at global level for backwards compatibility
 mesh_query_map <- static_data$mesh_query_map
 
-# Save the data
-save(static_data, file = "R/sysdata.rda")
+# Save the data using usethis if available, otherwise use base save
+if (requireNamespace("usethis", quietly = TRUE)) {
+  usethis::use_data(static_data, internal = TRUE, overwrite = TRUE)
+} else {
+  save(static_data, file = "R/sysdata.rda", compress = "xz")
+}

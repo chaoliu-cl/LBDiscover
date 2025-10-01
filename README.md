@@ -15,8 +15,7 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 [![License: GPL
 v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![R-CMD-check](https://github.com/chaoliu-cl/LBDiscover/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/chaoliu-cl/LBDiscover/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/chaoliu-cl/LBDiscover/graph/badge.svg)](https://app.codecov.io/gh/chaoliu-cl/LBDiscover)
+[![codecov](https://codecov.io/gh/chaoliu-cl/LBDiscover/branch/main/graph/badge.svg)](https://codecov.io/gh/chaoliu-cl/LBDiscover)
 <!-- badges: end -->
 
 ## Overview

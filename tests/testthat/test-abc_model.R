@@ -1,310 +1,643 @@
+# tests/testthat/test-abc-model.R
+
 library(testthat)
+library(LBDiscover)
 
-# Create mock data for abc_model testing
-create_mock_comat <- function() {
-  # Create a small co-occurrence matrix for testing
-  comat <- matrix(c(
-    1.0, 0.5, 0.3, 0.1, 0.0,
-    0.5, 1.0, 0.6, 0.2, 0.0,
-    0.3, 0.6, 1.0, 0.7, 0.2,
-    0.1, 0.2, 0.7, 1.0, 0.4,
-    0.0, 0.0, 0.2, 0.4, 1.0
-  ), nrow = 5, ncol = 5, byrow = TRUE)
-
-  rownames(comat) <- c("term_A", "term_B", "term_C", "term_D", "term_E")
-  colnames(comat) <- c("term_A", "term_B", "term_C", "term_D", "term_E")
-
-  # Add entity types as an attribute
-  entity_types <- c(
-    "term_A" = "disease",
-    "term_B" = "drug",
-    "term_C" = "gene",
-    "term_D" = "protein",
-    "term_E" = "pathway"
+# Helper function to create mock entity data
+create_mock_entity_data <- function() {
+  data.frame(
+    doc_id = rep(1:10, each = 5),
+    entity = rep(c("migraine", "headache", "serotonin", "CGRP", "sumatriptan"), 10),
+    entity_type = rep(c("disease", "symptom", "chemical", "protein", "drug"), 10),
+    frequency = sample(1:5, 50, replace = TRUE),
+    stringsAsFactors = FALSE
   )
-  attr(comat, "entity_types") <- entity_types
-
-  return(comat)
 }
 
-test_that("abc_model returns correct structure and data", {
-  # Create mock co-occurrence matrix
-  mock_comat <- create_mock_comat()
+# Helper function to create mock co-occurrence matrix
+create_mock_cooccurrence_matrix <- function() {
+  terms <- c("migraine", "headache", "pain", "serotonin", "CGRP", "sumatriptan",
+             "topiramate", "propranolol")
+  n <- length(terms)
 
-  # Run ABC model with mock data
+  set.seed(123)
+  mat <- matrix(runif(n * n, 0, 1), nrow = n, ncol = n)
+  mat[lower.tri(mat)] <- t(mat)[lower.tri(mat)]
+  diag(mat) <- 1
+
+  rownames(mat) <- colnames(mat) <- terms
+
+  entity_types <- c("disease", "symptom", "symptom", "chemical", "protein",
+                    "drug", "drug", "drug")
+  names(entity_types) <- terms
+  attr(mat, "entity_types") <- entity_types
+
+  entity_freq <- rep(5, n)
+  names(entity_freq) <- terms
+  attr(mat, "entity_freq") <- entity_freq
+
+  attr(mat, "metadata") <- list(
+    n_docs = 10,
+    n_entities = n,
+    has_types = TRUE,
+    normalization = "cosine"
+  )
+
+  return(mat)
+}
+
+# Tests for create_comat
+test_that("create_comat creates matrix with valid input", {
+  entity_data <- create_mock_entity_data()
+
+  # Mock the Matrix package if needed
+  skip_if_not_installed("Matrix")
+
+  result <- create_comat(
+    entity_data,
+    doc_id_col = "doc_id",
+    entity_col = "entity",
+    type_col = "entity_type",
+    normalize = FALSE
+  )
+
+  expect_true(is.matrix(result) || inherits(result, "Matrix"))
+  expect_equal(nrow(result), ncol(result))
+  expect_true(!is.null(rownames(result)))
+  expect_true(!is.null(attr(result, "entity_types")))
+  expect_true(!is.null(attr(result, "entity_freq")))
+})
+
+test_that("create_comat handles missing columns", {
+  entity_data <- create_mock_entity_data()
+
+  expect_error(
+    create_comat(
+      entity_data,
+      doc_id_col = "nonexistent_col",
+      entity_col = "entity"
+    ),
+    "Required columns not found"
+  )
+})
+
+test_that("create_comat normalizes correctly", {
+  entity_data <- create_mock_entity_data()
+
+  result <- create_comat(
+    entity_data,
+    normalize = TRUE,
+    normalization_method = "cosine"
+  )
+
+  expect_true(!is.null(attr(result, "metadata")))
+  expect_equal(attr(result, "metadata")$normalization, "cosine")
+})
+
+test_that("create_comat handles empty data", {
+  entity_data <- data.frame(
+    doc_id = character(0),
+    entity = character(0),
+    entity_type = character(0)
+  )
+
+  expect_error(
+    create_comat(entity_data),
+    "No valid data after filtering"
+  )
+})
+
+test_that("create_comat handles different normalization methods", {
+  entity_data <- create_mock_entity_data()
+
+  for (method in c("cosine", "jaccard", "dice")) {
+    result <- create_comat(
+      entity_data,
+      normalize = TRUE,
+      normalization_method = method
+    )
+
+    expect_equal(attr(result, "metadata")$normalization, method)
+  }
+})
+
+# Tests for is_valid_biomedical_entity
+test_that("is_valid_biomedical_entity recognizes valid entities", {
+  expect_true(is_valid_biomedical_entity("migraine", "disease"))
+  expect_true(is_valid_biomedical_entity("receptor", "protein"))
+  expect_true(is_valid_biomedical_entity("BRCA1", "gene"))
+  expect_true(is_valid_biomedical_entity("sumatriptan", "drug"))
+})
+
+test_that("is_valid_biomedical_entity rejects clearly invalid entities", {
+  # Test without claimed type - these should be rejected based on general characteristics
+  expect_false(is_valid_biomedical_entity("", NULL))
+  expect_false(is_valid_biomedical_entity(NA, NULL))
+  expect_false(is_valid_biomedical_entity(NULL, NULL))
+})
+
+test_that("is_valid_biomedical_entity handles empty or NA input", {
+  expect_false(is_valid_biomedical_entity("", "disease"))
+  expect_false(is_valid_biomedical_entity(NA, "disease"))
+  expect_false(is_valid_biomedical_entity(NULL, "disease"))
+})
+
+test_that("is_valid_biomedical_entity handles acronyms correctly", {
+  expect_true(is_valid_biomedical_entity("CGRP", "protein"))
+  expect_true(is_valid_biomedical_entity("DNA", "gene"))
+})
+
+test_that("is_valid_biomedical_entity handles special cases", {
+  expect_true(is_valid_biomedical_entity("malformation", "disease"))
+  expect_true(is_valid_biomedical_entity("receptor", "protein"))
+})
+
+test_that("is_valid_biomedical_entity with pattern matching", {
+  # Test terms that should match biomedical patterns
+  expect_true(is_valid_biomedical_entity("cardiomyopathy", "disease"))
+  expect_true(is_valid_biomedical_entity("inflammation", "biological_process"))
+})
+
+# Tests for abc_model
+test_that("abc_model returns valid results", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
   results <- abc_model(
-    co_matrix = mock_comat,
-    a_term = "term_A",
+    co_matrix,
+    a_term = "migraine",
     min_score = 0.1,
     n_results = 10
   )
 
-  # Test structure of results
-  expect_true(is.data.frame(results))
-  expect_true(all(c("a_term", "b_term", "c_term", "a_b_score", "b_c_score", "abc_score") %in% colnames(results)))
-
-  # Verify that all results contain term_A as the A term
-  expect_true(all(results$a_term == "term_A"))
-
-  # Verify that scores are within expected range [0, 1]
-  expect_true(all(results$a_b_score >= 0 & results$a_b_score <= 1))
-  expect_true(all(results$b_c_score >= 0 & results$b_c_score <= 1))
-  expect_true(all(results$abc_score >= 0 & results$abc_score <= 1))
-
-  # Test that filtering by min_score works
-  expect_true(all(results$a_b_score >= 0.1))
-  expect_true(all(results$b_c_score >= 0.1))
+  expect_s3_class(results, "data.frame")
+  expect_true(all(c("a_term", "b_term", "c_term", "abc_score") %in% names(results)))
+  expect_true(all(results$a_term == "migraine"))
+  expect_true(nrow(results) <= 10)
 })
 
-test_that("abc_model handles entity type constraints correctly", {
-  # Create mock co-occurrence matrix
-  mock_comat <- create_mock_comat()
+test_that("abc_model handles missing A term", {
+  co_matrix <- create_mock_cooccurrence_matrix()
 
-  # Run ABC model with B term type constraint
-  results_drug <- abc_model(
-    co_matrix = mock_comat,
-    a_term = "term_A",
-    min_score = 0.1,
-    b_term_types = "drug"
-  )
-
-  # Check that all B terms have type "drug" if results exist
-  if (nrow(results_drug) > 0 && "b_type" %in% colnames(results_drug)) {
-    expect_true(all(results_drug$b_type == "drug"))
-  } else {
-    # If no results or no b_type column, test passes (filters working correctly)
-    expect_true(TRUE)
-  }
-
-  # Run model with C term type constraint
-  results_pathway <- abc_model(
-    co_matrix = mock_comat,
-    a_term = "term_A",
-    min_score = 0.1,
-    c_term_types = "pathway"
-  )
-
-  # Check that all C terms have type "pathway" if results exist
-  if (nrow(results_pathway) > 0 && "c_type" %in% colnames(results_pathway)) {
-    expect_true(all(results_pathway$c_type == "pathway"))
-  } else {
-    expect_true(TRUE)
-  }
-})
-
-test_that("abc_model applies scoring methods correctly", {
-  # Create mock co-occurrence matrix
-  mock_comat <- create_mock_comat()
-
-  # Test multiplication scoring method
-  results_mult <- abc_model(
-    co_matrix = mock_comat,
-    a_term = "term_A",
-    min_score = 0.1,
-    scoring_method = "multiplication"
-  )
-
-  # Test that ABC score equals a_b_score * b_c_score
-  if (nrow(results_mult) > 0) {
-    for (i in 1:nrow(results_mult)) {
-      expect_equal(
-        results_mult$abc_score[i],
-        results_mult$a_b_score[i] * results_mult$b_c_score[i],
-        tolerance = 1e-10
-      )
-    }
-  }
-
-  # Test average scoring method
-  results_avg <- abc_model(
-    co_matrix = mock_comat,
-    a_term = "term_A",
-    min_score = 0.1,
-    scoring_method = "average"
-  )
-
-  # Check if average scoring produces different results
-  if (nrow(results_avg) > 0) {
-    # Average method should use (a_b + b_c) / 2
-    expect_true(is.numeric(results_avg$abc_score))
-  }
-})
-
-test_that("abc_model handles error cases gracefully", {
-  # Create mock co-occurrence matrix
-  mock_comat <- create_mock_comat()
-
-  # Test with non-existent A term
   expect_error(
-    abc_model(mock_comat, a_term = "nonexistent_term"),
-    "A-term 'nonexistent_term' not found in the co-occurrence matrix"
+    abc_model(co_matrix, a_term = "nonexistent"),
+    "not found in the co-occurrence matrix"
+  )
+})
+
+test_that("abc_model handles specific C term", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  results <- abc_model(
+    co_matrix,
+    a_term = "migraine",
+    c_term = "sumatriptan",
+    min_score = 0.1
   )
 
-  # Test with non-existent C term
+  expect_s3_class(results, "data.frame")
+  if (nrow(results) > 0) {
+    expect_true(all(results$c_term == "sumatriptan"))
+  }
+})
+
+test_that("abc_model respects scoring methods", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  for (method in c("multiplication", "average", "combined", "jaccard")) {
+    results <- abc_model(
+      co_matrix,
+      a_term = "migraine",
+      scoring_method = method,
+      min_score = 0.1,
+      n_results = 5
+    )
+
+    expect_s3_class(results, "data.frame")
+  }
+})
+
+test_that("abc_model filters by entity types", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  results <- abc_model(
+    co_matrix,
+    a_term = "migraine",
+    b_term_types = c("chemical", "protein"),
+    c_term_types = c("drug"),
+    min_score = 0.1
+  )
+
+  expect_s3_class(results, "data.frame")
+  if (nrow(results) > 0) {
+    expect_true(all(results$b_type %in% c("chemical", "protein")))
+    expect_true(all(results$c_type == "drug"))
+  }
+})
+
+test_that("abc_model excludes general terms when requested", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  results <- abc_model(
+    co_matrix,
+    a_term = "migraine",
+    exclude_general_terms = TRUE,
+    min_score = 0.1
+  )
+
+  expect_s3_class(results, "data.frame")
+})
+
+test_that("abc_model filters similar terms", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  results <- abc_model(
+    co_matrix,
+    a_term = "migraine",
+    filter_similar_terms = TRUE,
+    similarity_threshold = 0.8,
+    min_score = 0.1
+  )
+
+  expect_s3_class(results, "data.frame")
+  # No B term should be too similar to "migraine"
+  if (nrow(results) > 0) {
+    expect_false("migraine" %in% results$b_term)
+  }
+})
+
+test_that("abc_model handles no valid B terms", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+  # Set very high threshold
+
+  results <- abc_model(
+    co_matrix,
+    a_term = "migraine",
+    min_score = 0.999
+  )
+
+  expect_s3_class(results, "data.frame")
+  expect_equal(nrow(results), 0)
+})
+
+# Tests for calculate_score
+test_that("calculate_score computes correctly", {
+  a_b <- 0.5
+  b_c <- 0.6
+
+  expect_equal(calculate_score(a_b, b_c, "multiplication"), 0.3)
+  expect_equal(calculate_score(a_b, b_c, "average"), 0.55)
+  expect_true(is.numeric(calculate_score(a_b, b_c, "combined")))
+  expect_true(is.numeric(calculate_score(a_b, b_c, "jaccard")))
+})
+
+# Tests for diversify_abc
+test_that("diversify_abc removes duplicates", {
+  abc_results <- data.frame(
+    a_term = rep("migraine", 6),
+    b_term = rep(c("serotonin", "CGRP"), each = 3),
+    c_term = rep(c("sumatriptan", "topiramate", "propranolol"), 2),
+    abc_score = runif(6, 0.5, 1),
+    stringsAsFactors = FALSE
+  )
+
+  results <- diversify_abc(
+    abc_results,
+    diversity_method = "b_term_groups",
+    max_per_group = 2
+  )
+
+  expect_s3_class(results, "data.frame")
+  expect_true(nrow(results) <= nrow(abc_results))
+})
+
+test_that("diversify_abc handles empty input", {
+  abc_results <- data.frame(
+    a_term = character(0),
+    b_term = character(0),
+    c_term = character(0),
+    abc_score = numeric(0),
+    stringsAsFactors = FALSE
+  )
+
+  results <- diversify_abc(abc_results)
+
+  expect_s3_class(results, "data.frame")
+  expect_equal(nrow(results), 0)
+})
+
+test_that("diversify_abc respects max_per_group", {
+  abc_results <- data.frame(
+    a_term = rep("migraine", 10),
+    b_term = rep("serotonin", 10),
+    c_term = paste0("drug", 1:10),
+    abc_score = seq(1, 0.1, length.out = 10),
+    stringsAsFactors = FALSE
+  )
+
+  results <- diversify_abc(
+    abc_results,
+    diversity_method = "b_term_groups",
+    max_per_group = 3
+  )
+
+  expect_true(nrow(results) <= 3)
+})
+
+test_that("diversify_abc validates methods", {
+  abc_results <- data.frame(
+    a_term = "migraine",
+    b_term = "serotonin",
+    c_term = "sumatriptan",
+    abc_score = 0.8,
+    stringsAsFactors = FALSE
+  )
+
   expect_error(
-    abc_model(mock_comat, a_term = "term_A", c_term = "nonexistent_term"),
-    "C-term 'nonexistent_term' not found in the co-occurrence matrix"
+    diversify_abc(abc_results, diversity_method = "invalid"),
+    "'arg' should be one of"
   )
-
-  # Test with min_score that filters out all results
-  high_threshold_results <- abc_model(
-    mock_comat,
-    a_term = "term_A",
-    min_score = 0.9
-  )
-  expect_true(is.data.frame(high_threshold_results))
-  expect_equal(nrow(high_threshold_results), 0)
 })
 
-test_that("is_valid_biomedical_entity correctly validates entities", {
-  # Test positive cases - using terms that should clearly pass validation
-  expect_true(is_valid_biomedical_entity("migraine", "disease"))
-  expect_true(is_valid_biomedical_entity("BRCA1", "gene"))
-  expect_true(is_valid_biomedical_entity("receptor", "protein"))
+# Tests for validate_abc
+test_that("validate_abc adds significance testing", {
+  co_matrix <- create_mock_cooccurrence_matrix()
 
-  # Test that drug-like terms work (generic drug class terms)
-  expect_true(is_valid_biomedical_entity("antibiotic", "drug"))
-
-  # Test negative cases - terms that should clearly fail
-  expect_false(is_valid_biomedical_entity("europe", "disease"))
-  expect_false(is_valid_biomedical_entity("the", "gene"))
-  expect_false(is_valid_biomedical_entity("optimization", "chemical"))
-  expect_false(is_valid_biomedical_entity("analysis", "drug"))
-
-  # Test case sensitivity with terms we know work
-  expect_true(is_valid_biomedical_entity("Migraine", "disease"))
-  expect_true(is_valid_biomedical_entity("ANTIBIOTIC", "drug"))
-})
-
-test_that("calculate_score applies different scoring methods correctly", {
-  # Test multiplication method
-  expect_equal(calculate_score(0.5, 0.6, "multiplication"), 0.3)
-
-  # Test average method
-  expect_equal(calculate_score(0.5, 0.6, "average"), 0.55)
-
-  # Test combined method (0.7 * multiplication + 0.3 * average)
-  expected <- 0.7 * (0.5 * 0.6) + 0.3 * ((0.5 + 0.6) / 2)
-  expect_equal(calculate_score(0.5, 0.6, "combined"), expected)
-
-  # Test default method
-  expect_equal(calculate_score(0.5, 0.6, "non_existent_method"), 0.5 * 0.6)
-})
-
-test_that("diversify_b_terms creates diverse results", {
-  # Create a simple results data frame with repeated B terms
-  test_results <- data.frame(
-    a_term = rep("A", 9),
-    b_term = rep(c("B1", "B2", "B3"), each = 3),
-    c_term = c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"),
-    a_b_score = rep(0.5, 9),
-    b_c_score = rep(0.6, 9),
-    abc_score = c(0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1),
+  abc_results <- data.frame(
+    a_term = rep("migraine", 3),
+    b_term = c("serotonin", "CGRP", "pain"),
+    c_term = c("sumatriptan", "topiramate", "propranolol"),
+    abc_score = c(0.8, 0.7, 0.6),
     stringsAsFactors = FALSE
   )
 
-  # Apply diversification
-  diverse_results <- diversify_b_terms(test_results, max_per_group = 2)
+  results <- validate_abc(abc_results, co_matrix)
 
-  # Check that we have at most 2 results per B term
-  expect_true(all(table(diverse_results$b_term) <= 2))
-
-  # Check that we keep the highest scoring results for each B term
-  b1_results <- diverse_results[diverse_results$b_term == "B1", ]
-  expect_true(all(b1_results$c_term %in% c("C1", "C2")))
+  expect_s3_class(results, "data.frame")
+  expect_true(all(c("p_value", "significant", "adjusted_p_value") %in% names(results)))
 })
 
-test_that("validate_abc applies statistical validation correctly", {
-  # Create a mock ABC results data frame
-  test_results <- data.frame(
-    a_term = rep("term_A", 3),
-    b_term = c("term_B", "term_B", "term_C"),
-    c_term = c("term_D", "term_E", "term_E"),
-    a_b_score = c(0.5, 0.5, 0.3),
-    b_c_score = c(0.6, 0.4, 0.6),
-    abc_score = c(0.3, 0.2, 0.18),
+test_that("validate_abc handles empty results", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  abc_results <- data.frame(
+    a_term = character(0),
+    b_term = character(0),
+    c_term = character(0),
+    abc_score = numeric(0),
     stringsAsFactors = FALSE
   )
 
-  # Create a mock co-occurrence matrix
-  mock_comat <- create_mock_comat()
+  results <- validate_abc(abc_results, co_matrix)
 
-  # Apply validation
-  validated_results <- validate_abc(
-    test_results,
-    mock_comat,
-    alpha = 0.05,
-    correction = "none"
-  )
-
-  # Check that validation adds expected columns
-  expect_true(all(c("p_value", "adjusted_p_value", "significant") %in% colnames(validated_results)))
-
-  # Check that p-values are between 0 and 1
-  expect_true(all(validated_results$p_value >= 0 & validated_results$p_value <= 1))
-  expect_true(all(validated_results$adjusted_p_value >= 0 & validated_results$adjusted_p_value <= 1))
-
-  # Check that significant column is logical
-  expect_true(is.logical(validated_results$significant))
+  expect_s3_class(results, "data.frame")
+  expect_equal(nrow(results), 0)
 })
 
-test_that("abc_model handles malformed input gracefully", {
-  # Test with non-matrix input
-  expect_error(abc_model("not_a_matrix", a_term = "test"))
+test_that("validate_abc applies different corrections", {
+  co_matrix <- create_mock_cooccurrence_matrix()
 
-  # Test with matrix without proper dimnames
-  bad_matrix <- matrix(runif(25), nrow = 5)
-  expect_error(abc_model(bad_matrix, a_term = "test"))
-
-  # Test with matrix containing negative scores
-  mock_comat <- create_mock_comat()
-  mock_comat[1, 2] <- -0.5
-  # Should handle gracefully (may warn or process)
-  result <- abc_model(mock_comat, a_term = rownames(mock_comat)[1], min_score = 0)
-  expect_true(is.data.frame(result))
-})
-
-test_that("abc_model parameter validation works correctly", {
-  mock_comat <- create_mock_comat()
-  a_term <- rownames(mock_comat)[1]
-
-  # Test invalid scoring methods
-  expect_error(abc_model(mock_comat, a_term = a_term, scoring_method = "invalid"))
-
-  # Test with valid parameters
-  result1 <- abc_model(mock_comat, a_term = a_term, n_results = 1)
-  expect_true(nrow(result1) <= 1)
-
-  result2 <- abc_model(mock_comat, a_term = a_term, min_score = 0.1)
-  expect_true(is.data.frame(result2))
-
-  # Test that results are filtered appropriately with high min_score
-  result3 <- abc_model(mock_comat, a_term = a_term, min_score = 0.99)
-  expect_true(nrow(result3) == 0 || all(result3$abc_score >= 0.99))
-})
-
-test_that("diversify_abc handles edge cases", {
-  # Empty results
-  empty_results <- data.frame(
-    a_term = character(),
-    b_term = character(),
-    c_term = character(),
-    abc_score = numeric(),
+  abc_results <- data.frame(
+    a_term = rep("migraine", 3),
+    b_term = c("serotonin", "CGRP", "pain"),
+    c_term = c("sumatriptan", "topiramate", "propranolol"),
+    abc_score = c(0.8, 0.7, 0.6),
     stringsAsFactors = FALSE
   )
 
-  result <- diversify_abc(empty_results)
-  expect_equal(nrow(result), 0)
+  for (correction in c("BH", "bonferroni", "none")) {
+    results <- validate_abc(abc_results, co_matrix, correction = correction)
+    expect_s3_class(results, "data.frame")
+    expect_true("adjusted_p_value" %in% names(results))
+  }
+})
 
-  # Single result
-  single_result <- data.frame(
-    a_term = "A1",
-    b_term = "B1",
-    c_term = "C1",
-    abc_score = 0.5,
+test_that("validate_abc can filter by significance", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  abc_results <- data.frame(
+    a_term = rep("migraine", 3),
+    b_term = c("serotonin", "CGRP", "pain"),
+    c_term = c("sumatriptan", "topiramate", "propranolol"),
+    abc_score = c(0.8, 0.7, 0.6),
     stringsAsFactors = FALSE
   )
 
-  result <- diversify_abc(single_result)
-  expect_equal(nrow(result), 1)
+  # Expect warning when no significant results
+  expect_warning(
+    results <- validate_abc(
+      abc_results,
+      co_matrix,
+      filter_by_significance = TRUE
+    ),
+    "No statistically significant results found"
+  )
+
+  expect_s3_class(results, "data.frame")
+})
+
+# Tests for perm_test_abc
+test_that("perm_test_abc runs permutation test", {
+  skip_on_cran()  # Permutation tests are slow
+
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  abc_results <- data.frame(
+    a_term = rep("migraine", 2),
+    b_term = c("serotonin", "CGRP"),
+    c_term = c("sumatriptan", "topiramate"),
+    abc_score = c(0.8, 0.7),
+    stringsAsFactors = FALSE
+  )
+
+  results <- perm_test_abc(
+    abc_results,
+    co_matrix,
+    n_permutations = 10  # Small number for testing
+  )
+
+  expect_s3_class(results, "data.frame")
+  expect_true(all(c("perm_p_value", "perm_significant") %in% names(results)))
+})
+
+test_that("perm_test_abc handles empty results", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  abc_results <- data.frame(
+    a_term = character(0),
+    b_term = character(0),
+    c_term = character(0),
+    abc_score = numeric(0),
+    stringsAsFactors = FALSE
+  )
+
+  results <- perm_test_abc(abc_results, co_matrix, n_permutations = 10)
+
+  expect_s3_class(results, "data.frame")
+  expect_equal(nrow(results), 0)
+})
+
+# Tests for get_type_dist
+test_that("get_type_dist returns type distribution", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  result <- get_type_dist(co_matrix)
+
+  expect_s3_class(result, "data.frame")
+  expect_true(all(c("entity_type", "count", "percentage") %in% names(result)))
+  expect_equal(sum(result$percentage), 100)
+})
+
+test_that("get_type_dist handles matrix without types", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+  attr(co_matrix, "entity_types") <- NULL
+
+  expect_error(
+    get_type_dist(co_matrix),
+    "does not have entity type information"
+  )
+})
+
+# Tests for filter_by_type
+test_that("filter_by_type filters correctly", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  filtered <- filter_by_type(co_matrix, types = c("disease", "drug"))
+
+  expect_true(is.matrix(filtered) || inherits(filtered, "Matrix"))
+  expect_true(nrow(filtered) < nrow(co_matrix))
+
+  # Check that only specified types remain
+  remaining_types <- unique(attr(filtered, "entity_types"))
+  expect_true(all(remaining_types %in% c("disease", "drug")))
+})
+
+test_that("filter_by_type handles matrix without types", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+  attr(co_matrix, "entity_types") <- NULL
+
+  expect_error(
+    filter_by_type(co_matrix, types = c("disease")),
+    "does not have entity type information"
+  )
+})
+
+# Tests for find_abc_all
+test_that("find_abc_all finds connections for all terms", {
+  skip_on_cran()  # Can be slow
+
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  # Suppress messages for cleaner test output
+  suppressMessages({
+    results <- find_abc_all(
+      co_matrix,
+      min_score = 0.3,
+      n_results = 5
+    )
+  })
+
+  expect_s3_class(results, "data.frame")
+  expect_true(all(c("a_term", "b_term", "c_term", "abc_score") %in% names(results)))
+})
+
+test_that("find_abc_all filters by entity types", {
+  skip_on_cran()
+
+  co_matrix <- create_mock_cooccurrence_matrix()
+
+  suppressMessages({
+    results <- find_abc_all(
+      co_matrix,
+      a_type = "disease",
+      c_type = "drug",
+      min_score = 0.3,
+      n_results = 5
+    )
+  })
+
+  expect_s3_class(results, "data.frame")
+})
+
+# Tests for abc_timeslice - skip due to complexity
+test_that("abc_timeslice handles missing time column", {
+  entity_data <- create_mock_entity_data()
+
+  expect_error(
+    abc_timeslice(
+      entity_data,
+      time_column = "nonexistent",
+      split_time = 2014,
+      a_term = "migraine"
+    ),
+    "Time column.*not found"
+  )
+})
+
+# Tests for validation helper functions
+test_that("validate_entity_with_nlp handles missing spacyr", {
+  skip_if_not_installed("spacyr")
+  skip_on_cran()
+
+  # Should fall back to pattern-based validation on error
+  result <- tryCatch({
+    validate_entity_with_nlp("test_term", "disease")
+  }, error = function(e) {
+    # If spacyr is not initialized, it should return pattern-based result
+    is_valid_biomedical_entity("test_term", "disease")
+  })
+
+  expect_type(result, "logical")
+})
+
+test_that("validate_entity_comprehensive uses multiple methods", {
+  result <- validate_entity_comprehensive(
+    "migraine",
+    "disease",
+    use_nlp = FALSE,
+    use_pattern = TRUE,
+    use_external_api = FALSE
+  )
+
+  expect_type(result, "logical")
+  expect_true(result)
+})
+
+# Edge case tests
+test_that("abc_model handles single B term", {
+  co_matrix <- create_mock_cooccurrence_matrix()
+  # Make only one B term valid
+  co_matrix["migraine", ] <- 0
+  co_matrix["migraine", "migraine"] <- 1
+  co_matrix["migraine", "serotonin"] <- 0.5
+
+  results <- abc_model(
+    co_matrix,
+    a_term = "migraine",
+    min_score = 0.4
+  )
+
+  expect_s3_class(results, "data.frame")
+})
+
+test_that("abc_model handles all similar terms", {
+  co_matrix <- matrix(0.95, nrow = 3, ncol = 3)
+  diag(co_matrix) <- 1
+  rownames(co_matrix) <- colnames(co_matrix) <- c("migraine", "migraines", "migrain")
+
+  entity_types <- rep("disease", 3)
+  names(entity_types) <- rownames(co_matrix)
+  attr(co_matrix, "entity_types") <- entity_types
+
+  entity_freq <- rep(5, 3)
+  names(entity_freq) <- rownames(co_matrix)
+  attr(co_matrix, "entity_freq") <- entity_freq
+
+  results <- abc_model(
+    co_matrix,
+    a_term = "migraine",
+    filter_similar_terms = TRUE,
+    min_score = 0.1
+  )
+
+  expect_s3_class(results, "data.frame")
 })

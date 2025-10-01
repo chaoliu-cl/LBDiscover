@@ -41,6 +41,11 @@ preprocess_text <- function(text_data, text_column = "abstract",
                             min_word_length = 3,
                             max_word_length = 50) {
 
+  # Check if text_data is NULL or empty
+  if (is.null(text_data) || nrow(text_data) == 0) {
+    stop("text_data cannot be NULL or empty")
+  }
+
   # Add ID column if not present
   if (!"doc_id" %in% colnames(text_data)) {
     text_data$doc_id <- seq_len(nrow(text_data))
@@ -626,11 +631,13 @@ load_dictionary <- function(dictionary_type = NULL,
 load_from_mesh <- function(dictionary_type, n_terms = 200, query = NULL) {
   # Check if rentrez is available
   if (!requireNamespace("rentrez", quietly = TRUE)) {
-    stop("The rentrez package is required for MeSH queries. Install it with: install.packages('rentrez')")
+    warning("The rentrez package is required for MeSH queries. Using dummy dictionary instead.")
+    return(create_dummy_dictionary(dictionary_type))
   }
 
   if (!requireNamespace("xml2", quietly = TRUE)) {
-    stop("The xml2 package is required for parsing MeSH data. Install it with: install.packages('xml2')")
+    warning("The xml2 package is required for parsing MeSH data. Using dummy dictionary instead.")
+    return(create_dummy_dictionary(dictionary_type))
   }
 
   # Build query based on dictionary type (using static_data)
@@ -639,13 +646,6 @@ load_from_mesh <- function(dictionary_type, n_terms = 200, query = NULL) {
     base_query <- "mesh[sb]"
   } else {
     base_query <- static_data$mesh_query_map[[dictionary_type]]
-  }
-
-  if (is.null(dictionary_type) || !dictionary_type %in% names(mesh_query_map)) {
-    # If dictionary_type is not specified or not in our mapping, use a general search
-    base_query <- "mesh[sb]"
-  } else {
-    base_query <- mesh_query_map[[dictionary_type]]
   }
 
   # Add user-provided query if available
@@ -713,9 +713,9 @@ load_from_mesh <- function(dictionary_type, n_terms = 200, query = NULL) {
     # For direct MeSH search, simplify the query
     if (!is.null(query)) {
       direct_query <- query
-    } else if (!is.null(dictionary_type) && dictionary_type %in% names(mesh_query_map)) {
+    } else if (!is.null(dictionary_type) && dictionary_type %in% names(static_data$mesh_query_map)) {
       # Extract keyword from MeSH query (removing the [MeSH] qualifier)
-      direct_query <- gsub("\\[MeSH\\]", "", mesh_query_map[[dictionary_type]])
+      direct_query <- gsub("\\[MeSH\\]", "", static_data$mesh_query_map[[dictionary_type]])
     } else {
       direct_query <- ""  # Empty query will return all MeSH terms
     }
@@ -805,6 +805,7 @@ load_from_mesh <- function(dictionary_type, n_terms = 200, query = NULL) {
 
   return(combined_dict)
 }
+
 #' Process MeSH XML data with improved error handling
 #'
 #' Helper function to process MeSH XML data and extract terms
@@ -1522,8 +1523,68 @@ validate_umls_key <- function(api_key, validator_api_key = NULL) {
 create_dummy_dictionary <- function(dictionary_type) {
   message("Creating dummy dictionary for ", dictionary_type)
 
-  if (dictionary_type %in% names(static_data$dummy_dictionaries)) {
-    return(static_data$dummy_dictionaries[[dictionary_type]])
+  # Define static dummy dictionaries
+  dummy_dictionaries <- list(
+    disease = data.frame(
+      term = c("migraine", "headache", "nausea", "hypertension", "diabetes", "cancer", "stroke", "pneumonia"),
+      id = paste0("DISEASE_", 1:8),
+      type = rep("disease", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    drug = data.frame(
+      term = c("aspirin", "ibuprofen", "acetaminophen", "insulin", "metformin", "atorvastatin", "lisinopril", "warfarin"),
+      id = paste0("DRUG_", 1:8),
+      type = rep("drug", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    gene = data.frame(
+      term = c("BRCA1", "BRCA2", "TP53", "EGFR", "MYC", "RAS", "APC", "VHL"),
+      id = paste0("GENE_", 1:8),
+      type = rep("gene", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    protein = data.frame(
+      term = c("insulin", "hemoglobin", "albumin", "collagen", "receptor", "enzyme", "antibody", "hormone"),
+      id = paste0("PROTEIN_", 1:8),
+      type = rep("protein", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    chemical = data.frame(
+      term = c("glucose", "cholesterol", "sodium", "potassium", "calcium", "magnesium", "phosphate", "creatinine"),
+      id = paste0("CHEMICAL_", 1:8),
+      type = rep("chemical", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    pathway = data.frame(
+      term = c("glycolysis", "metabolism", "signaling", "apoptosis", "transcription", "translation", "replication", "repair"),
+      id = paste0("PATHWAY_", 1:8),
+      type = rep("pathway", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    symptom = data.frame(
+      term = c("pain", "fatigue", "nausea", "dizziness", "weakness", "shortness of breath", "chest pain", "headache"),
+      id = paste0("SYMPTOM_", 1:8),
+      type = rep("symptom", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    anatomy = data.frame(
+      term = c("heart", "lung", "liver", "kidney", "brain", "muscle", "bone", "skin"),
+      id = paste0("ANATOMY_", 1:8),
+      type = rep("anatomy", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    )
+  )
+
+  if (dictionary_type %in% names(dummy_dictionaries)) {
+    return(dummy_dictionaries[[dictionary_type]])
   } else {
     # Return empty dictionary for unknown types
     return(data.frame(
@@ -1605,6 +1666,11 @@ search_umls_by_semantic_type <- function(tgt_url, semantic_type, max_results = 1
 #' # Returns "en"
 #' }
 detect_lang <- function(text, sample_size = 1000) {
+  # Handle empty or NULL text
+  if (is.null(text) || length(text) == 0 || text == "") {
+    return("unknown")
+  }
+
   # Simple language detection based on common words in different languages
   # This is a basic implementation - more sophisticated methods would use proper language models
 
@@ -1669,8 +1735,22 @@ extract_ngrams <- function(text, n = 1, min_freq = 2) {
   # Remove missing values
   text <- text[!is.na(text)]
 
+  # Handle empty input
+  if (length(text) == 0) {
+    return(data.frame(
+      ngram = character(0),
+      frequency = numeric(0),
+      stringsAsFactors = FALSE
+    ))
+  }
+
   # Function to extract n-grams from a single text
   extract_text_ngrams <- function(single_text, n) {
+    # Handle empty or NA text
+    if (is.na(single_text) || single_text == "") {
+      return(character(0))
+    }
+
     # Remove non-alphanumeric characters and convert to lowercase
     clean_text <- tolower(gsub("[^a-zA-Z0-9 ]", " ", single_text))
 
@@ -1695,8 +1775,26 @@ extract_ngrams <- function(text, n = 1, min_freq = 2) {
   # Apply to all texts and combine results
   all_ngrams <- unlist(lapply(text, extract_text_ngrams, n = n))
 
+  # Handle case where no n-grams are extracted
+  if (length(all_ngrams) == 0 || is.null(all_ngrams)) {
+    return(data.frame(
+      ngram = character(0),
+      frequency = numeric(0),
+      stringsAsFactors = FALSE
+    ))
+  }
+
   # Count frequencies
   ngram_freq <- table(all_ngrams)
+
+  # Handle empty table
+  if (length(ngram_freq) == 0) {
+    return(data.frame(
+      ngram = character(0),
+      frequency = numeric(0),
+      stringsAsFactors = FALSE
+    ))
+  }
 
   # Convert to data frame and filter by minimum frequency
   result <- data.frame(
@@ -1707,6 +1805,15 @@ extract_ngrams <- function(text, n = 1, min_freq = 2) {
 
   # Filter by minimum frequency
   result <- result[result$frequency >= min_freq, ]
+
+  # Handle case where no n-grams meet the frequency threshold
+  if (nrow(result) == 0) {
+    return(data.frame(
+      ngram = character(0),
+      frequency = numeric(0),
+      stringsAsFactors = FALSE
+    ))
+  }
 
   # Sort by frequency
   result <- result[order(result$frequency, decreasing = TRUE), ]
@@ -2165,7 +2272,14 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
   # Check input
   if (is.null(dictionary) || nrow(dictionary) == 0) {
     warning("Empty dictionary provided for sanitization")
-    return(dictionary)
+    # Return a properly structured empty dictionary
+    return(data.frame(
+      term = character(0),
+      id = character(0),
+      type = character(0),
+      source = character(0),
+      stringsAsFactors = FALSE
+    ))
   }
 
   if (!term_column %in% colnames(dictionary)) {
@@ -2206,7 +2320,13 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
   # If the dictionary is now empty, early return to avoid further processing
   if (nrow(safe_dict) == 0) {
     warning("No terms remain after removing terms with regex special characters")
-    return(safe_dict)
+    return(data.frame(
+      term = character(0),
+      id = character(0),
+      type = character(0),
+      source = character(0),
+      stringsAsFactors = FALSE
+    ))
   }
 
   # Step 2: Remove terms with numbers followed by special characters
@@ -2220,7 +2340,13 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
   # If the dictionary is now empty, early return
   if (nrow(safe_dict) == 0) {
     warning("No terms remain after removing terms with numbers followed by special characters")
-    return(safe_dict)
+    return(data.frame(
+      term = character(0),
+      id = character(0),
+      type = character(0),
+      source = character(0),
+      stringsAsFactors = FALSE
+    ))
   }
 
   # Step 3: Check for specific problematic patterns and remove them
@@ -2242,7 +2368,13 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
   # If the dictionary is now empty, early return
   if (nrow(safe_dict) == 0) {
     warning("No terms remain after removing problematic terms")
-    return(safe_dict)
+    return(data.frame(
+      term = character(0),
+      id = character(0),
+      type = character(0),
+      source = character(0),
+      stringsAsFactors = FALSE
+    ))
   }
 
   # Step 4: Remove common conjunctive adverbs and non-medical terms
@@ -2259,7 +2391,13 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
   # If the dictionary is now empty, early return
   if (nrow(safe_dict) == 0) {
     warning("No terms remain after removing common non-medical terms")
-    return(safe_dict)
+    return(data.frame(
+      term = character(0),
+      id = character(0),
+      type = character(0),
+      source = character(0),
+      stringsAsFactors = FALSE
+    ))
   }
 
   # Step 5: Apply term-type corrections for commonly misclassified terms
@@ -2466,7 +2604,6 @@ sanitize_dictionary <- function(dictionary, term_column = "term", type_column = 
 
   return(safe_dict)
 }
-
 
 #' Load terms from MeSH using PubMed search
 #'
@@ -3176,6 +3313,11 @@ create_term_document_matrix <- function(preprocessed_data, min_df = 2, max_df = 
     }
   })))
 
+  # Handle case where no terms are found
+  if (length(all_terms) == 0) {
+    stop("No terms found in preprocessed data")
+  }
+
   # Create term-document matrix
   tdm <- matrix(0, nrow = length(all_terms), ncol = nrow(preprocessed_data))
   rownames(tdm) <- all_terms
@@ -3210,3 +3352,174 @@ create_term_document_matrix <- function(preprocessed_data, min_df = 2, max_df = 
 
   return(tdm)
 }
+
+#' Static data used throughout the text preprocessing module
+#' @keywords internal
+static_data <- list(
+  # MeSH query mappings for different entity types
+  mesh_query_map = list(
+    disease = "disease[MeSH]",
+    drug = "drug[MeSH] OR pharmaceutical[MeSH]",
+    gene = "gene[MeSH] OR genetics[MeSH]",
+    protein = "protein[MeSH]",
+    chemical = "chemical[MeSH]",
+    pathway = "pathway[MeSH]",
+    anatomy = "anatomy[MeSH]",
+    organism = "organism[MeSH]",
+    biological_process = "biological process[MeSH]",
+    cell = "cell[MeSH]",
+    tissue = "tissue[MeSH]",
+    symptom = "symptom[MeSH]",
+    diagnostic_procedure = "diagnostic procedure[MeSH]",
+    therapeutic_procedure = "therapeutic procedure[MeSH]",
+    phenotype = "phenotype[MeSH]",
+    molecular_function = "molecular function[MeSH]"
+  ),
+
+  # UMLS semantic types mapping
+  umls_semantic_types = list(
+    disease = c("T047", "T048", "T019", "T046"), # Disease and Syndrome, Mental Disorder, Congenital Abnormality, Pathologic Function
+    drug = c("T116", "T121", "T195", "T200"), # Amino Acid, Lipid, Antibiotic, Clinical Drug
+    gene = c("T028", "T087", "T123"), # Gene, Amino Acid Sequence, Nucleotide Sequence
+    protein = c("T116", "T123", "T087"), # Amino Acid, Protein, Amino Acid Sequence
+    chemical = c("T103", "T104", "T196"), # Chemical, Chemical Viewed Structurally, Element
+    pathway = c("T040", "T043", "T044"), # Organ or Tissue Function, Cell Function, Molecular Function
+    anatomy = c("T017", "T029", "T023"), # Anatomical Structure, Body Location, Body Part
+    organism = c("T001", "T002", "T004"), # Organism, Plant, Fungus
+    biological_process = c("T038", "T039", "T040"), # Biologic Function, Physiologic Function, Organ Function
+    cellular_component = c("T026", "T030"), # Cell Component, Body Substance
+    molecular_function = c("T044", "T045"), # Molecular Function, Genetic Function
+    diagnostic_procedure = c("T060", "T058"), # Diagnostic Procedure, Health Care Activity
+    therapeutic_procedure = c("T061", "T058"), # Therapeutic Procedure, Health Care Activity
+    phenotype = c("T032", "T033"), # Organism Attribute, Finding
+    symptom = c("T184", "T033"), # Sign or Symptom, Finding
+    cell = c("T025"), # Cell
+    tissue = c("T024"), # Tissue
+    mental_process = c("T041"), # Mental Process
+    physiologic_function = c("T039"), # Physiologic Function
+    laboratory_procedure = c("T059") # Laboratory Procedure
+  ),
+
+  # Blacklisted terms for sanitization
+  blacklisted_terms = c(
+    "however", "therefore", "moreover", "furthermore", "nevertheless", "consequently",
+    "additionally", "meanwhile", "likewise", "similarly", "conversely", "specifically",
+    "generally", "particularly", "especially", "obviously", "clearly", "certainly",
+    "possibly", "probably", "approximately", "significantly", "substantially",
+    "europe", "america", "asia", "africa", "australia", "north", "south", "east", "west",
+    "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
+    "january", "february", "march", "april", "may", "june", "july", "august",
+    "september", "october", "november", "december", "spring", "summer", "autumn", "winter",
+    "optimization", "maximization", "minimization", "standardization", "normalization",
+    "implementation", "development", "establishment", "improvement", "enhancement",
+    "a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "from", "had",
+    "has", "have", "he", "her", "his", "i", "in", "is", "it", "its", "of", "on",
+    "or", "that", "the", "this", "to", "was", "were", "which", "with", "you"
+  ),
+
+  # Term type mappings for corrections
+  term_type_mappings = list(
+    "migraine" = "disease",
+    "headache" = "symptom",
+    "photophobia" = "symptom",
+    "phonophobia" = "symptom",
+    "nausea" = "symptom",
+    "vomiting" = "symptom",
+    "aura" = "symptom",
+    "pain" = "symptom",
+    "fatigue" = "symptom",
+    "weakness" = "symptom",
+    "dizziness" = "symptom",
+    "vertigo" = "symptom",
+    "numbness" = "symptom",
+    "tingling" = "symptom",
+    "serotonin" = "chemical",
+    "dopamine" = "chemical",
+    "noradrenaline" = "chemical",
+    "acetylcholine" = "chemical",
+    "gaba" = "chemical",
+    "glutamate" = "chemical",
+    "receptor" = "protein",
+    "enzyme" = "protein",
+    "kinase" = "protein",
+    "antibody" = "protein",
+    "hormone" = "protein",
+    "insulin" = "protein",
+    "hemoglobin" = "protein",
+    "albumin" = "protein",
+    "collagen" = "protein",
+    "aspirin" = "drug",
+    "ibuprofen" = "drug",
+    "acetaminophen" = "drug",
+    "sumatriptan" = "drug",
+    "metformin" = "drug",
+    "atorvastatin" = "drug",
+    "lisinopril" = "drug",
+    "warfarin" = "drug",
+    "bcpnn" = "method",
+    "faers" = "method",
+    "uplc" = "method",
+    "frap" = "method",
+    "hplc" = "method"
+  ),
+
+  # Dummy dictionaries for fallback
+  dummy_dictionaries = list(
+    disease = data.frame(
+      term = c("migraine", "headache", "nausea", "hypertension", "diabetes", "cancer", "stroke", "pneumonia"),
+      id = paste0("DISEASE_", 1:8),
+      type = rep("disease", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    drug = data.frame(
+      term = c("aspirin", "ibuprofen", "acetaminophen", "insulin", "metformin", "atorvastatin", "lisinopril", "warfarin"),
+      id = paste0("DRUG_", 1:8),
+      type = rep("drug", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    gene = data.frame(
+      term = c("BRCA1", "BRCA2", "TP53", "EGFR", "MYC", "RAS", "APC", "VHL"),
+      id = paste0("GENE_", 1:8),
+      type = rep("gene", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    protein = data.frame(
+      term = c("insulin", "hemoglobin", "albumin", "collagen", "receptor", "enzyme", "antibody", "hormone"),
+      id = paste0("PROTEIN_", 1:8),
+      type = rep("protein", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    chemical = data.frame(
+      term = c("glucose", "cholesterol", "sodium", "potassium", "calcium", "magnesium", "phosphate", "creatinine"),
+      id = paste0("CHEMICAL_", 1:8),
+      type = rep("chemical", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    pathway = data.frame(
+      term = c("glycolysis", "metabolism", "signaling", "apoptosis", "transcription", "translation", "replication", "repair"),
+      id = paste0("PATHWAY_", 1:8),
+      type = rep("pathway", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    symptom = data.frame(
+      term = c("pain", "fatigue", "nausea", "dizziness", "weakness", "shortness of breath", "chest pain", "headache"),
+      id = paste0("SYMPTOM_", 1:8),
+      type = rep("symptom", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    ),
+    anatomy = data.frame(
+      term = c("heart", "lung", "liver", "kidney", "brain", "muscle", "bone", "skin"),
+      id = paste0("ANATOMY_", 1:8),
+      type = rep("anatomy", 8),
+      source = rep("dummy", 8),
+      stringsAsFactors = FALSE
+    )
+  )
+)

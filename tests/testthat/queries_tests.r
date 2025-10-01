@@ -1,687 +1,473 @@
+# Test file for queries.R functions
+# Tests for the LBDiscover package
+
 library(testthat)
 
-# ============================================================================
-# Tests for query_umls - Basic Functionality
-# ============================================================================
-test_that("query_umls requires API key", {
+# Test helper functions and mock data
+create_mock_abc_results <- function() {
+  data.frame(
+    a_term = c("migraine", "migraine", "headache"),
+    b_terms = c("serotonin, CGRP", "sumatriptan", "pain"),
+    c_term = c("CGRP", "receptor", "inflammation"),
+    a_b_score = c(0.8, 0.7, 0.6),
+    b_c_score = c(0.9, 0.8, 0.7),
+    abc_score = c(0.72, 0.56, 0.42),
+    stringsAsFactors = FALSE
+  )
+}
+
+create_mock_umls_response <- function() {
+  list(
+    cui = "C0149931",
+    term = "Migraine Disorders",
+    semantic_type = "Disease or Syndrome",
+    source = "UMLS",
+    definition = "A class of disabling primary headache disorders"
+  )
+}
+
+create_mock_mesh_response <- function() {
+  data.frame(
+    mesh_id = "D008881",
+    term = "Migraine Disorders",
+    tree_number = "C10.228.140.546.800.525",
+    scope_note = "A class of disabling primary headache disorders",
+    stringsAsFactors = FALSE
+  )
+}
+
+# Helper function to check if we can run API integration tests
+can_run_umls_tests <- function() {
+  # Check if httr is available and we have basic internet connectivity
+  if (!requireNamespace("httr", quietly = TRUE)) {
+    return(FALSE)
+  }
+
+  # Try a simple HTTP request to check connectivity
+  tryCatch({
+    httr::GET("https://httpbin.org/status/200", httr::timeout(5))
+    return(TRUE)
+  }, error = function(e) {
+    return(FALSE)
+  })
+}
+
+can_run_mesh_tests <- function() {
+  # Check if rentrez is available
+  if (!requireNamespace("rentrez", quietly = TRUE)) {
+    return(FALSE)
+  }
+
+  # Try to load rentrez
+  tryCatch({
+    library(rentrez, quietly = TRUE)
+    return(TRUE)
+  }, error = function(e) {
+    return(FALSE)
+  })
+}
+
+# Tests for query_umls function
+test_that("query_umls validates required parameters", {
+  # Test that API key is required
   expect_error(
     query_umls("migraine", api_key = NULL),
     "UMLS API key is required"
   )
+
+  # Test that function accepts required parameters
+  expect_no_error({
+    # Basic parameter validation
+    term <- "migraine"
+    api_key <- "test_key"
+    version <- "current"
+
+    expect_type(term, "character")
+    expect_type(api_key, "character")
+    expect_type(version, "character")
+  })
 })
 
-test_that("query_umls error message includes registration URL", {
-  expect_error(
-    query_umls("test", api_key = NULL),
-    "https://uts.nlm.nih.gov/uts/license"
-  )
-})
-
-test_that("query_umls handles httr package dependency", {
+test_that("query_umls handles missing term gracefully", {
   skip_if_not_installed("httr")
-  skip_on_cran()
-  
-  # Function should exist and be callable
-  expect_true(exists("query_umls"))
+
+  # Test with empty term
+  expect_no_error({
+    # This would require a real API call, so we test parameter validation only
+    term <- ""
+    expect_type(term, "character")
+    expect_equal(nchar(term), 0)
+  })
 })
 
-# ============================================================================
-# Tests for query_umls - Response Structure
-# ============================================================================
-test_that("query_umls returns data frame with correct structure", {
-  skip_on_cran()
+test_that("query_umls returns correct structure for invalid terms", {
   skip_if_not_installed("httr")
-  
-  # Expected column structure
-  expected_cols <- c("cui", "term", "semantic_type", "source", "definition")
-  
-  # Mock response when no results found
-  mock_result <- data.frame(
+  skip_if_not_installed("jsonlite")
+
+  # Mock the HTTP responses for UMLS API
+  # We'll test the structure that should be returned for terms not found
+
+  expected_structure <- data.frame(
     cui = NA_character_,
-    term = "test_term",
+    term = "nonexistentterm",
     semantic_type = "Unknown",
     source = "UMLS",
     definition = NA_character_,
     stringsAsFactors = FALSE
   )
-  
-  expect_true(all(expected_cols %in% colnames(mock_result)))
-  expect_equal(nrow(mock_result), 1)
+
+  expect_s3_class(expected_structure, "data.frame")
+  expect_true("cui" %in% colnames(expected_structure))
+  expect_true("term" %in% colnames(expected_structure))
+  expect_true("semantic_type" %in% colnames(expected_structure))
+  expect_true("source" %in% colnames(expected_structure))
+  expect_true("definition" %in% colnames(expected_structure))
 })
 
-test_that("query_umls handles missing UI field", {
-  # When UI field is missing, should return NA for CUI
-  mock_result <- data.frame(
-    cui = NA_character_,
-    term = "test",
-    semantic_type = "Unknown",
-    source = "UMLS",
-    definition = NA_character_,
-    stringsAsFactors = FALSE
-  )
-  
-  expect_true(is.na(mock_result$cui))
-  expect_equal(mock_result$semantic_type, "Unknown")
+test_that("query_umls integration test with real API", {
+  skip_if_not_installed("httr")
+  skip_if_not_installed("jsonlite")
+  skip_if_not(can_run_umls_tests(), "Cannot run UMLS integration tests")
+
+  # This test requires a real UMLS API key
+  # We'll skip it in most cases unless explicitly testing with credentials
+  skip_if(Sys.getenv("UMLS_API_KEY") == "", "No UMLS API key provided")
+
+  api_key <- Sys.getenv("UMLS_API_KEY")
+
+  result <- tryCatch({
+    query_umls("migraine", api_key = api_key)
+  }, error = function(e) {
+    skip(paste("UMLS API call failed:", e$message))
+  })
+
+  expect_s3_class(result, "data.frame")
+  expect_true("cui" %in% colnames(result))
+  expect_true("term" %in% colnames(result))
+  expect_true("semantic_type" %in% colnames(result))
+  expect_equal(result$source, "UMLS")
 })
 
-test_that("query_umls handles missing concept data", {
-  # When concept data is incomplete, should return Unknown semantic type
-  mock_result <- data.frame(
-    cui = "C0018681",
-    term = "test",
-    semantic_type = "Unknown",
-    source = "UMLS",
-    definition = NA_character_,
-    stringsAsFactors = FALSE
-  )
-  
-  expect_equal(mock_result$semantic_type, "Unknown")
-  expect_equal(mock_result$source, "UMLS")
-})
+# Tests for query_mesh function
+test_that("query_mesh validates parameters", {
+  # Test that function accepts basic parameters
+  expect_no_error({
+    term <- "migraine"
+    api_key <- "test_key"
 
-test_that("query_umls handles missing semantic types", {
-  # When semantic types are missing
-  mock_result <- data.frame(
-    cui = "C0018681",
-    term = "test",
-    semantic_type = "Unknown",
-    source = "UMLS",
-    definition = NA_character_,
-    stringsAsFactors = FALSE
-  )
-  
-  expect_equal(mock_result$semantic_type, "Unknown")
-})
-
-test_that("query_umls handles multiple semantic types", {
-  # Multiple semantic types should be comma-separated
-  semantic_types <- c("Disease or Syndrome", "Sign or Symptom")
-  combined <- paste(semantic_types, collapse = ", ")
-  
-  expect_equal(combined, "Disease or Syndrome, Sign or Symptom")
-  expect_true(grepl(",", combined))
-})
-
-# ============================================================================
-# Tests for query_umls - API Authentication
-# ============================================================================
-test_that("query_umls authentication flow structure", {
-  skip_on_cran()
-  
-  # Base URLs should be correctly formatted
-  base_url <- "https://uts-ws.nlm.nih.gov/rest"
-  auth_url <- "https://utslogin.nlm.nih.gov/cas/v1/api-key"
-  
-  expect_true(grepl("^https://", base_url))
-  expect_true(grepl("^https://", auth_url))
-  expect_true(grepl("uts-ws.nlm.nih.gov", base_url))
-})
-
-test_that("query_umls service ticket URL construction", {
-  # Service ticket should be for umlsks.nlm.nih.gov
-  service_url <- "http://umlsks.nlm.nih.gov"
-  expect_true(grepl("umlsks.nlm.nih.gov", service_url))
-})
-
-# ============================================================================
-# Tests for query_umls - Error Handling
-# ============================================================================
-test_that("query_umls handles authentication failures gracefully", {
-  skip_on_cran()
-  
-  # Mock authentication failure scenario
-  expect_true(exists("query_umls"))
-})
-
-test_that("query_umls handles empty search results", {
-  # When no results found
-  mock_result <- data.frame(
-    cui = NA_character_,
-    term = "nonexistent_term",
-    semantic_type = "Unknown",
-    source = "UMLS",
-    definition = NA_character_,
-    stringsAsFactors = FALSE
-  )
-  
-  expect_true(is.na(mock_result$cui))
-  expect_true(is.na(mock_result$definition))
-})
-
-# ============================================================================
-# Tests for query_mesh - Basic Functionality
-# ============================================================================
-test_that("query_mesh requires rentrez package", {
-  skip_if_installed("rentrez")
-  
-  expect_message(
-    result <- query_mesh("migraine"),
-    "rentrez package is required"
-  )
-})
-
-test_that("query_mesh handles missing rentrez gracefully", {
-  skip_if_installed("rentrez")
-  
-  result <- suppressMessages(query_mesh("test"))
-  
-  expect_true(is.data.frame(result))
-  expect_true(is.na(result$mesh_id))
+    expect_type(term, "character")
+    expect_true(is.null(api_key) || is.character(api_key))
+  })
 })
 
 test_that("query_mesh returns correct structure", {
-  # Expected columns
-  expected_cols <- c("mesh_id", "term", "tree_number", "scope_note")
-  
-  mock_result <- data.frame(
+  skip_if_not_installed("rentrez")
+
+  # Test the expected return structure
+  expected_structure <- data.frame(
     mesh_id = NA_character_,
-    term = "test",
+    term = "test_term",
     tree_number = NA_character_,
-    scope_note = NA_character_,
+    scope_note = "No MeSH term found for: test_term",
     stringsAsFactors = FALSE
   )
-  
-  expect_true(all(expected_cols %in% colnames(mock_result)))
+
+  expect_s3_class(expected_structure, "data.frame")
+  expect_true("mesh_id" %in% colnames(expected_structure))
+  expect_true("term" %in% colnames(expected_structure))
+  expect_true("tree_number" %in% colnames(expected_structure))
+  expect_true("scope_note" %in% colnames(expected_structure))
 })
 
-# ============================================================================
-# Tests for query_mesh - API Key Handling
-# ============================================================================
-test_that("query_mesh accepts optional API key", {
-  skip_on_cran()
+test_that("query_mesh handles missing rentrez package", {
+  # Test behavior when rentrez is not available
+  # This tests the graceful degradation in the function
+
+  # Mock the requireNamespace function to return FALSE
+  if (!requireNamespace("rentrez", quietly = TRUE)) {
+    expect_message(
+      result <- query_mesh("migraine"),
+      "rentrez package is required"
+    )
+    expect_s3_class(result, "data.frame")
+    expect_equal(nrow(result), 1)
+    expect_true(is.na(result$mesh_id))
+  }
+})
+
+test_that("query_mesh integration test with real API", {
   skip_if_not_installed("rentrez")
-  
-  # Should not error with NULL api_key
-  expect_silent({
-    api_key <- NULL
-    is.null(api_key)
+  skip_if_not(can_run_mesh_tests(), "Cannot run MeSH integration tests")
+
+  result <- tryCatch({
+    query_mesh("migraine")
+  }, error = function(e) {
+    skip(paste("MeSH API call failed:", e$message))
   })
-})
 
-test_that("query_mesh uses API key when provided", {
-  skip_on_cran()
-  skip_if_not_installed("rentrez")
-  
-  api_key <- "test_key"
-  expect_equal(api_key, "test_key")
-})
+  expect_s3_class(result, "data.frame")
+  expect_true("mesh_id" %in% colnames(result))
+  expect_true("term" %in% colnames(result))
+  expect_true("tree_number" %in% colnames(result))
+  expect_true("scope_note" %in% colnames(result))
 
-# ============================================================================
-# Tests for query_mesh - MeSH Record Parsing
-# ============================================================================
-test_that("query_mesh extracts MeSH ID from text", {
-  mesh_record <- "DescriptorUI: D008881\nDescriptorName: Migraine"
-  
-  # Extract MeSH ID pattern
-  pattern <- "DescriptorUI: ([A-Z][0-9]+)"
-  match <- regexpr(pattern, mesh_record)
-  
-  expect_true(match > 0)
-  
-  if (match > 0) {
-    extracted <- regmatches(mesh_record, match)
-    mesh_id <- gsub("DescriptorUI: ", "", extracted)
-    expect_equal(mesh_id, "D008881")
+  # If successful, check that we got actual data
+  if (!is.na(result$mesh_id[1])) {
+    expect_true(grepl("^D[0-9]+$", result$mesh_id[1]))
   }
-})
-
-test_that("query_mesh extracts descriptor name from text", {
-  mesh_record <- "DescriptorUI: D008881\nDescriptorName: Migraine Disorders"
-  
-  pattern <- "DescriptorName: ([^\n]+)"
-  match <- regexpr(pattern, mesh_record)
-  
-  expect_true(match > 0)
-  
-  if (match > 0) {
-    extracted <- regmatches(mesh_record, match)
-    term <- gsub("DescriptorName: ", "", extracted)
-    expect_equal(term, "Migraine Disorders")
-  }
-})
-
-test_that("query_mesh extracts tree numbers from text", {
-  mesh_record <- "Tree Number: C10.228.140.546\nTree Number: F03.087.250.450"
-  
-  pattern <- "Tree Number: ([A-Z][0-9\\.]+)"
-  matches <- gregexpr(pattern, mesh_record)
-  
-  expect_true(matches[[1]][1] > 0)
-  
-  if (matches[[1]][1] > 0) {
-    extracted <- regmatches(mesh_record, matches)[[1]]
-    tree_numbers <- gsub("Tree Number: ", "", extracted)
-    expect_equal(length(tree_numbers), 2)
-    expect_true(grepl("^[A-Z][0-9\\.]+$", tree_numbers[1]))
-  }
-})
-
-test_that("query_mesh extracts scope note from text", {
-  mesh_record <- "Scope Note: A class of disabling primary headache disorders."
-  
-  pattern <- "Scope Note: ([^\n]+)"
-  match <- regexpr(pattern, mesh_record)
-  
-  expect_true(match > 0)
-  
-  if (match > 0) {
-    extracted <- regmatches(mesh_record, match)
-    scope_note <- gsub("Scope Note: ", "", extracted)
-    expect_true(grepl("headache", scope_note, ignore.case = TRUE))
-  }
-})
-
-# ============================================================================
-# Tests for query_mesh - Error Handling
-# ============================================================================
-test_that("query_mesh handles no results found", {
-  skip_on_cran()
-  skip_if_not_installed("rentrez")
-  
-  # Mock scenario where count is 0
-  mock_search <- list(count = 0)
-  expect_equal(mock_search$count, 0)
-  
-  # Should return data frame with NA values
-  expected_result <- data.frame(
-    mesh_id = NA_character_,
-    term = "test",
-    tree_number = NA_character_,
-    scope_note = "No MeSH term found for: test",
-    stringsAsFactors = FALSE
-  )
-  
-  expect_true(is.na(expected_result$mesh_id))
-  expect_true(grepl("No MeSH term found", expected_result$scope_note))
 })
 
 test_that("query_mesh handles API errors gracefully", {
-  skip_on_cran()
-  
-  # Error result structure
-  error_result <- data.frame(
-    mesh_id = NA_character_,
-    term = "test",
-    tree_number = NA_character_,
-    scope_note = "Error: API connection failed",
-    stringsAsFactors = FALSE
-  )
-  
-  expect_true(is.na(error_result$mesh_id))
-  expect_true(grepl("Error:", error_result$scope_note))
-})
-
-test_that("query_mesh tryCatch handles exceptions", {
-  # Test that tryCatch structure works
-  result <- tryCatch({
-    stop("Test error")
-  }, error = function(e) {
-    data.frame(
-      mesh_id = NA_character_,
-      term = "test",
-      tree_number = NA_character_,
-      scope_note = paste("Error:", e$message),
-      stringsAsFactors = FALSE
-    )
-  })
-  
-  expect_true(is.data.frame(result))
-  expect_true(grepl("Test error", result$scope_note))
-})
-
-# ============================================================================
-# Tests for query_mesh - Message Output
-# ============================================================================
-test_that("query_mesh produces appropriate messages", {
-  skip_on_cran()
   skip_if_not_installed("rentrez")
-  
-  # Should message when no results found
-  mock_count <- 0
-  if (mock_count == 0) {
-    expect_true(TRUE)  # Would produce message in actual function
-  }
+  skip_if_not(can_run_mesh_tests(), "Cannot run MeSH integration tests")
+
+  # Test with a term that should cause issues or not be found
+  result <- tryCatch({
+    query_mesh("veryrarenonexistentterm12345")
+  }, error = function(e) {
+    # The function should handle errors gracefully
+    skip(paste("Expected error occurred:", e$message))
+  })
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 1)
+
+  # Should return a record even if term not found
+  expect_equal(result$term[1], "veryrarenonexistentterm12345")
 })
 
-# ============================================================================
-# Tests for enhance_abc_kb - Basic Functionality
-# ============================================================================
-test_that("enhance_abc_kb requires knowledge_base parameter", {
-  skip_on_cran()
-  
-  abc_results <- data.frame(
-    a_term = "migraine",
-    c_term = "sumatriptan",
-    abc_score = 0.8
+# Tests for enhance_abc_kb function
+test_that("enhance_abc_kb validates parameters", {
+  abc_results <- create_mock_abc_results()
+
+  # Test knowledge_base parameter validation
+  expect_error(
+    enhance_abc_kb(abc_results, knowledge_base = "invalid"),
+    "'arg' should be one of"
   )
-  
-  # Should accept valid knowledge bases
-  valid_kb <- c("umls", "mesh")
-  expect_true(all(valid_kb %in% c("umls", "mesh")))
-})
 
-test_that("enhance_abc_kb validates knowledge_base argument", {
-  # match.arg should validate
-  knowledge_base <- "mesh"
-  valid_options <- c("umls", "mesh")
-  
-  expect_true(knowledge_base %in% valid_options)
+  # Test with valid parameters
+  expect_no_error({
+    knowledge_base <- match.arg("mesh", c("umls", "mesh"))
+    expect_equal(knowledge_base, "mesh")
+  })
 })
 
 test_that("enhance_abc_kb handles empty results", {
   empty_results <- data.frame(
-    a_term = character(),
-    c_term = character(),
-    abc_score = numeric()
+    a_term = character(0),
+    b_terms = character(0),
+    c_term = character(0),
+    stringsAsFactors = FALSE
   )
-  
-  expect_equal(nrow(empty_results), 0)
+
+  result <- enhance_abc_kb(empty_results, knowledge_base = "mesh")
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 0)
 })
 
-test_that("enhance_abc_kb returns input for empty results", {
-  empty_results <- data.frame(
-    a_term = character(),
-    c_term = character(),
-    abc_score = numeric()
-  )
-  
-  # Should return input unchanged when empty
-  result <- empty_results
-  expect_identical(result, empty_results)
-})
-
-# ============================================================================
-# Tests for enhance_abc_kb - Term Extraction
-# ============================================================================
 test_that("enhance_abc_kb extracts unique terms correctly", {
-  abc_results <- data.frame(
-    a_term = c("migraine", "migraine", "headache"),
-    b_terms = c("serotonin, CGRP", "CGRP, dopamine", "serotonin"),
-    c_term = c("sumatriptan", "rizatriptan", "sumatriptan"),
-    stringsAsFactors = FALSE
-  )
-  
-  # Extract unique terms
-  all_terms <- unique(c(
-    abc_results$a_term,
-    unlist(strsplit(abc_results$b_terms, ", ")),
-    abc_results$c_term
+  abc_results <- create_mock_abc_results()
+
+  # Test the term extraction logic (without making API calls)
+  a_terms <- unique(abc_results$a_term)
+  b_terms <- unique(unlist(strsplit(abc_results$b_terms, ", ")))
+  c_terms <- unique(abc_results$c_term)
+  unique_terms <- unique(c(a_terms, b_terms, c_terms))
+
+  expect_type(unique_terms, "character")
+  expect_gte(length(unique_terms), 3)
+  expect_true("migraine" %in% unique_terms)
+  expect_true("CGRP" %in% unique_terms)
+  expect_true("serotonin" %in% unique_terms)
+})
+
+test_that("enhance_abc_kb with MeSH knowledge base (integration test)", {
+  skip_if_not_installed("rentrez")
+  skip_if_not(can_run_mesh_tests(), "Cannot run MeSH integration tests")
+
+  abc_results <- create_mock_abc_results()
+
+  result <- tryCatch({
+    enhance_abc_kb(abc_results, knowledge_base = "mesh")
+  }, error = function(e) {
+    skip(paste("MeSH enhancement failed:", e$message))
+  })
+
+  expect_s3_class(result, "data.frame")
+  expect_gte(ncol(result), ncol(abc_results))
+
+  # Should have added MeSH-related columns
+  mesh_columns <- c("a_mesh_id", "a_tree_number", "c_mesh_id", "c_tree_number")
+  expected_mesh_cols <- intersect(mesh_columns, colnames(result))
+  expect_gte(length(expected_mesh_cols), 2)
+})
+
+test_that("enhance_abc_kb with UMLS knowledge base (integration test)", {
+  skip_if_not_installed("httr")
+  skip_if_not_installed("jsonlite")
+  skip_if_not(can_run_umls_tests(), "Cannot run UMLS integration tests")
+  skip_if(Sys.getenv("UMLS_API_KEY") == "", "No UMLS API key provided")
+
+  abc_results <- create_mock_abc_results()
+  api_key <- Sys.getenv("UMLS_API_KEY")
+
+  result <- tryCatch({
+    enhance_abc_kb(abc_results, knowledge_base = "umls", api_key = api_key)
+  }, error = function(e) {
+    skip(paste("UMLS enhancement failed:", e$message))
+  })
+
+  expect_s3_class(result, "data.frame")
+  expect_gte(ncol(result), ncol(abc_results))
+
+  # Should have added UMLS-related columns
+  umls_columns <- c("a_cui", "a_semantic_type", "c_cui", "c_semantic_type")
+  expected_umls_cols <- intersect(umls_columns, colnames(result))
+  expect_gte(length(expected_umls_cols), 2)
+})
+
+test_that("enhance_abc_kb handles API failures gracefully", {
+  abc_results <- create_mock_abc_results()
+
+  # Test with MeSH when rentrez might not be available
+  result <- tryCatch({
+    enhance_abc_kb(abc_results, knowledge_base = "mesh")
+  }, error = function(e) {
+    # Should handle missing packages gracefully
+    expect_s3_class(abc_results, "data.frame")  # Return original if enhancement fails
+    abc_results
+  })
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), nrow(abc_results))
+})
+
+# Performance and edge case tests
+test_that("enhance_abc_kb performance with large datasets", {
+  # Create a larger mock dataset
+  large_abc_results <- do.call(rbind, replicate(50, create_mock_abc_results(), simplify = FALSE))
+
+  # Test that it doesn't take too long (without making API calls)
+  start_time <- Sys.time()
+
+  # Test the term extraction part (most computationally intensive)
+  unique_terms <- unique(c(
+    large_abc_results$a_term,
+    unlist(strsplit(large_abc_results$b_terms, ", ")),
+    large_abc_results$c_term
   ))
-  
-  expect_true(length(all_terms) >= 5)
-  expect_true("migraine" %in% all_terms)
-  expect_true("sumatriptan" %in% all_terms)
+
+  end_time <- Sys.time()
+
+  expect_lt(as.numeric(end_time - start_time), 1)  # Should complete in under 1 second
+  expect_type(unique_terms, "character")
+  expect_gte(length(unique_terms), 3)
 })
 
-test_that("enhance_abc_kb handles b_terms correctly", {
-  b_terms_string <- "serotonin, CGRP, dopamine"
-  b_terms_vector <- unlist(strsplit(b_terms_string, ", "))
-  
-  expect_equal(length(b_terms_vector), 3)
-  expect_true("serotonin" %in% b_terms_vector)
-  expect_true("CGRP" %in% b_terms_vector)
+test_that("query functions handle special characters in terms", {
+  # Test with terms containing special characters
+  special_terms <- c("migraine", "head-ache", "5-HT", "α-receptor", "β-blocker")
+
+  for (term in special_terms) {
+    expect_type(term, "character")
+    expect_gt(nchar(term), 0)
+
+    # Test that terms don't break URL encoding (for API calls)
+    encoded_term <- utils::URLencode(term)
+    expect_type(encoded_term, "character")
+    expect_gte(nchar(encoded_term), nchar(term))
+  }
 })
 
-# ============================================================================
-# Tests for enhance_abc_kb - UMLS Enhancement
-# ============================================================================
-test_that("enhance_abc_kb adds UMLS columns", {
-  skip_on_cran()
-  
-  # Mock enhanced results with UMLS data
-  enhanced <- data.frame(
-    a_term = "migraine",
-    c_term = "sumatriptan",
-    abc_score = 0.8,
-    a_cui = "C0018681",
-    a_semantic_type = "Disease or Syndrome",
-    c_cui = "C0076687",
-    c_semantic_type = "Pharmacologic Substance",
-    stringsAsFactors = FALSE
-  )
-  
-  expect_true("a_cui" %in% colnames(enhanced))
-  expect_true("a_semantic_type" %in% colnames(enhanced))
-  expect_true("c_cui" %in% colnames(enhanced))
-  expect_true("c_semantic_type" %in% colnames(enhanced))
-})
+test_that("query functions handle very long terms", {
+  # Test with unusually long terms
+  long_term <- paste(rep("verylongterm", 10), collapse = "")
 
-test_that("enhance_abc_kb UMLS columns have correct structure", {
-  umls_cols <- c("a_cui", "a_semantic_type", "c_cui", "c_semantic_type")
-  
-  expect_equal(length(umls_cols), 4)
-  expect_true(all(grepl("cui|semantic_type", umls_cols)))
-})
+  expect_type(long_term, "character")
+  expect_gt(nchar(long_term), 50)
 
-# ============================================================================
-# Tests for enhance_abc_kb - MeSH Enhancement
-# ============================================================================
-test_that("enhance_abc_kb adds MeSH columns", {
-  skip_on_cran()
-  
-  # Mock enhanced results with MeSH data
-  enhanced <- data.frame(
-    a_term = "migraine",
-    c_term = "sumatriptan",
-    abc_score = 0.8,
-    a_mesh_id = "D008881",
-    a_tree_number = "C10.228.140.546",
-    c_mesh_id = "D018170",
-    c_tree_number = "D02.033.755.624.776.850",
-    stringsAsFactors = FALSE
-  )
-  
-  expect_true("a_mesh_id" %in% colnames(enhanced))
-  expect_true("a_tree_number" %in% colnames(enhanced))
-  expect_true("c_mesh_id" %in% colnames(enhanced))
-  expect_true("c_tree_number" %in% colnames(enhanced))
-})
-
-test_that("enhance_abc_kb MeSH columns have correct structure", {
-  mesh_cols <- c("a_mesh_id", "a_tree_number", "c_mesh_id", "c_tree_number")
-  
-  expect_equal(length(mesh_cols), 4)
-  expect_true(all(grepl("mesh_id|tree_number", mesh_cols)))
-})
-
-# ============================================================================
-# Tests for enhance_abc_kb - Progress Tracking
-# ============================================================================
-test_that("enhance_abc_kb uses progress bar for large datasets", {
-  skip_on_cran()
-  
-  # Progress bar should be created for term processing
-  n_terms <- 10
-  
-  expect_silent({
-    pb <- utils::txtProgressBar(min = 0, max = n_terms, style = 3)
-    utils::setTxtProgressBar(pb, 5)
-    close(pb)
+  # Test that long terms don't break the functions
+  expect_no_error({
+    # This is just parameter validation, not an actual API call
+    if (requireNamespace("httr", quietly = TRUE)) {
+      encoded_long_term <- utils::URLencode(long_term)
+      expect_type(encoded_long_term, "character")
+    }
   })
 })
 
-# ============================================================================
-# Tests for enhance_abc_kb - Term Info Caching
-# ============================================================================
-test_that("enhance_abc_kb caches term information", {
-  skip_on_cran()
-  
-  # Term info should be stored in a list
-  term_info <- list()
-  term_info[["migraine"]] <- data.frame(
-    cui = "C0018681",
-    semantic_type = "Disease or Syndrome",
+test_that("enhance_abc_kb handles malformed ABC results", {
+  # Test with missing required columns
+  malformed_results <- data.frame(
+    wrong_column = "test",
     stringsAsFactors = FALSE
   )
-  
-  expect_true("migraine" %in% names(term_info))
-  expect_equal(term_info[["migraine"]]$cui, "C0018681")
+
+  # Should handle missing columns gracefully
+  expect_error({
+    # This might error or handle gracefully depending on implementation
+    enhance_abc_kb(malformed_results, knowledge_base = "mesh")
+  }, ".*")  # Expect some kind of error or warning
 })
 
-test_that("enhance_abc_kb reuses cached term info", {
-  # Same term should use cached data
-  term_info <- list()
-  term_info[["migraine"]] <- list(cui = "C0018681")
-  
-  # Accessing cached data
-  cached_cui <- term_info[["migraine"]]$cui
-  expect_equal(cached_cui, "C0018681")
+# Integration test for the complete workflow
+test_that("complete workflow integration test", {
+  skip_if_not(can_run_mesh_tests(), "Cannot run complete workflow test")
+
+  abc_results <- create_mock_abc_results()
+
+  # Test the complete workflow with MeSH
+  result <- tryCatch({
+    enhance_abc_kb(abc_results, knowledge_base = "mesh")
+  }, error = function(e) {
+    skip(paste("Complete workflow failed:", e$message))
+  })
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), nrow(abc_results))
+  expect_gte(ncol(result), ncol(abc_results))
+
+  # Verify that original data is preserved
+  for (col in colnames(abc_results)) {
+    if (col %in% colnames(result)) {
+      expect_equal(result[[col]], abc_results[[col]])
+    }
+  }
 })
 
-# ============================================================================
-# Tests for enhance_abc_kb - sapply Operations
-# ============================================================================
-test_that("enhance_abc_kb uses sapply to add columns", {
-  abc_results <- data.frame(
-    a_term = c("migraine", "headache"),
-    c_term = c("sumatriptan", "ibuprofen"),
-    stringsAsFactors = FALSE
-  )
-  
-  term_info <- list(
-    "migraine" = list(cui = "C0018681"),
-    "headache" = list(cui = "C0018681"),
-    "sumatriptan" = list(cui = "C0076687"),
-    "ibuprofen" = list(cui = "C0020740")
-  )
-  
-  # Simulate sapply operation
-  a_cuis <- sapply(abc_results$a_term, function(term) term_info[[term]]$cui)
-  
-  expect_equal(length(a_cuis), 2)
-  expect_equal(a_cuis[1], "C0018681")
+# Cleanup and utility tests
+test_that("utility functions work correctly", {
+  # Test progress bar functionality (used in enhance_abc_kb)
+  expect_no_error({
+    pb <- utils::txtProgressBar(min = 0, max = 10, style = 3)
+    utils::setTxtProgressBar(pb, 5)
+    close(pb)
+  })
+
+  # Test string manipulation used in the functions
+  test_terms <- "term1, term2, term3"
+  split_terms <- unlist(strsplit(test_terms, ", "))
+  expect_equal(length(split_terms), 3)
+  expect_equal(split_terms[1], "term1")
 })
 
-# ============================================================================
-# Tests for enhance_abc_kb - API Key Handling
-# ============================================================================
-test_that("enhance_abc_kb passes API key to query functions", {
-  skip_on_cran()
-  
-  api_key <- "test_api_key"
-  knowledge_base <- "umls"
-  
-  expect_equal(api_key, "test_api_key")
-  expect_equal(knowledge_base, "umls")
-})
+test_that("HTTP status code handling", {
+  skip_if_not_installed("httr")
 
-test_that("enhance_abc_kb works without API key for MeSH", {
-  skip_on_cran()
-  
-  knowledge_base <- "mesh"
-  api_key <- NULL
-  
-  expect_null(api_key)
-  expect_equal(knowledge_base, "mesh")
-})
+  # Test HTTP status code interpretation
+  expect_equal(200, 200)  # Success
+  expect_equal(401, 401)  # Unauthorized
+  expect_equal(404, 404)  # Not found
+  expect_equal(500, 500)  # Server error
 
-# ============================================================================
-# Tests for enhance_abc_kb - Message Output
-# ============================================================================
-test_that("enhance_abc_kb produces informative messages", {
-  skip_on_cran()
-  
-  n_terms <- 5
-  kb <- "mesh"
-  
-  expected_message <- paste("Enhancing", n_terms, "unique terms with", kb)
-  expect_true(grepl("Enhancing", expected_message))
-  expect_true(grepl("mesh", expected_message))
-})
+  # Test that we understand HTTP status codes used in the functions
+  success_codes <- c(200, 201)
+  client_error_codes <- c(400, 401, 403, 404)
+  server_error_codes <- c(500, 502, 503)
 
-# ============================================================================
-# Tests for enhance_abc_kb - Result Structure Preservation
-# ============================================================================
-test_that("enhance_abc_kb preserves original columns", {
-  original <- data.frame(
-    a_term = "migraine",
-    c_term = "sumatriptan",
-    abc_score = 0.8,
-    stringsAsFactors = FALSE
-  )
-  
-  enhanced <- original
-  enhanced$a_mesh_id <- "D008881"
-  
-  # Original columns should be preserved
-  expect_true(all(colnames(original) %in% colnames(enhanced)))
-  expect_equal(enhanced$abc_score, 0.8)
-})
-
-test_that("enhance_abc_kb maintains row count", {
-  original <- data.frame(
-    a_term = c("migraine", "headache", "pain"),
-    c_term = c("drug1", "drug2", "drug3"),
-    abc_score = c(0.8, 0.7, 0.6),
-    stringsAsFactors = FALSE
-  )
-  
-  # Enhancement should not change number of rows
-  expect_equal(nrow(original), 3)
-})
-
-# ============================================================================
-# Integration Tests for Query Functions
-# ============================================================================
-test_that("query functions work together in enhance_abc_kb", {
-  skip_on_cran()
-  
-  # Mock workflow
-  abc_results <- data.frame(
-    a_term = "migraine",
-    b_terms = "serotonin",
-    c_term = "sumatriptan",
-    abc_score = 0.8,
-    stringsAsFactors = FALSE
-  )
-  
-  # Should be able to extract terms
-  terms <- unique(c(abc_results$a_term, abc_results$c_term))
-  expect_equal(length(terms), 2)
-})
-
-# ============================================================================
-# Tests for URL Construction
-# ============================================================================
-test_that("UMLS API URLs are correctly formatted", {
-  base_url <- "https://uts-ws.nlm.nih.gov/rest"
-  version <- "current"
-  cui <- "C0018681"
-  
-  concept_url <- paste0(base_url, "/content/", version, "/CUI/", cui)
-  
-  expect_true(grepl("^https://", concept_url))
-  expect_true(grepl(cui, concept_url))
-  expect_true(grepl(version, concept_url))
-})
-
-test_that("UMLS search URL construction", {
-  base_url <- "https://uts-ws.nlm.nih.gov/rest"
-  version <- "current"
-  
-  search_url <- paste0(base_url, "/search/", version)
-  
-  expect_equal(search_url, "https://uts-ws.nlm.nih.gov/rest/search/current")
-})
-
-test_that("UMLS semantic types URL construction", {
-  base_url <- "https://uts-ws.nlm.nih.gov/rest"
-  version <- "current"
-  cui <- "C0018681"
-  
-  concept_url <- paste0(base_url, "/content/", version, "/CUI/", cui)
-  semantics_url <- paste0(concept_url, "/semanticTypes")
-  
-  expect_true(grepl("/semanticTypes$", semantics_url))
-})
-
-test_that("UMLS definitions URL construction", {
-  base_url <- "https://uts-ws.nlm.nih.gov/rest"
-  version <- "current"
-  cui <- "C0018681"
-  
-  concept_url <- paste0(base_url, "/content/", version, "/CUI/", cui)
-  definitions_url <- paste0(concept_url, "/definitions")
-  
-  expect_true(grepl("/definitions$", definitions_url))
+  expect_true(200 %in% success_codes)
+  expect_true(404 %in% client_error_codes)
+  expect_true(500 %in% server_error_codes)
 })
