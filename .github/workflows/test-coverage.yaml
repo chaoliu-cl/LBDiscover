@@ -1,0 +1,47 @@
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+name: test-coverage
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::covr
+          needs: coverage
+
+      - name: Test coverage
+        run: |
+          covr::codecov(
+            type = "tests",
+            line_exclusions = list(
+              "tests/testthat/test-abc_model_test.R",
+              "tests/testthat/queries_tests.r",
+              "tests/testthat/test-comprehensive_summary_test.R",
+              "tests/testthat/test-comprehensive_summary.R",
+              "tests/testthat/test-test_queries.R",
+              "tests/testthat/test-text_preprocessing.R",
+              "tests/testthat/test-pubmed_search.R",
+              "tests/testthat/test-utilities.R",
+              "tests/testthat/test-visualization.R"
+            ),
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package"),
+            token = "${{ secrets.CODECOV_TOKEN }}"
+          )
+        shell: Rscript {0}
