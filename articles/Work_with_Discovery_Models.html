@@ -240,8 +240,8 @@ terms.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from ABC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;           a_term    b_term   c_term    abc_score</span></span>
-<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0007255033</span></span>
-<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0003063139</span></span></code></pre></div>
+<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0007552133</span></span>
+<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0003373392</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="statistical-validation-of-abc-results">Statistical Validation of ABC Results<a class="anchor" aria-label="anchor" href="#statistical-validation-of-abc-results"></a>
 </h4>
@@ -255,7 +255,7 @@ the discovered connections:</p>
 <span>  correction <span class="op">=</span> <span class="st">"BH"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimized approach for large matrix validation...</span></span>
-<span><span class="co">#&gt; Using metadata for document count: 292</span></span>
+<span><span class="co">#&gt; Using metadata for document count: 287</span></span>
 <span><span class="co">#&gt; Calculating statistical significance using hypergeometric test...</span></span>
 <span><span class="co">#&gt; 0.0% of connections are statistically significant (p &lt; 0.05, BH correction)</span></span>
 <span></span>
@@ -298,7 +298,7 @@ intermediate B terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from AnC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term         b_terms   c_term   anc_score</span></span>
-<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.005319369</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.005513104</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitola-model">3. BITOLA Model<a class="anchor" aria-label="anchor" href="#bitola-model"></a>
@@ -351,12 +351,12 @@ related terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from LSI model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term             c_term lsi_similarity</span></span>
-<span><span class="co">#&gt; 1 cancer          carcinoma      0.6507093</span></span>
-<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.5895871</span></span>
-<span><span class="co">#&gt; 3 cancer         luciferase      0.5099154</span></span>
-<span><span class="co">#&gt; 4 cancer anticholinesterase      0.4871930</span></span>
-<span><span class="co">#&gt; 5 cancer           fibrosis      0.4509886</span></span>
-<span><span class="co">#&gt; 6 cancer          signaling      0.3968424</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer          carcinoma      0.6565676</span></span>
+<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.5850332</span></span>
+<span><span class="co">#&gt; 3 cancer anticholinesterase      0.4870496</span></span>
+<span><span class="co">#&gt; 4 cancer           fibrosis      0.4775760</span></span>
+<span><span class="co">#&gt; 5 cancer         luciferase      0.4438604</span></span>
+<span><span class="co">#&gt; 6 cancer          signaling      0.3815595</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparing-results-from-different-models">Comparing Results from Different Models<a class="anchor" aria-label="anchor" href="#comparing-results-from-different-models"></a>
