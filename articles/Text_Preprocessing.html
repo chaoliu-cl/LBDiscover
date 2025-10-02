@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Text Preprocessing and Entity Extraction</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-10-01</h4>
+            <h4 data-toc-skip class="date">2025-10-02</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Text_Preprocessing.Rmd" class="external-link"><code>vignettes/Text_Preprocessing.Rmd</code></a></small>
       <div class="d-none name"><code>Text_Preprocessing.Rmd</code></div>
@@ -106,7 +106,10 @@ relationships between biomedical concepts.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Created pubmed_cache environment for result caching</span></span>
 <span><span class="co">#&gt; Searching PubMed for: migraine pathophysiology</span></span>
-<span><span class="co">#&gt; Found 11840 results, retrieving 100 records</span></span>
+<span><span class="co">#&gt; API call failed (attempt 1/3): Timeout was reached [eutils.ncbi.nlm.nih.gov]:</span></span>
+<span><span class="co">#&gt; Failed to connect to eutils.ncbi.nlm.nih.gov port 443 after 10001 ms: Timeout was reached</span></span>
+<span><span class="co">#&gt; Retrying in 1 seconds...</span></span>
+<span><span class="co">#&gt; Found 11841 results, retrieving 100 records</span></span>
 <span><span class="co">#&gt; Fetching batch 1 of 1 (records 1-100)</span></span>
 <span><span class="co">#&gt; Processing 100 articles</span></span>
 <span><span class="co">#&gt;   Processing article 100 of 100</span></span>
@@ -193,7 +196,7 @@ preprocessing function:</p>
 <span><span class="co">#&gt; Processing text in 2 chunks...</span></span>
 <span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.062   0.001   0.063</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.065   0.000   0.065</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -215,16 +218,16 @@ concepts:</p>
 <span><span class="co"># View the most frequent bigrams</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bigrams</span>, <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                 ngram frequency</span></span>
-<span><span class="co">#&gt; 8077           in the       131</span></span>
-<span><span class="co">#&gt; 11137          of the        84</span></span>
-<span><span class="co">#&gt; 11529             p 0        83</span></span>
-<span><span class="co">#&gt; 11006     of migraine        73</span></span>
-<span><span class="co">#&gt; 7984      in migraine        67</span></span>
-<span><span class="co">#&gt; 11901   patients with        59</span></span>
-<span><span class="co">#&gt; 8685             is a        51</span></span>
-<span><span class="co">#&gt; 2877  associated with        47</span></span>
-<span><span class="co">#&gt; 9783     migraine and        46</span></span>
-<span><span class="co">#&gt; 17447   with migraine        45</span></span></code></pre></div>
+<span><span class="co">#&gt; 8101           in the       131</span></span>
+<span><span class="co">#&gt; 11151          of the        84</span></span>
+<span><span class="co">#&gt; 11544             p 0        80</span></span>
+<span><span class="co">#&gt; 11021     of migraine        77</span></span>
+<span><span class="co">#&gt; 8008      in migraine        68</span></span>
+<span><span class="co">#&gt; 11924   patients with        59</span></span>
+<span><span class="co">#&gt; 8707             is a        51</span></span>
+<span><span class="co">#&gt; 2910  associated with        49</span></span>
+<span><span class="co">#&gt; 9802     migraine and        47</span></span>
+<span><span class="co">#&gt; 17460   with migraine        44</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="sentence-segmentation">Sentence Segmentation<a class="anchor" aria-label="anchor" href="#sentence-segmentation"></a>
@@ -323,7 +326,7 @@ recognition:</p>
 <span>  source <span class="op">=</span> <span class="st">"mesh"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: disease[MeSH]</span></span>
-<span><span class="co">#&gt; Found 194009 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 194013 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 5</span></span>
@@ -348,7 +351,7 @@ recognition:</p>
 <span>  source <span class="op">=</span> <span class="st">"mesh"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: pharmaceutical preparations[MeSH]</span></span>
-<span><span class="co">#&gt; Found 1000171 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 1000325 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 2</span></span>
@@ -459,7 +462,7 @@ extraction workflow:</p>
 <span><span class="co">#&gt; Creating dummy dictionary for gene</span></span>
 <span><span class="co">#&gt;   Added 8 terms from gene (local)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: proteins[MeSH]</span></span>
-<span><span class="co">#&gt; Found 7661341 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 7662036 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 5</span></span>
@@ -475,7 +478,7 @@ extraction workflow:</p>
 <span><span class="co">#&gt; Retrieved 105 unique terms from MeSH</span></span>
 <span><span class="co">#&gt;   Added 105 terms from protein (mesh)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: metabolic networks and pathways[MeSH]</span></span>
-<span><span class="co">#&gt; Found 189041 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 189074 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 1</span></span>
@@ -492,18 +495,18 @@ extraction workflow:</p>
 <span><span class="co">#&gt; Processing batch 1/1</span></span>
 <span><span class="co">#&gt; Extracting entities from 100 documents...</span></span>
 <span><span class="co">#&gt; Processing document 100 of 100</span></span>
-<span><span class="co">#&gt; Extracted 568 entity mentions:</span></span>
-<span><span class="co">#&gt;   disease: 551</span></span>
+<span><span class="co">#&gt; Extracted 574 entity mentions:</span></span>
+<span><span class="co">#&gt;   disease: 557</span></span>
 <span><span class="co">#&gt;   protein: 17</span></span>
-<span><span class="co">#&gt; Extracted 568 entity mentions in 0.13 minutes</span></span>
-<span><span class="co">#&gt;   disease: 551</span></span>
+<span><span class="co">#&gt; Extracted 574 entity mentions in 0.13 minutes</span></span>
+<span><span class="co">#&gt;   disease: 557</span></span>
 <span><span class="co">#&gt;   protein: 17</span></span>
 <span></span>
 <span><span class="co"># View summary of entity types</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">entities_workflow</span><span class="op">$</span><span class="va">entity_type</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; disease protein </span></span>
-<span><span class="co">#&gt;     551      17</span></span></code></pre></div>
+<span><span class="co">#&gt;     557      17</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="customizing-entity-extraction">Customizing Entity Extraction<a class="anchor" aria-label="anchor" href="#customizing-entity-extraction"></a>
@@ -556,15 +559,15 @@ additional MeSH queries or custom dictionaries:</p>
 <span><span class="co">#&gt; Processing batch 1/1</span></span>
 <span><span class="co">#&gt; Extracting entities from 100 documents...</span></span>
 <span><span class="co">#&gt; Processing document 100 of 100</span></span>
-<span><span class="co">#&gt; Extracted 655 entity mentions:</span></span>
+<span><span class="co">#&gt; Extracted 661 entity mentions:</span></span>
 <span><span class="co">#&gt;   anatomy: 2</span></span>
 <span><span class="co">#&gt;   biological_process: 9</span></span>
-<span><span class="co">#&gt;   disease: 551</span></span>
+<span><span class="co">#&gt;   disease: 557</span></span>
 <span><span class="co">#&gt;   protein: 93</span></span>
-<span><span class="co">#&gt; Extracted 655 entity mentions in 0.01 minutes</span></span>
+<span><span class="co">#&gt; Extracted 661 entity mentions in 0.01 minutes</span></span>
 <span><span class="co">#&gt;   anatomy: 2</span></span>
 <span><span class="co">#&gt;   biological_process: 9</span></span>
-<span><span class="co">#&gt;   disease: 551</span></span>
+<span><span class="co">#&gt;   disease: 557</span></span>
 <span><span class="co">#&gt;   protein: 93</span></span>
 <span></span>
 <span><span class="co"># View custom entities</span></span>
@@ -628,7 +631,7 @@ MeSH or UMLS:</p>
 <span>  similarity_threshold <span class="op">=</span> <span class="fl">0.8</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Searching MeSH database for: disease[MeSH]</span></span>
-<span><span class="co">#&gt; Found 194009 PubMed records with matching MeSH terms</span></span>
+<span><span class="co">#&gt; Found 194013 PubMed records with matching MeSH terms</span></span>
 <span><span class="co">#&gt; Error getting MeSH links: Must specify either (not both) 'id' or 'web_history' arguments</span></span>
 <span><span class="co">#&gt; Trying direct MeSH database search...</span></span>
 <span><span class="co">#&gt; Processing batch 1 of 5</span></span>
@@ -671,69 +674,69 @@ corpus:</p>
 <span><span class="co"># View top terms for each topic</span></span>
 <span><span class="va">topics</span><span class="op">$</span><span class="va">topics</span></span>
 <span><span class="co">#&gt; $`Topic 1`</span></span>
-<span><span class="co">#&gt;                              term   weight</span></span>
-<span><span class="co">#&gt; cgrp                         cgrp 71.91410</span></span>
-<span><span class="co">#&gt; kif1a                       kif1a 55.91852</span></span>
-<span><span class="co">#&gt; creb                         creb 46.79390</span></span>
-<span><span class="co">#&gt; migraine                 migraine 35.79888</span></span>
-<span><span class="co">#&gt; stress                     stress 27.64812</span></span>
-<span><span class="co">#&gt; induced                   induced 20.81469</span></span>
-<span><span class="co">#&gt; effects                   effects 20.56038</span></span>
-<span><span class="co">#&gt; receptor                 receptor 18.15210</span></span>
-<span><span class="co">#&gt; axis                         axis 17.75462</span></span>
-<span><span class="co">#&gt; hypersensitivity hypersensitivity 17.08027</span></span>
+<span><span class="co">#&gt;                term    weight</span></span>
+<span><span class="co">#&gt; migraine   migraine 15.192003</span></span>
+<span><span class="co">#&gt; cgrp           cgrp 14.497975</span></span>
+<span><span class="co">#&gt; pacap         pacap 13.290129</span></span>
+<span><span class="co">#&gt; more           more  6.848359</span></span>
+<span><span class="co">#&gt; peptide     peptide  6.526134</span></span>
+<span><span class="co">#&gt; pathways   pathways  4.842937</span></span>
+<span><span class="co">#&gt; both           both  4.195142</span></span>
+<span><span class="co">#&gt; effective effective  3.310947</span></span>
+<span><span class="co">#&gt; treatment treatment  3.184416</span></span>
+<span><span class="co">#&gt; complex     complex  2.844409</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 2`</span></span>
-<span><span class="co">#&gt;                            term   weight</span></span>
-<span><span class="co">#&gt; pain                       pain 60.01236</span></span>
-<span><span class="co">#&gt; migraine               migraine 40.99820</span></span>
-<span><span class="co">#&gt; disability           disability 29.54476</span></span>
-<span><span class="co">#&gt; catastrophizing catastrophizing 27.08075</span></span>
-<span><span class="co">#&gt; headache               headache 23.81337</span></span>
-<span><span class="co">#&gt; baseline               baseline 21.57984</span></span>
-<span><span class="co">#&gt; frequency             frequency 16.50899</span></span>
-<span><span class="co">#&gt; related                 related 16.39150</span></span>
-<span><span class="co">#&gt; follow                   follow 16.15843</span></span>
-<span><span class="co">#&gt; 001                         001 14.00633</span></span>
+<span><span class="co">#&gt;              term    weight</span></span>
+<span><span class="co">#&gt; migraine migraine 16.075778</span></span>
+<span><span class="co">#&gt; patients patients  4.596626</span></span>
+<span><span class="co">#&gt; levels     levels  3.441761</span></span>
+<span><span class="co">#&gt; study       study  2.823521</span></span>
+<span><span class="co">#&gt; glp           glp  2.350556</span></span>
+<span><span class="co">#&gt; aura         aura  2.310999</span></span>
+<span><span class="co">#&gt; group       group  1.951931</span></span>
+<span><span class="co">#&gt; between   between  1.904486</span></span>
+<span><span class="co">#&gt; results   results  1.725362</span></span>
+<span><span class="co">#&gt; hormone   hormone  1.665256</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 3`</span></span>
-<span><span class="co">#&gt;                        term    weight</span></span>
-<span><span class="co">#&gt; patients           patients 59.068914</span></span>
-<span><span class="co">#&gt; migraine           migraine 15.440973</span></span>
-<span><span class="co">#&gt; higher               higher 13.262289</span></span>
-<span><span class="co">#&gt; significantly significantly 11.374662</span></span>
-<span><span class="co">#&gt; compared           compared 11.372968</span></span>
-<span><span class="co">#&gt; tth                     tth 10.548135</span></span>
-<span><span class="co">#&gt; vestibular       vestibular 10.302207</span></span>
-<span><span class="co">#&gt; than                   than  9.574364</span></span>
-<span><span class="co">#&gt; using                 using  9.175739</span></span>
-<span><span class="co">#&gt; functional       functional  7.401015</span></span>
+<span><span class="co">#&gt;                      term   weight</span></span>
+<span><span class="co">#&gt; migraine         migraine 36.37965</span></span>
+<span><span class="co">#&gt; trpa1               trpa1 32.03007</span></span>
+<span><span class="co">#&gt; cgrp                 cgrp 29.58675</span></span>
+<span><span class="co">#&gt; epigenetic     epigenetic 28.08563</span></span>
+<span><span class="co">#&gt; related           related 24.28531</span></span>
+<span><span class="co">#&gt; rons                 rons 20.01878</span></span>
+<span><span class="co">#&gt; studies           studies 19.65018</span></span>
+<span><span class="co">#&gt; gene                 gene 18.36546</span></span>
+<span><span class="co">#&gt; inflammatory inflammatory 18.21358</span></span>
+<span><span class="co">#&gt; pathogenesis pathogenesis 16.82538</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 4`</span></span>
-<span><span class="co">#&gt;              term   weight</span></span>
-<span><span class="co">#&gt; headache headache 84.09526</span></span>
-<span><span class="co">#&gt; between   between 39.42343</span></span>
-<span><span class="co">#&gt; symptoms symptoms 31.43607</span></span>
-<span><span class="co">#&gt; aura         aura 31.10863</span></span>
-<span><span class="co">#&gt; quality   quality 29.11831</span></span>
-<span><span class="co">#&gt; sleep       sleep 26.84046</span></span>
-<span><span class="co">#&gt; visual     visual 25.81555</span></span>
-<span><span class="co">#&gt; migraine migraine 25.44537</span></span>
-<span><span class="co">#&gt; index       index 19.96364</span></span>
-<span><span class="co">#&gt; cortical cortical 17.53185</span></span>
+<span><span class="co">#&gt;                        term    weight</span></span>
+<span><span class="co">#&gt; patients           patients 1.7120666</span></span>
+<span><span class="co">#&gt; migraine           migraine 1.0125669</span></span>
+<span><span class="co">#&gt; tth                     tth 0.6674115</span></span>
+<span><span class="co">#&gt; vestibular       vestibular 0.6144050</span></span>
+<span><span class="co">#&gt; headache           headache 0.5340076</span></span>
+<span><span class="co">#&gt; than                   than 0.5339528</span></span>
+<span><span class="co">#&gt; significantly significantly 0.4740797</span></span>
+<span><span class="co">#&gt; higher               higher 0.4550176</span></span>
+<span><span class="co">#&gt; compared           compared 0.3460162</span></span>
+<span><span class="co">#&gt; both                   both 0.3222715</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $`Topic 5`</span></span>
-<span><span class="co">#&gt;                            term    weight</span></span>
-<span><span class="co">#&gt; migraine               migraine 529.90835</span></span>
-<span><span class="co">#&gt; chronic                 chronic  85.56562</span></span>
-<span><span class="co">#&gt; treatment             treatment  69.45672</span></span>
-<span><span class="co">#&gt; study                     study  64.25971</span></span>
-<span><span class="co">#&gt; studies                 studies  60.68628</span></span>
-<span><span class="co">#&gt; pathophysiology pathophysiology  44.10501</span></span>
-<span><span class="co">#&gt; potential             potential  42.91812</span></span>
-<span><span class="co">#&gt; may                         may  40.65998</span></span>
-<span><span class="co">#&gt; group                     group  38.82708</span></span>
-<span><span class="co">#&gt; these                     these  38.44343</span></span></code></pre></div>
+<span><span class="co">#&gt;                          term     weight</span></span>
+<span><span class="co">#&gt; ictal                   ictal 0.26520032</span></span>
+<span><span class="co">#&gt; phase                   phase 0.22796045</span></span>
+<span><span class="co">#&gt; microstate         microstate 0.20837168</span></span>
+<span><span class="co">#&gt; pre                       pre 0.18952437</span></span>
+<span><span class="co">#&gt; migraine             migraine 0.15833078</span></span>
+<span><span class="co">#&gt; features             features 0.07759706</span></span>
+<span><span class="co">#&gt; model                   model 0.07683995</span></span>
+<span><span class="co">#&gt; classification classification 0.05792221</span></span>
+<span><span class="co">#&gt; showed                 showed 0.05739233</span></span>
+<span><span class="co">#&gt; during                 during 0.05721304</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
