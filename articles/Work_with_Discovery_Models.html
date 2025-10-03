@@ -123,7 +123,7 @@ data:</p>
 <span><span class="co"># Combine and remove duplicates</span></span>
 <span><span class="va">all_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_results.html">merge_results</a></span><span class="op">(</span><span class="va">alzheimer_articles</span>, <span class="va">drug_articles</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Retrieved"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span>, <span class="st">"unique articles"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Retrieved 1953 unique articles"</span></span>
+<span><span class="co">#&gt; [1] "Retrieved 1957 unique articles"</span></span>
 <span></span>
 <span><span class="co"># Preprocess text</span></span>
 <span><span class="va">preprocessed_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocess_text.html">preprocess_text</a></span><span class="op">(</span></span>
@@ -240,7 +240,7 @@ terms.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from ABC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;           a_term    b_term   c_term    abc_score</span></span>
-<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0006644480</span></span>
+<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0006090006</span></span>
 <span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0001773888</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="statistical-validation-of-abc-results">Statistical Validation of ABC Results<a class="anchor" aria-label="anchor" href="#statistical-validation-of-abc-results"></a>
@@ -255,7 +255,7 @@ the discovered connections:</p>
 <span>  correction <span class="op">=</span> <span class="st">"BH"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimized approach for large matrix validation...</span></span>
-<span><span class="co">#&gt; Using metadata for document count: 290</span></span>
+<span><span class="co">#&gt; Using metadata for document count: 293</span></span>
 <span><span class="co">#&gt; Calculating statistical significance using hypergeometric test...</span></span>
 <span><span class="co">#&gt; 0.0% of connections are statistically significant (p &lt; 0.05, BH correction)</span></span>
 <span></span>
@@ -298,7 +298,7 @@ intermediate B terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from AnC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term         b_terms   c_term   anc_score</span></span>
-<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.005011542</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.004910176</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitola-model">3. BITOLA Model<a class="anchor" aria-label="anchor" href="#bitola-model"></a>
@@ -351,12 +351,12 @@ related terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from LSI model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term             c_term lsi_similarity</span></span>
-<span><span class="co">#&gt; 1 cancer          carcinoma      0.6369660</span></span>
-<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.5903372</span></span>
-<span><span class="co">#&gt; 3 cancer anticholinesterase      0.4556981</span></span>
-<span><span class="co">#&gt; 4 cancer         luciferase      0.3927120</span></span>
-<span><span class="co">#&gt; 5 cancer           fibrosis      0.3558442</span></span>
-<span><span class="co">#&gt; 6 cancer          signaling      0.3435959</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer          carcinoma      0.6323981</span></span>
+<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.5913024</span></span>
+<span><span class="co">#&gt; 3 cancer anticholinesterase      0.4659343</span></span>
+<span><span class="co">#&gt; 4 cancer         luciferase      0.4128554</span></span>
+<span><span class="co">#&gt; 5 cancer          signaling      0.3488728</span></span>
+<span><span class="co">#&gt; 6 cancer             glioma      0.3137523</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparing-results-from-different-models">Comparing Results from Different Models<a class="anchor" aria-label="anchor" href="#comparing-results-from-different-models"></a>
