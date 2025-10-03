@@ -240,8 +240,8 @@ terms.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from ABC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;           a_term    b_term   c_term    abc_score</span></span>
-<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0006090006</span></span>
-<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0001773888</span></span></code></pre></div>
+<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0006259258</span></span>
+<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0001770956</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="statistical-validation-of-abc-results">Statistical Validation of ABC Results<a class="anchor" aria-label="anchor" href="#statistical-validation-of-abc-results"></a>
 </h4>
@@ -255,7 +255,7 @@ the discovered connections:</p>
 <span>  correction <span class="op">=</span> <span class="st">"BH"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Using optimized approach for large matrix validation...</span></span>
-<span><span class="co">#&gt; Using metadata for document count: 293</span></span>
+<span><span class="co">#&gt; Using metadata for document count: 295</span></span>
 <span><span class="co">#&gt; Calculating statistical significance using hypergeometric test...</span></span>
 <span><span class="co">#&gt; 0.0% of connections are statistically significant (p &lt; 0.05, BH correction)</span></span>
 <span></span>
@@ -298,7 +298,7 @@ intermediate B terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from AnC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term         b_terms   c_term   anc_score</span></span>
-<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.004910176</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.004976009</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitola-model">3. BITOLA Model<a class="anchor" aria-label="anchor" href="#bitola-model"></a>
@@ -351,12 +351,12 @@ related terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from LSI model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term             c_term lsi_similarity</span></span>
-<span><span class="co">#&gt; 1 cancer          carcinoma      0.6323981</span></span>
-<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.5913024</span></span>
-<span><span class="co">#&gt; 3 cancer anticholinesterase      0.4659343</span></span>
-<span><span class="co">#&gt; 4 cancer         luciferase      0.4128554</span></span>
-<span><span class="co">#&gt; 5 cancer          signaling      0.3488728</span></span>
-<span><span class="co">#&gt; 6 cancer             glioma      0.3137523</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer          carcinoma      0.6347671</span></span>
+<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.5902296</span></span>
+<span><span class="co">#&gt; 3 cancer anticholinesterase      0.4688805</span></span>
+<span><span class="co">#&gt; 4 cancer         luciferase      0.4126015</span></span>
+<span><span class="co">#&gt; 5 cancer          signaling      0.3461154</span></span>
+<span><span class="co">#&gt; 6 cancer             glioma      0.3049624</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparing-results-from-different-models">Comparing Results from Different Models<a class="anchor" aria-label="anchor" href="#comparing-results-from-different-models"></a>
@@ -386,7 +386,7 @@ models:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  BITOLA model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bitola_c_terms</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   BITOLA model: 0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  LSI model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">lsi_c_terms</span><span class="op">)</span>, <span class="st">"\n\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   LSI model: 119</span></span>
+<span><span class="co">#&gt;   LSI model: 120</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Number of C terms found by multiple models:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of C terms found by multiple models:</span></span>
