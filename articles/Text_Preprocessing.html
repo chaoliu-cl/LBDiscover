@@ -106,9 +106,6 @@ relationships between biomedical concepts.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Created pubmed_cache environment for result caching</span></span>
 <span><span class="co">#&gt; Searching PubMed for: migraine pathophysiology</span></span>
-<span><span class="co">#&gt; API call failed (attempt 1/3): Timeout was reached [eutils.ncbi.nlm.nih.gov]:</span></span>
-<span><span class="co">#&gt; Failed to connect to eutils.ncbi.nlm.nih.gov port 443 after 10002 ms: Timeout was reached</span></span>
-<span><span class="co">#&gt; Retrying in 1 seconds...</span></span>
 <span><span class="co">#&gt; Found 11845 results, retrieving 100 records</span></span>
 <span><span class="co">#&gt; Fetching batch 1 of 1 (records 1-100)</span></span>
 <span><span class="co">#&gt; Processing 100 articles</span></span>
@@ -183,7 +180,7 @@ preprocessing function:</p>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Tokenizing text...</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.072   0.000   0.072</span></span>
+<span><span class="co">#&gt;   0.069   0.000   0.069</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="../reference/vec_preprocess.html">vec_preprocess</a></span><span class="op">(</span></span>
@@ -196,7 +193,7 @@ preprocessing function:</p>
 <span><span class="co">#&gt; Processing text in 2 chunks...</span></span>
 <span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%</span></span>
 <span><span class="co">#&gt;    user  system elapsed </span></span>
-<span><span class="co">#&gt;   0.066   0.000   0.066</span></span></code></pre></div>
+<span><span class="co">#&gt;   0.064   0.000   0.063</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
