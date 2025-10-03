@@ -37,23 +37,12 @@ abc_model_sig(
 }
 \value{
 A data frame with ranked discovery results and p-values.
-
-A data frame with ranked discovery results and p-values.
 }
 \description{
 This function extends the ABC model with statistical significance testing
 to evaluate the strength of discovered connections.
 }
 \examples{
-\dontrun{
-abc_results <- abc_model_sig(co_matrix, a_term = "migraine",
-                                                scoring_method = "combined")
-}
-Apply the ABC model with statistical significance testing
-
-This function extends the ABC model with statistical significance testing
-to evaluate the strength of discovered connections.
-
 \dontrun{
 abc_results <- abc_model_sig(co_matrix, a_term = "migraine",
                                                 scoring_method = "combined")
