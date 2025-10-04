@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Working with Discovery Models</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-10-03</h4>
+            <h4 data-toc-skip class="date">2025-10-04</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Work_with_Discovery_Models.Rmd" class="external-link"><code>vignettes/Work_with_Discovery_Models.Rmd</code></a></small>
       <div class="d-none name"><code>Work_with_Discovery_Models.Rmd</code></div>
@@ -123,7 +123,7 @@ data:</p>
 <span><span class="co"># Combine and remove duplicates</span></span>
 <span><span class="va">all_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_results.html">merge_results</a></span><span class="op">(</span><span class="va">alzheimer_articles</span>, <span class="va">drug_articles</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Retrieved"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">all_articles</span><span class="op">)</span>, <span class="st">"unique articles"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Retrieved 1957 unique articles"</span></span>
+<span><span class="co">#&gt; [1] "Retrieved 1958 unique articles"</span></span>
 <span></span>
 <span><span class="co"># Preprocess text</span></span>
 <span><span class="va">preprocessed_articles</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocess_text.html">preprocess_text</a></span><span class="op">(</span></span>
@@ -240,8 +240,8 @@ terms.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from ABC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;           a_term    b_term   c_term    abc_score</span></span>
-<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0006259258</span></span>
-<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0001770956</span></span></code></pre></div>
+<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0006228201</span></span>
+<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0001760176</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="statistical-validation-of-abc-results">Statistical Validation of ABC Results<a class="anchor" aria-label="anchor" href="#statistical-validation-of-abc-results"></a>
 </h4>
@@ -298,7 +298,7 @@ intermediate B terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from AnC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term         b_terms   c_term   anc_score</span></span>
-<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.004976009</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.004961869</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitola-model">3. BITOLA Model<a class="anchor" aria-label="anchor" href="#bitola-model"></a>
@@ -350,13 +350,13 @@ related terms:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from LSI model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt;   a_term             c_term lsi_similarity</span></span>
-<span><span class="co">#&gt; 1 cancer          carcinoma      0.6347671</span></span>
-<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.5902296</span></span>
-<span><span class="co">#&gt; 3 cancer anticholinesterase      0.4688805</span></span>
-<span><span class="co">#&gt; 4 cancer         luciferase      0.4126015</span></span>
-<span><span class="co">#&gt; 5 cancer          signaling      0.3461154</span></span>
-<span><span class="co">#&gt; 6 cancer             glioma      0.3049624</span></span></code></pre></div>
+<span><span class="co">#&gt;   a_term                c_term lsi_similarity</span></span>
+<span><span class="co">#&gt; 1 cancer        adenocarcinoma      0.5838248</span></span>
+<span><span class="co">#&gt; 2 cancer    anticholinesterase      0.4692602</span></span>
+<span><span class="co">#&gt; 3 cancer            luciferase      0.4247685</span></span>
+<span><span class="co">#&gt; 4 cancer             signaling      0.3420209</span></span>
+<span><span class="co">#&gt; 5 cancer              fibrosis      0.3073048</span></span>
+<span><span class="co">#&gt; 6 cancer butyrylcholinesterase      0.2988901</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparing-results-from-different-models">Comparing Results from Different Models<a class="anchor" aria-label="anchor" href="#comparing-results-from-different-models"></a>
@@ -386,7 +386,7 @@ models:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  BITOLA model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">bitola_c_terms</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   BITOLA model: 0</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"  LSI model:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">lsi_c_terms</span><span class="op">)</span>, <span class="st">"\n\n"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   LSI model: 120</span></span>
+<span><span class="co">#&gt;   LSI model: 119</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="st">"Number of C terms found by multiple models:\n"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Number of C terms found by multiple models:</span></span>
