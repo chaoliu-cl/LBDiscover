@@ -65,7 +65,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Working with Discovery Models</h1>
                         <h4 data-toc-skip class="author">Chao Liu</h4>
             
-            <h4 data-toc-skip class="date">2025-10-04</h4>
+            <h4 data-toc-skip class="date">2025-10-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/chaoliu-cl/LBDiscover/blob/main/vignettes/Work_with_Discovery_Models.Rmd" class="external-link"><code>vignettes/Work_with_Discovery_Models.Rmd</code></a></small>
       <div class="d-none name"><code>Work_with_Discovery_Models.Rmd</code></div>
@@ -158,10 +158,10 @@ data:</p>
 <span><span class="va">available_terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"First 30 terms in the co-occurrence matrix:"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">available_terms</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "Acid"           "Receptors"      "cancer"         "Databases"     </span></span>
+<span><span class="co">#&gt;  [1] "Receptors"      "Acid"           "cancer"         "Databases"     </span></span>
 <span><span class="co">#&gt;  [5] "migraine"       "Phytochemicals" "Nitric"         "Menopause"     </span></span>
 <span><span class="co">#&gt;  [9] "Hemolysis"      "Estrogens"      "Toxins"         "Aromatherapy"  </span></span>
-<span><span class="co">#&gt; [13] "Taste"          "Pesticides"</span></span>
+<span><span class="co">#&gt; [13] "Anesthetics"    "Taste"          "Pesticides"</span></span>
 <span></span>
 <span><span class="co"># Check if the term is misspelled or slightly different</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"\nChecking for variations of 'alzheimer' and related terms:"</span><span class="op">)</span></span>
@@ -211,7 +211,7 @@ data:</p>
 <span></span>
 <span><span class="co"># Check matrix dimensions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">co_matrix</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 14 14</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 15 15</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="classic-abc-model">1. Classic ABC Model<a class="anchor" aria-label="anchor" href="#classic-abc-model"></a>
@@ -229,7 +229,7 @@ terms.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Filtered 2 B terms (50%) that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Filtered out 0 B terms that were too similar to A term (similarity threshold: 0.8)</span></span>
-<span><span class="co">#&gt; Filtered 10 potential C terms that weren't valid biomedical entities</span></span>
+<span><span class="co">#&gt; Filtered 11 potential C terms that weren't valid biomedical entities</span></span>
 <span><span class="co">#&gt; Identifying potential C terms via 2 B terms...</span></span>
 <span><span class="co">#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%</span></span>
 <span></span>
@@ -240,8 +240,8 @@ terms.</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from ABC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;           a_term    b_term   c_term    abc_score</span></span>
-<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0006228201</span></span>
-<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0001760176</span></span></code></pre></div>
+<span><span class="co">#&gt; Acid      cancer      Acid migraine 0.0005655229</span></span>
+<span><span class="co">#&gt; Receptors cancer Receptors migraine 0.0001382608</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="statistical-validation-of-abc-results">Statistical Validation of ABC Results<a class="anchor" aria-label="anchor" href="#statistical-validation-of-abc-results"></a>
 </h4>
@@ -298,7 +298,7 @@ intermediate B terms:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from AnC model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt;   a_term         b_terms   c_term   anc_score</span></span>
-<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.004961869</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 cancer Acid, Receptors migraine 0.004559308</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="bitola-model">3. BITOLA Model<a class="anchor" aria-label="anchor" href="#bitola-model"></a>
@@ -350,13 +350,13 @@ related terms:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"No results from LSI model"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt;   a_term                c_term lsi_similarity</span></span>
-<span><span class="co">#&gt; 1 cancer        adenocarcinoma      0.5838248</span></span>
-<span><span class="co">#&gt; 2 cancer    anticholinesterase      0.4692602</span></span>
-<span><span class="co">#&gt; 3 cancer            luciferase      0.4247685</span></span>
-<span><span class="co">#&gt; 4 cancer             signaling      0.3420209</span></span>
-<span><span class="co">#&gt; 5 cancer              fibrosis      0.3073048</span></span>
-<span><span class="co">#&gt; 6 cancer butyrylcholinesterase      0.2988901</span></span></code></pre></div>
+<span><span class="co">#&gt;   a_term             c_term lsi_similarity</span></span>
+<span><span class="co">#&gt; 1 cancer          carcinoma      0.8922610</span></span>
+<span><span class="co">#&gt; 2 cancer     adenocarcinoma      0.7551005</span></span>
+<span><span class="co">#&gt; 3 cancer anticholinesterase      0.5539092</span></span>
+<span><span class="co">#&gt; 4 cancer             glioma      0.4302862</span></span>
+<span><span class="co">#&gt; 5 cancer     hyperlipidemia      0.3091686</span></span>
+<span><span class="co">#&gt; 6 cancer           database      0.2510976</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="comparing-results-from-different-models">Comparing Results from Different Models<a class="anchor" aria-label="anchor" href="#comparing-results-from-different-models"></a>
